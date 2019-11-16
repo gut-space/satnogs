@@ -1,0 +1,16 @@
+integration: "Integration"
+tracking: "Satellite tracking"
+satdata: "Satellite data storage"
+receive: "Photo receive"
+convert: "Photo converting"
+storage: "Photo storage"
+
+integration:next pass [satellite, date, azimuth, elevation]=tracking.getNextPass()
+integration:sattelite data [frequency, ...]=satdata.getSatelliteData()
+[c:opt until pass]
+integration:=integration.waitForPass()
+[/c]
+integration[1]:=receive.startRecord(frequency, bandwidth, ...)
+integration:WAV file=receive.stopRecord()
+integration:PNG file=convert.convert(WAV file)
+integration:=storage.save(PNG file)

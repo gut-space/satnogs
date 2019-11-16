@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="23cm" height="14cm" viewBox="459 438 457 272" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="480" y="639.293" width="80.95" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="480" y="639.293" width="80.95" height="70"/>
+    <rect style="fill: #ffffff" x="460" y="653.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="653.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="460" y="681.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="681.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="508" y="662.624">
+      <tspan x="508" y="662.624">Satellite</tspan>
+      <tspan x="508" y="678.624">tracking</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="480" y="439.293" width="80.95" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="480" y="439.293" width="80.95" height="70"/>
+    <rect style="fill: #ffffff" x="460" y="453.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="453.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="460" y="481.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="481.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="508" y="462.624">
+      <tspan x="508" y="462.624">Satellite</tspan>
+      <tspan x="508" y="478.624">data</tspan>
+      <tspan x="508" y="494.624">storage</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="820" y="439.293" width="87.15" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="820" y="439.293" width="87.15" height="70"/>
+    <rect style="fill: #ffffff" x="800" y="453.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="453.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="800" y="481.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="481.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="848" y="462.624">
+      <tspan x="848" y="462.624">Image</tspan>
+      <tspan x="848" y="478.624">receiving</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="820" y="539.293" width="94.95" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="820" y="539.293" width="94.95" height="70"/>
+    <rect style="fill: #ffffff" x="800" y="553.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="553.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="800" y="581.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="581.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="848" y="562.624">
+      <tspan x="848" y="562.624">Photo</tspan>
+      <tspan x="848" y="578.624">converting</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="640" y="539.293" width="96" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="640" y="539.293" width="96" height="70"/>
+    <rect style="fill: #ffffff" x="620" y="553.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="553.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="620" y="581.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="620" y="581.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="668" y="562.624">
+      <tspan x="668" y="562.624">Integration</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="820" y="639.293" width="78.25" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="820" y="639.293" width="78.25" height="70"/>
+    <rect style="fill: #ffffff" x="800" y="653.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="653.293" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="800" y="681.293" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="800" y="681.293" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="848" y="662.624">
+      <tspan x="848" y="662.624">Photo</tspan>
+      <tspan x="848" y="678.624">storage</tspan>
+    </text>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="537.336" y1="510.296" x2="618.992" y2="559.039"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="560.245" y1="638.287" x2="620" y2="588.293"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="820" y1="574.293" x2="736" y2="574.293"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="800" y1="488.293" x2="734.008" y2="538.287"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="800" y1="660.293" x2="708.283" y2="610.266"/>
+</svg>
