@@ -1,5 +1,5 @@
 ---
-title: Receive imaginary automatization
+title: Receive imagery automatization
 subtitle: Feasibility study
 author:
   - Sławomir Figiel
@@ -14,7 +14,7 @@ papersize: a4paper
 
 # Main objectives
 
-We need a software for automatically receive imaginary from satellites. We want to track NOAA satellites and receive APT transmissions. Our station is built on Raspberry Pi 4. We connect to this using SSH protocol.  
+We need a software for automatically receive imagery from satellites. We want to track NOAA satellites and receive APT transmissions. Our station is built on Raspberry Pi 4. We connect to this using SSH protocol.  
 Software should fetch data about next transition, adjust SDR, manage record the signal, extract picture and save this to specific target location
 
 ## Physical architecture
@@ -67,7 +67,7 @@ Software should fetch data about next transition, adjust SDR, manage record the 
         +-------:--------------------------------------+
                 |
           +-----+-----+
-          | Imaginary |
+          | imagery   |
           +-----------+
 
 ~~~~~

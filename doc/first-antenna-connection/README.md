@@ -31,13 +31,13 @@ Antenna was mounted on the Tomek's terrace on the top floor. From the north side
 # First connection
 
 In test time the best pass parameters has NOAA 18 satellite. We adjust the SDR to frequency 137.9125 MHz and start observations. We noticed that noise level was -82dB. But downlink signal has very bad quality. It was at level -78 dB. It has very narrow width, without any side bands.  
-We cannot extract any imaginary from this signal.
+We cannot extract any imagery from this signal.
 
 # Compare to old antenna
 
 So far we used a simply turnstile antenna attached to SDR. It is low quality and small length. But we received correctly a few imageries from NOAA satellites using this. We replaced it with new antenna during NOAA 18 pass.  
 The parameters of the signal changed. The noise level increased to -75 dB. The downlink signal increased to -60 dB. At specified frequency we had noticeable, wide beam. We noticed also a lot of side bands.
-Probably it is possible to extract imaginary from recorded data, but we change the antenna in record time and our current algorithm wasn't prepare to handle it. Based on previous experienced the output picture will be strongly noised but on part recorded above antenna the details would be noticeable.
+Probably it is possible to extract imagery from recorded data, but we change the antenna in record time and our current algorithm wasn't prepare to handle it. Based on previous experienced the output picture will be strongly noised but on part recorded above antenna the details would be noticeable.
 
 # Conclusions
 

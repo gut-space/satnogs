@@ -1,9 +1,9 @@
 integration: "Integration"
 tracking: "Satellite tracking"
 satdata: "Satellite data storage"
-receive: "Photo receive"
-convert: "Photo converting"
-storage: "Photo storage"
+receive: "Transmission reception"
+convert: "Data processing"
+storage: "Photo repository"
 
 integration:next pass [satellite, date, azimuth, elevation]=tracking.getNextPass()
 integration:sattelite data [frequency, ...]=satdata.getSatelliteData()
