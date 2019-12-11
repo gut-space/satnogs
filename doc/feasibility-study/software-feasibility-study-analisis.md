@@ -1,5 +1,5 @@
 ---
-title: Receive imagery automatization
+title: Image Reception Automation
 subtitle: Feasibility study
 author:
   - Sławomir Figiel
@@ -14,8 +14,8 @@ papersize: a4paper
 
 # Main objectives
 
-We need a software for automatically receive imagery from satellites. We want to track NOAA satellites and receive APT transmissions. Our station is built on Raspberry Pi 4. We connect to this using SSH protocol.  
-Software should fetch data about next transition, adjust SDR, manage record the signal, extract picture and save this to specific target location
+We need a software for automatically receiving imagery from satellites. We want to track NOAA satellites and receive APT transmissions. Our station is built on Raspberry Pi 4. We connect to the ground station using the SSH protocol.  
+Software should fetch data about next transition, adjust SDR, manage record the signal, extract picture and save this to specific target location.
 
 ## Physical architecture
 
@@ -72,7 +72,7 @@ Software should fetch data about next transition, adjust SDR, manage record the 
 
 ~~~~~
 
-I propose that most components should be realized using external command line tools. These tools should be called by core Python script. This core script may be installed in operating system as SystemD daemon for autostart, work without session and OS-level fail procedure support.
+I propose that most components should be realized using external command line tools. These tools should be called by a core Python script. This core script may be installed in operating system as SystemD daemon for autostart, work without session and OS-level fail procedure support.
 
 1. Prediction - component for calculate next prediction time. It needs actual data about orbits from Internet.  
    Proposed software: Predict, [others](https://en.wikipedia.org/wiki/List_of_satellite_pass_predictors)
