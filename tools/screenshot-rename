@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+
+''' This script conveniently renames screenshots (as done by gnome)
+    to more ordered names.
+
+    Screenshot from 2019-12-15 10-01-47.png
+ 
+    20191215-100147.png
+
+Usage: rename-screenshot [suffix]
+     
+    Optional suffix parameter will be added to the filename, e.g.
+
+    rename-screenshot noaa-18
+
+    will rename Screenshot from 2019-12-15 10-01-47.png to 20191215-100147-noaa-18.png
+'''
+
+path = "."
+
+import re
+import sys
+from os import listdir, rename
+from os.path import isfile, join
+onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and (f.find("Screenshot") != -1)]
+
+def rename_screenshot(src, suffix):
+
+    # first ignore any non-date nonsense, like screenshot from
+    m = re.search(r"\d", src)
+    if m is None:
+        print("Digit not found in %s, skipping" % src)
+        return
+    dst = src[m.start():]
+
+    # now get rid of dashes, so 2019-12-15 becomes 20191215
+    dst = dst.replace('-','')
+
+    # now get rid of space it should be dash
+    # so "20191215 100147.png" becomes 20191215-100147.png
+    dst = dst.replace(' ','-')
+    if len(suffix):
+        dst = dst.replace('.', '-' + suffix + '.')
+    print("%s => %s" % (src, dst))
+
+    rename(src, dst)
+
+if len(sys.argv) > 1:
+    suffix=sys.argv[1]
+else:
+    suffix=""
+
+for f in onlyfiles:
+    rename_screenshot(f, suffix)
