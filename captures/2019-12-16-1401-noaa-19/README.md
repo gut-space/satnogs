@@ -9,9 +9,9 @@ Przelot wysoko (76 stopni).
 Nie obserwowalem znaczącej zmiany częstotliwości. Dobre, silne prążki nawet dla satelity bardzo nisko nad horyzontem (dla 4 stopni
 nadal wyraźnie widoczny sygnał). Zdjęcie dobrej jakości, ale mało kontrastowe. Zrobiłem prymitywną obróbkę krzywymi w GIMPie.
 
-![Pass trajectory](pass.png)
+![Pass trajectory](pass.jpg)
 
-![Waterfall](gqrx.png)
+![Waterfall](gqrx.jpg)
 
 ![Image](output.png)
 
