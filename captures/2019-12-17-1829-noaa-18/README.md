@@ -1,5 +1,7 @@
 Nagrywający: Tomek
+
 AOS: 2019/12/17 18:23 UTC
+
 LOS: 2019/12/17 18:37 UTC
 
 Dane przelotu: [brak]
