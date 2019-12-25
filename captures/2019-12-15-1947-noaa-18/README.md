@@ -1,4 +1,5 @@
 Nagrywający: Sławek
+Satelita: NOAA 18
 AOS: 2019-12-15 19:46:48
 LOS: 2019-12-15 20:02:54
 

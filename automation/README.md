@@ -1,0 +1,28 @@
+# Components
+
+- [ ] Orbit and transmitter database
+  - [ ] Fetch SatNOG API
+  - [ ] Fetch orbits
+  - [ ] Fetch transmitters
+  - [ ] Read local data
+- [ ] Predictor
+  - [ ] Encapsulate library
+  - [ ] Get passes in period
+- [ ] Scheduler
+  - [ ] Plan observations based on priority
+  - [ ] Plan observations based on quality
+- [ ] Recorder
+  - [ ] Record WAV
+  - [ ] Handle busy device
+- [ ] Post-extractor
+  - [ ] Abstract post-processing
+  - [ ] Call noaa-apt
+  - [ ] Different processing for different satellites
+- [ ] Saver
+  - [ ] Save metadata
+  - [ ] Save WAV
+  - [ ] Save post-process results
+  - [ ] Use good structure
+- [ ] System
+  - [ ] SystemD service
+  - [ ] Detailed logging
