@@ -34,7 +34,7 @@ function showStats($dbconn) {
     $endDate   = $row[1];
     pg_free_result($result);
 
-    echo "<p> $obsCnt observations from $satsCnt sattelite(s), between $startDate and $endDate.</p>";
+    echo "<p> $obsCnt observations from $satsCnt satellite(s), between $startDate and $endDate.</p>";
 }
 
 function showSats($dbconn) {
@@ -73,15 +73,14 @@ function showObservations($dbconn) {
         // Printing results in HTML
         $cnt = 0;
         echo "<table class='table table-striped table-hover'>\n";
-        echo "<tr><th>obs_id</th><th>aos</th><th>tca</th><th>los</th><th>sat_id</th><th>sat_name</th><th>filename</th><th>notes</th></tr>";
+        echo "<tr><th>ID</th><th>AOS</th><th>TCA</th><th>LOS</th><th>Satellite</th><th>Image</th><th>Notes</th></tr>";
         while ($line = pg_fetch_array($result, null, PGSQL_ASSOC)) {
             echo "\t<tr>\n";
             echo "<td>" . $line["obs_id"] . "</td>";
             echo "<td>" . $line["aos"] . "</td>";
             echo "<td>" . $line["tca"] . "</td>";
             echo "<td>" . $line["los"] . "</td>";
-            echo "<td>" . $line["sat_id"] . "</td>";
-            echo "<td>" . $line["sat_name"] . "</td>";
+            echo "<td>" . strtoupper($line["sat_name"]) . "</td>";
             echo "<td><a href=\"data/" . $line["filename"] . "\">" . $line["filename"] . "</a></td>";
             echo "<td>" . $line["notes"] . "</td>";
             //foreach ($line as $col_value) {
