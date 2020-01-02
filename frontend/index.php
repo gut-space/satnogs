@@ -62,7 +62,7 @@ while ($line = pg_fetch_array($result, null, PGSQL_ASSOC)) {
 }
 echo "</table>\n";
 
-echo "$cnt++ observation(s).<br>\n";
+echo "$cnt observation(s).<br>\n";
 
 // Free resultset
 pg_free_result($result);
