@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
 </head>
 <body>
 
@@ -37,8 +42,6 @@ function showStats($dbconn) {
     echo "<p> $obsCnt observations from $satsCnt satellite(s), between $startDate and $endDate.</p>";
 }
 
-
-
 function getSats($dbconn) {
     // Performing SQL query
     $query = 'SELECT * FROM satellites';
@@ -60,6 +63,7 @@ function showSats($sats) {
     // Printing results in HTML
     $cnt = 0;
     echo "<h3>Satellites</h3>";
+
     echo "<table class='table table-striped'>\n";
     echo "<tr><th>ID</th><th>Name</th></tr>";
 
@@ -68,10 +72,6 @@ function showSats($sats) {
         echo "<td>" . $key . "</td>";
         echo "<td><a href=\"". $val[1]. "\">". $val[0] . "</a></td>";
 
-        //var_dump($line);
-        //foreach ($line as $col_value) {
-        //    echo "\t\t<td>$col_value</td>\n";
-        //}
         echo "\t</tr>\n";
         $cnt++;
     }
@@ -79,7 +79,7 @@ function showSats($sats) {
 
 }
 
-function showObservations($dbconn) {
+function showObservations($dbconn, $sats) {
         echo "<h3>Observations</h3>";
         $query = 'SELECT * FROM observations';
         $result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -87,19 +87,25 @@ function showObservations($dbconn) {
         // Printing results in HTML
         $cnt = 0;
         echo "<table class='table table-striped table-hover'>\n";
-        echo "<tr><th>ID</th><th>AOS</th><th>TCA</th><th>LOS</th><th>Satellite</th><th>Image</th><th>Notes</th></tr>";
+        echo "<tr><th>ID</th>";
+        echo "<th><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Aquisition of Signal\">AOS</a></th>";
+        echo "<th><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Time of closest approach\">TCA</a></th>";
+        echo "<th><a href=\"#\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Loss of Signal\">LOS</a></th>";
+        echo "<th>Satellite</th><th>Image</th>";
+        // Notes are not yet supported.
+        // echo "<th>Notes</th></tr>";
         while ($line = pg_fetch_array($result, null, PGSQL_ASSOC)) {
             echo "\t<tr>\n";
             echo "<td>" . $line["obs_id"] . "</td>";
             echo "<td>" . $line["aos"] . "</td>";
             echo "<td>" . $line["tca"] . "</td>";
             echo "<td>" . $line["los"] . "</td>";
-            echo "<td>" . strtoupper($line["sat_name"]) . "</td>";
+
+            echo "<td> <a href=\"" . $sats[strtoupper($line["sat_name"])][1] . "\">". strtoupper($line["sat_name"]) . "</a></td>";
             echo "<td><a href=\"data/" . $line["filename"] . "\">" . $line["filename"] . "</a></td>";
-            echo "<td>" . $line["notes"] . "</td>";
-            //foreach ($line as $col_value) {
-            //    echo "\t\t<td>$col_value</td>\n";
-            //}
+
+            // echo "<td>" . $line["notes"] . "</td>";
+
             echo "\t</tr>\n";
             $cnt++;
         }
@@ -115,11 +121,11 @@ $dbconn = pg_connect("host=localhost dbname=satnogs user=satnogs password=lie8Av
 
 $sats = getSats($dbconn);
 
-showStats($sats);
+showStats($dbconn);
 
-showObservations($dbconn);
+showObservations($dbconn, $sats);
 
-showSats($dbconn);
+showSats($sats);
 
 // Closing connection
 pg_close($dbconn);
