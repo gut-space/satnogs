@@ -18,8 +18,8 @@ hostname="satnogs.klub.com.pl"
 destdir="public_html/data"
 
 # Uncomment this for local deployment
-#hostname="localhost"
-#destdir="/var/www/html"
+hostname="localhost"
+destdir="/var/www/html"
 
 # Postgres connection
 dbuser="satnogs"
@@ -61,7 +61,7 @@ def submit_observation(path, sat_name, aos, tca, los, notes):
     subprocess.run(params)
 
     # Finally, we need to create the DB entry
-    sqlcmd = "INSERT INTO observations(aos,sat_name,filename) VALUES('%s', '%s', '%s');" % (aos, sat_name, filename)
+    sqlcmd = "INSERT INTO observations(aos,tca,los,sat_name,filename) VALUES('%s', '%s', '%s', '%s', '%s');" % (aos, tca, los, sat_name, filename)
     print("Adding record in the db: sqlcmd=[%s]" % sqlcmd)
 
     params = []
