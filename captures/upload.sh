@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This is a sample script that uploads observations to the frontend server.
 # It must be run from the top level dir, e.g.
