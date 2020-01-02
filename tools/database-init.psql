@@ -2,17 +2,19 @@
 DROP TABLE IF EXISTS observations;
 DROP TABLE IF EXISTS satellites;
 
+-- This table contains information about the observations conducted.
 CREATE TABLE observations (
     obs_id serial PRIMARY KEY NOT NULL,
-    aos TIMESTAMP,
-    tca TIMESTAMP,
-    los TIMESTAMP,
-    sat_id int,
+    aos TIMESTAMP, -- Aquisiton of signal
+    tca TIMESTAMP, -- Time of closest approach
+    los TIMESTAMP, -- Loss of signal
+    sat_id int, -- this is norad id
     sat_name VARCHAR(32),
     filename VARCHAR(255),
     notes VARCHAR
 );
 
+-- This table contains list of satellites we're observing.
 CREATE TABLE satellites (
     sat_id int PRIMARY KEY NOT NULL,
     sat_name VARCHAR(32),
