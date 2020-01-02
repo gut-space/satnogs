@@ -52,7 +52,7 @@ while ($line = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     echo "<td>" . $line["los"] . "</td>";
     echo "<td>" . $line["sat_id"] . "</td>";
     echo "<td>" . $line["sat_name"] . "</td>";
-    echo "<td><a href=\"" . $line["filename"] . "\">" . $line["filename"] . "</a></td>";
+    echo "<td><a href=\"data/" . $line["filename"] . "\">" . $line["filename"] . "</a></td>";
     echo "<td>" . $line["notes"] . "</td>";
     //foreach ($line as $col_value) {
     //    echo "\t\t<td>$col_value</td>\n";
