@@ -58,8 +58,7 @@ def submit_observation(path, sat_name, aos, tca, los, notes):
     params.append(path)
     params.append(dst)
 
-    # Commented out
-    #subprocess.run(params)
+    subprocess.run(params)
 
     # Finally, we need to create the DB entry
     sqlcmd = "INSERT INTO observations(aos,sat_name,filename) VALUES('%s', '%s', '%s');" % (aos, sat_name, filename)
