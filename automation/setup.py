@@ -11,6 +11,7 @@ setup(name='SatNOG PG',
           "orbit-predictor>=1.10",
           "DateTimeRange>=0.6",
           "python-crontab>=2.4",
+          "cron-descriptor>=1.2.24",
           "PyYAML>=5.3"
       ]
      )

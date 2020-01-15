@@ -1,6 +1,7 @@
 import datetime
 import logging
 from collections import namedtuple
+import sys
 from typing import Iterable, Tuple
 
 from crontab import CronTab
@@ -11,12 +12,12 @@ from datetimerange import DateTimeRange
 import yaml
 
 from selectstrategy import aos_priority_strategy, Observation
+from utils import COMMENT_PASS_TAG
 
 cron = CronTab(tabfile='cron.tab')
 strategy = aos_priority_strategy
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 
-COMMENT_TAG = "SatNOG_PG"
 NOAA_URL = r"https://celestrak.com/NORAD/elements/noaa.txt"
 
 with open("config.yml") as f:
@@ -43,22 +44,19 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     selected = strategy(init)
     return selected
 
-def clear():
-    cron.remove_all(comment=COMMENT_TAG)
-
 def plan_passes(selected: Iterable[Observation]):
     for entry in selected:
         cmd = get_command(entry.data, entry.range)
-        job = cron.new(cmd, COMMENT_TAG)
+        job = cron.new(cmd, COMMENT_PASS_TAG)
         job.setall(entry.range.start_datetime)
     cron.write()
 
 if __name__ == '__main__':
+    interval = sys.argv[1] if len(sys.argv) > 1 else 24 * 60 * 60
     start = datetime.datetime.utcnow()
-    delta = datetime.timedelta(days=1)
+    delta = datetime.timedelta(seconds=interval)
     end = start + delta
 
     passes = get_passes(prediction_config, start, end)
-    clear()
     plan_passes(passes)
 
