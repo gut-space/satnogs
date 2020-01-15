@@ -8,6 +8,9 @@ setup(name='SatNOG PG',
       author='SF, TM',
       packages=find_packages(),
       install_requires=[
-          "orbit-predictor>=1.10"
+          "orbit-predictor>=1.10",
+          "DateTimeRange>=0.6",
+          "python-crontab>=2.4",
+          "PyYAML>=5.3"
       ]
      )
