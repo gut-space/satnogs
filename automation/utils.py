@@ -22,7 +22,7 @@ def _get_command(directory, filename):
         directory = os.path.dirname(directory)
     path = os.path.join(directory, filename)
     path = os.path.abspath(path)
-    return "python %s " % path
+    return "python3 %s " % path
 
 def get_planner_command(directory=None):
     return _get_command(directory, "planner.py")
