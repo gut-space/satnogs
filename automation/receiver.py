@@ -9,11 +9,11 @@ import typing
 
 import yaml
 
-from utils import first
+from utils import first, get_receiver_command, get_planner_command
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
+RECEIVER_COMMAND = get_receiver_command()
 
-current_process_terminate: typing.Callable = None
+current_process_terminate: typing.Callable = lambda: None
 
 def sigint_handler(signal, frame):
     logging.debug("Terminate")
@@ -38,7 +38,7 @@ def record(frequency: str, output_filename: str):
          "-"
         ], stdout=subprocess.PIPE
     )
-    sox_process = subprocess.Popen(
+    _ = subprocess.Popen(
         ["sox",
          "-t", "raw",
          "-b16",
@@ -52,11 +52,13 @@ def record(frequency: str, output_filename: str):
     )
 
     terminate = lambda: rtl_process.terminate()
+    global current_process_terminate
     current_process_terminate = terminate
     return terminate
 
 def on_stop_recording(terminate):
     terminate()
+    global current_process_terminate
     current_process_terminate = None
     logging.debug("Stop recording")
 
@@ -69,7 +71,7 @@ def decode_apt(input_path: str, output_path):
     process.wait()
 
 with open("config.yml") as f:
-    config = yaml.load(f)
+    config = yaml.safe_load(f)
 
 if __name__ == '__main__':
     _, name, los = sys.argv

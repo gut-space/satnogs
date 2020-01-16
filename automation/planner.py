@@ -4,27 +4,24 @@ from collections import namedtuple
 import sys
 from typing import Iterable, Tuple
 
-from crontab import CronTab
 from orbit_predictor.sources import NoradTLESource
 from orbit_predictor.locations import Location
 from orbit_predictor.predictors import PredictedPass
 from datetimerange import DateTimeRange
-import yaml
 
 from selectstrategy import aos_priority_strategy, Observation
-from utils import COMMENT_PASS_TAG
+from utils import COMMENT_PASS_TAG, open_config, get_receiver_command, open_crontab
 
-cron = CronTab(tabfile='cron.tab')
+cron = open_crontab()
 strategy = aos_priority_strategy
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 
+RECEIVER_COMMAND = get_receiver_command()
 NOAA_URL = r"https://celestrak.com/NORAD/elements/noaa.txt"
 
-with open("config.yml") as f:
-    prediction_config = yaml.load(f)
+prediction_config = open_config()
 
 def get_command(name: str, range_: DateTimeRange):
-    return 'python receiver.py "%s" "%s"' % (name, range_.end_datetime.isoformat())
+    return RECEIVER_COMMAND + '"%s" "%s"' % (name, range_.end_datetime.isoformat())
 
 def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     location = Location(config["location"]["name"],
@@ -51,12 +48,20 @@ def plan_passes(selected: Iterable[Observation]):
         job.setall(entry.range.start_datetime)
     cron.write()
 
-if __name__ == '__main__':
-    interval = sys.argv[1] if len(sys.argv) > 1 else 24 * 60 * 60
+def clear():
+    cron.remove_all(comment=COMMENT_PASS_TAG)
+    cron.write()
+
+def execute(interval):
     start = datetime.datetime.utcnow()
     delta = datetime.timedelta(seconds=interval)
     end = start + delta
 
     passes = get_passes(prediction_config, start, end)
+    clear()
     plan_passes(passes)
+
+if __name__ == '__main__':
+    interval = sys.argv[1] if len(sys.argv) > 1 else 24 * 60 * 60
+    execute(interval)
 

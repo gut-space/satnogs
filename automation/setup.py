@@ -12,6 +12,7 @@ setup(name='SatNOG PG',
           "DateTimeRange>=0.6",
           "python-crontab>=2.4",
           "cron-descriptor>=1.2.24",
-          "PyYAML>=5.3"
+          "PyYAML>=5.3",
+          "deepdiff>=4.0"
       ]
      )
