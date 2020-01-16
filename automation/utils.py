@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import sys
@@ -104,3 +105,6 @@ class EditWatcher:
 
     def get_wrapped(self):
         return self._obj
+
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)

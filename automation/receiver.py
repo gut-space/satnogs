@@ -10,6 +10,7 @@ import typing
 import yaml
 
 from utils import first, get_receiver_command, get_planner_command
+from submitobs import submit_observation
 
 RECEIVER_COMMAND = get_receiver_command()
 
@@ -74,7 +75,7 @@ with open("config.yml") as f:
     config = yaml.safe_load(f)
 
 if __name__ == '__main__':
-    _, name, los = sys.argv
+    _, name, los, *_ = sys.argv
 
     satellite = first(config["satellites"], lambda s: s["name"] == name)
     if satellite is None:
@@ -96,3 +97,6 @@ if __name__ == '__main__':
     png_filename = "/tmp/%s_%s.png" % (name, los)
     decode_apt(wav_filename, png_filename)
     os.remove(wav_filename)
+
+    submit_observation(png_filename, name, str(now_datetime), str(now_datetime), str(los_datetime), "")
+    os.remove(png_filename)

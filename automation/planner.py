@@ -10,9 +10,8 @@ from orbit_predictor.predictors import PredictedPass
 from datetimerange import DateTimeRange
 
 from selectstrategy import aos_priority_strategy, Observation
-from utils import COMMENT_PASS_TAG, open_config, get_receiver_command, open_crontab
+from utils import COMMENT_PASS_TAG, open_config, get_receiver_command, open_crontab, utc_to_local
 
-cron = open_crontab()
 strategy = aos_priority_strategy
 
 RECEIVER_COMMAND = get_receiver_command()
@@ -41,25 +40,28 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     selected = strategy(init)
     return selected
 
-def plan_passes(selected: Iterable[Observation]):
+def plan_passes(selected: Iterable[Observation], cron):
     for entry in selected:
         cmd = get_command(entry.data, entry.range)
         job = cron.new(cmd, COMMENT_PASS_TAG)
-        job.setall(entry.range.start_datetime)
+        start_datetime = utc_to_local(entry.range.start_datetime)
+        job.setall(start_datetime)
     cron.write()
 
-def clear():
+def clear(cron):
     cron.remove_all(comment=COMMENT_PASS_TAG)
     cron.write()
 
-def execute(interval):
+def execute(interval, cron=None):
+    if cron is None:
+        cron = open_crontab()
     start = datetime.datetime.utcnow()
     delta = datetime.timedelta(seconds=interval)
     end = start + delta
 
     passes = get_passes(prediction_config, start, end)
-    clear()
-    plan_passes(passes)
+    clear(cron)
+    plan_passes(passes, cron)
 
 if __name__ == '__main__':
     interval = sys.argv[1] if len(sys.argv) > 1 else 24 * 60 * 60
