@@ -1,21 +1,21 @@
 import datetime
 import logging
 from collections import namedtuple
+from pprint import pprint
 import sys
 from typing import Iterable, Tuple
 
-from orbit_predictor.sources import NoradTLESource
 from orbit_predictor.locations import Location
 from orbit_predictor.predictors import PredictedPass
 from datetimerange import DateTimeRange
 
 from selectstrategy import aos_priority_strategy, Observation
 from utils import COMMENT_PASS_TAG, open_config, get_receiver_command, open_crontab, utc_to_local
+from orbitdb import OrbitDatabase
 
 strategy = aos_priority_strategy
 
 RECEIVER_COMMAND = get_receiver_command()
-NOAA_URL = r"https://celestrak.com/NORAD/elements/noaa.txt"
 
 prediction_config = open_config()
 
@@ -26,14 +26,15 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     location = Location(config["location"]["name"],
         config["location"]["latitude"], config["location"]["longitude"],
         config["location"]["elevation"])
-    source = NoradTLESource.from_url(NOAA_URL)
     satellties = config["satellites"]
+
+    orbit_db = OrbitDatabase()
     
     init = []
     for sat in satellties:
         aos_at = sat.get("aos_at") or config.get("aos_at") or 0
         max_elevation_greater_than = sat.get("max_elevation_greater_than") or config.get("max_elevation_greater_than") or 0
-        predictor = source.get_predictor(sat["name"])
+        predictor = orbit_db.get_predictor(sat["name"])
         passes = predictor.passes_over(location, from_, to, max_elevation_greater_than, aos_at_dg=aos_at)
         init += [(sat["name"], p) for p in passes]
     
@@ -62,8 +63,9 @@ def execute(interval, cron=None):
     passes = get_passes(prediction_config, start, end)
     clear(cron)
     plan_passes(passes, cron)
+    return passes
 
 if __name__ == '__main__':
     interval = sys.argv[1] if len(sys.argv) > 1 else 24 * 60 * 60
-    execute(interval)
-
+    passes = execute(interval)
+    pprint([(e.pass_, e.range, "CRON: %s" % (utc_to_local(e.range.start_datetime).strftime("%m-%d %H:%M:%S`"))) for e in passes], width=180)

@@ -1,0 +1,34 @@
+0 4 * * * python /home/lv/Projects/satnog-gdn/automation/planner.py 86164 # SatNOG-PG-Plan
+56 20 16 1 * python /home/lv/Projects/satnog-gdn/
+# DISABLED LINE
+# automation/receiver.py "NOAA 18" "2020-01-16T21:09:00.029276" # SatNOG-PG-Pass
+1 20 17 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-17T19:16:59.624740" # SatNOG-PG-Pass
+23 20 17 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-17T19:33:57.568825" # SatNOG-PG-Pass
+43 21 17 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-17T20:57:22.165230" # SatNOG-PG-Pass
+4 3 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T02:10:58.529917" # SatNOG-PG-Pass
+43 4 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T03:57:41.398095" # SatNOG-PG-Pass
+8 5 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T04:18:59.082393" # SatNOG-PG-Pass
+23 6 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T05:39:15.304346" # SatNOG-PG-Pass
+39 6 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T05:44:13.435773" # SatNOG-PG-Pass
+47 6 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T06:02:39.702390" # SatNOG-PG-Pass
+4 8 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T07:17:45.702184" # SatNOG-PG-Pass
+17 8 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T07:30:50.028744" # SatNOG-PG-Pass
+30 8 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T07:42:21.206230" # SatNOG-PG-Pass
+45 9 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T08:53:56.705571" # SatNOG-PG-Pass
+56 9 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T09:12:24.045468" # SatNOG-PG-Pass
+12 10 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T09:19:09.131313" # SatNOG-PG-Pass
+24 11 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T10:30:18.231829" # SatNOG-PG-Pass
+37 11 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T10:50:54.289617" # SatNOG-PG-Pass
+50 11 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T10:53:46.122041" # SatNOG-PG-Pass
+0 13 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T12:10:13.693268" # SatNOG-PG-Pass
+18 13 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T12:27:04.917059" # SatNOG-PG-Pass
+27 13 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T12:29:47.618021" # SatNOG-PG-Pass
+37 14 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T13:51:13.239735" # SatNOG-PG-Pass
+57 14 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T14:03:24.036874" # SatNOG-PG-Pass
+3 15 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T14:09:41.998712" # SatNOG-PG-Pass
+16 16 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T15:32:12.532457" # SatNOG-PG-Pass
+33 16 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T15:43:14.585445" # SatNOG-PG-Pass
+43 16 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T15:49:56.677811" # SatNOG-PG-Pass
+58 17 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 19" "2020-01-18T17:12:40.390904" # SatNOG-PG-Pass
+12 18 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 18" "2020-01-18T17:24:13.274491" # SatNOG-PG-Pass
+24 18 18 1 * python3 /home/lv/Projects/satnog-gdn/automation/receiver.py "NOAA 15" "2020-01-18T17:30:00.002811" # SatNOG-PG-Pass

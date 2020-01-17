@@ -14,7 +14,8 @@ logging.basicConfig(level=logging.DEBUG if DEV_ENVIRONEMT else logging.ERROR, fo
 APP_NAME = "SatNOG-PG"
 COMMENT_PASS_TAG = APP_NAME + "-Pass"
 COMMENT_PLAN_TAG = APP_NAME + "-Plan"
-CONFIG_PATH = os.path.expanduser("~/.config/%s/config.yml" % (APP_NAME,)) if not DEV_ENVIRONEMT else "config.yml"
+CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,)) if not DEV_ENVIRONEMT else os.path.abspath("./config")
+CONFIG_PATH = os.path.join(CONFIG_DIRECTORY, "config.yml")
 
 def _get_command(directory, filename):
     if directory is None:
@@ -35,11 +36,11 @@ DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.3833\n 
 
 def open_crontab() -> CronTab:
     if DEV_ENVIRONEMT:
-        filename = "cron.tab"
-        if not os.path.exists(filename):
-            with open(filename) as _:
+        path = os.path.join(CONFIG_DIRECTORY, "cron.tab")
+        if not os.path.exists(path):
+            with open(path) as _:
                 pass
-        return CronTab(tabfile="cron.tab")
+        return CronTab(tabfile=path)
     else:
         return CronTab(user=True)
 
@@ -108,3 +109,5 @@ class EditWatcher:
 
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
+
+
