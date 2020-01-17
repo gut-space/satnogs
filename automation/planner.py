@@ -28,7 +28,7 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
         config["location"]["elevation"])
     satellties = config["satellites"]
 
-    orbit_db = OrbitDatabase()
+    orbit_db = OrbitDatabase(config["norad"])
     
     init = []
     for sat in satellties:

@@ -1,4 +1,5 @@
 import argparse
+import os
 from pprint import pprint
 import subprocess
 import sys
@@ -6,6 +7,7 @@ import sys
 from deepdiff import DeepHash
 
 import planner
+from orbitdb import OrbitDatabase
 from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, first, \
                 get_planner_command, get_receiver_command, open_config, save_config, \
                 APP_NAME, open_crontab
@@ -57,7 +59,11 @@ satellite_config_parser.add_argument("name", type=str, help="Satellite name", na
 satellite_config_parser.add_argument("-f", "--frequency", type=str, help="Frequency in Hz. Allowed scientific notation.")
 satellite_config_parser.add_argument("-aos", type=int, help="Elevation (in degress) on AOS")
 satellite_config_parser.add_argument("-me", "--max-elevation", type=int, help="Max elevation greater than")
-satellite_config_parser.add_argument("--delete", action="store_true", help="Delete satellite")
+satellite_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete satellite")
+norad_config_parser = config_subparsers.add_parser("norad", help="Manage sources NORAD data")
+norad_config_parser.add_argument("urls", nargs="*", type=str, help="URLs of NORAD data")
+norad_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete NORAD")
+norad_config_parser.add_argument("-r", "--refresh", action="store_true", default=False, help="Re-fetch using NORAD files")
 
 args = parser.parse_args()
 command = args.command
@@ -134,14 +140,36 @@ elif command == "config":
                 update_config(sat, args, ("frequency", ("aos_at", "aos"), ("max_elevation_greater_than", "max-elevation")))
         elif args.delete:
             section.clear()
-
+    elif config_command == "norad":
+        section = config["norad"]
+        if args.urls is None:
+            if args.delete:
+                section.clear()
+            elif args.refresh:
+                db = OrbitDatabase(section)
+                db.refresh_satellites(s.name for s in config["satellites"])
+        elif args.urls is not None:
+            if args.delete:
+                for url in args.urls:
+                    section.remove(url)
+            elif args.refresh:
+                db = OrbitDatabase(args.urls)
+                db.refresh_urls()
+            else:
+                for url in args.urls:
+                    if any(u == url for u in section):
+                        continue
+                    section.append(url)
+                else:
+                    db = OrbitDatabase(section)
+                    print(db)
     is_changed = get_hash(config) != init_hash
     if is_changed:
         save_config(config)
         print("Configuration changed successfully")
         if args.replan:
             planner.execute(get_interval(planner_job))
-    pprint(section)
+    pprint(section, sort_dicts=False)
     
 else:
     parser.print_help()

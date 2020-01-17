@@ -34,7 +34,7 @@ def get_planner_command(directory=None):
 def get_receiver_command(directory=None):
     return _get_command(directory, "receiver.py")
 
-DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.3833\n  longitude: 18.4667\n  name: Taneczna\nmax_elevation_greater_than: 0\nsatellites:\n- freq: 137.62e6\n  name: NOAA 15\n- freq: 137.9125e6\n  name: NOAA 18\n- freq: 137.1e6\n  name: NOAA 19\n'
+DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.3833\n  longitude: 18.4667\n  name: Taneczna\nmax_elevation_greater_than: 0\nsatellites:\n- freq: 137.62e6\n  name: NOAA 15\n- freq: 137.9125e6\n  name: NOAA 18\n- freq: 137.1e6\n  name: NOAA 19\nnorad:\n- https://celestrak.com/NORAD/elements/noaa.txt\n- https://celestrak.com/NORAD/elements/active.txt'
 
 def open_crontab() -> CronTab:
     if DEV_ENVIRONEMT:
@@ -112,4 +112,9 @@ class EditWatcher:
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 
+def is_safe_filename_character(c: str) -> bool:
+    return c.isalpha() or c.isdigit() or c in (' ', '.', '-', ' ', '_')
 
+def safe_filename(filename: str, replacement: str="_") -> str:
+    chars = [c if is_safe_filename_character(c) else replacement for c in filename]
+    return "".join(chars).rstrip()
