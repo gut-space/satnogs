@@ -1,2 +1,5 @@
 /automation/config.yml
 /automation/cron.tab
+/automation/config/config.yml
+/automation/config/cron.tab
+/automation/config/noaa.txt

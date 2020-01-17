@@ -8,14 +8,16 @@ import yaml
 
 
 DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
-
-logging.basicConfig(level=logging.DEBUG if DEV_ENVIRONEMT else logging.ERROR, format='%(asctime)s %(levelname)s %(filename)s:%(lineno)d: %(message)s')
-
 APP_NAME = "SatNOG-PG"
 COMMENT_PASS_TAG = APP_NAME + "-Pass"
 COMMENT_PLAN_TAG = APP_NAME + "-Plan"
 CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,)) if not DEV_ENVIRONEMT else os.path.abspath("./config")
 CONFIG_PATH = os.path.join(CONFIG_DIRECTORY, "config.yml")
+
+logging.basicConfig(level=logging.DEBUG if DEV_ENVIRONEMT else logging.ERROR,
+                    format='%(asctime)s %(levelname)s %(filename)s:%(lineno)d: %(message)s',
+                    filename=os.path.join(CONFIG_DIRECTORY, "log") if not DEV_ENVIRONEMT else None)
+
 
 def _get_command(directory, filename):
     if directory is None:
