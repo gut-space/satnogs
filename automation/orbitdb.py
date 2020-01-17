@@ -51,7 +51,7 @@ class OrbitDatabase:
         return now > ctime + self.max_period
 
     def _get_current_tle_file(self, url: str, force_fetch=False):
-        tle_path = self._get_tle_from_url(url)
+        tle_path = self._get_tle_path_from_url(url)
         tle_path_exists = os.path.exists(tle_path)
         if not force_fetch and tle_path_exists and not self._is_out_of_date(tle_path):
             return tle_path
