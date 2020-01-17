@@ -37,7 +37,7 @@ def record(frequency: str, output_filename: str):
          "-"
         ], stdout=subprocess.PIPE
     )
-    _ = subprocess.Popen(
+    sox = subprocess.Popen(
         ["sox",
          "-t", "raw",
          "-b16",
@@ -53,7 +53,7 @@ def record(frequency: str, output_filename: str):
     terminate = lambda: rtl_process.terminate()
     global current_process_terminate
     current_process_terminate = terminate
-    return terminate
+    return sox, terminate
 
 def on_stop_recording(terminate):
     terminate()
@@ -72,7 +72,8 @@ def decode_apt(input_path: str, output_path):
 config = open_config()
 
 if __name__ == '__main__':
-    _, name, los, *_ = sys.argv
+    _, name, los, *opts = sys.argv
+    debug = len(opts) != 0
 
     satellite = first(config["satellites"], lambda s: s["name"] == name)
     if satellite is None:
@@ -85,15 +86,18 @@ if __name__ == '__main__':
 
     wav_filename = "/tmp/%s_%s.wav" % (name, los)
     frequency = satellite["freq"]
-    terminate = record(frequency, wav_filename)
+    process, terminate = record(frequency, wav_filename)
 
     scheduler = sched.scheduler()
     scheduler.enter(delta.total_seconds(), 1, on_stop_recording, (terminate,))
     scheduler.run()
+    process.wait()
 
     png_filename = "/tmp/%s_%s.png" % (name, los)
     decode_apt(wav_filename, png_filename)
-    os.remove(wav_filename)
-    if os.path.exists(png_filename):
+    if not debug:
+        os.remove(wav_filename)
+
+    if not debug and os.path.exists(png_filename):
         submit_observation(png_filename, name, str(now_datetime), str(now_datetime), str(los_datetime), "")
         os.remove(png_filename)
