@@ -1,3 +1,4 @@
+import os.path
 #!/usr/bin/python
 
 # This tool is used to upload recorded observations to the on-line database. Usage:
@@ -29,10 +30,9 @@ import sys
 import os
 import subprocess
 
-def submit_observation(path, sat_name, aos, tca, los, notes):
+def submit_observation(image_path, sat_name, aos, tca, los, notes):
 
-    fnames = path.split("/")
-    filename = fnames[-1]
+    directory, filename = os.path.split(image_path)
 
     # First we need to make sure there's the destination directory
     params = []
@@ -43,20 +43,25 @@ def submit_observation(path, sat_name, aos, tca, los, notes):
     params.append("mkdir")
     params.append("-p")
     params.append(("%s/%s" % (destdir, "data")))
-    subprocess.run(params)
+    subprocess.call(params)
 
+    # Make thumbnail
+    thumbnail_path = os.path.join(directory, "thumb-" + filename)
+    subprocess.call(["convert" ,"-thumbnail", "200", image_path, thumbnail_path])
     # Second step is to copy (cp or scp) the file to its destination
-    params = []
-    if hostname != "localhost":
-        dst = "%s:%s/data" % (hostname, destdir)
-        params.append("scp")
-    else:
-        dst = "%s/data" % destdir
-        params.append("cp")
-    params.append(path)
-    params.append(dst)
+    for path in [image_path, thumbnail_path]:
+        params = []
+        if hostname != "localhost":
+            dst = "%s:%s/data" % (hostname, destdir)
+            params.append("scp")
+        else:
+            dst = "%s/data" % destdir
+            params.append("cp")
+        params.append(path)
+        params.append(dst)
 
-    subprocess.run(params)
+        subprocess.call(params)
+    os.remove(thumbnail_path)
 
     # Finally, we need to create the DB entry
     sqlcmd = "INSERT INTO observations(aos,tca,los,sat_name,filename) VALUES('%s', '%s', '%s', '%s', '%s');" % (aos, tca, los, sat_name, filename)
@@ -73,7 +78,7 @@ def submit_observation(path, sat_name, aos, tca, los, notes):
         params.append("-c")
         params.append(sqlcmd)
         params.append(dbname)
-    subprocess.run(params)
+    subprocess.call(params)
 
 
 if __name__ == '__main__':

@@ -63,7 +63,7 @@ satellite_config_parser.add_argument("-d", "--delete", action="store_true", defa
 norad_config_parser = config_subparsers.add_parser("norad", help="Manage sources NORAD data")
 norad_config_parser.add_argument("urls", nargs="*", type=str, help="URLs of NORAD data")
 norad_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete NORAD")
-norad_config_parser.add_argument("-r", "--refresh", action="store_true", default=False, help="Re-fetch using NORAD files")
+norad_config_parser.add_argument("-r", "--refresh", action="store_true", default=False, help="Re-fetch necessary NORAD files")
 
 args = parser.parse_args()
 command = args.command
