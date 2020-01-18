@@ -1,4 +1,6 @@
 import argparse
+import datetime
+import calendar
 import os
 from pprint import pprint
 import subprocess
@@ -14,7 +16,9 @@ from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, first, \
 
 def get_interval(job):
     frequency = job.frequency()
-    interval = int(round((365 * 24 * 60 * 60 * 1.0) / frequency))
+    year = datetime.datetime.utcnow().year
+    days_in_year = 366 if calendar.isleap(year) else 365
+    interval = int(round((days_in_year * 24 * 60 * 60 * 1.0) / frequency))
     return interval
 
 def update_config(config, args, names):
