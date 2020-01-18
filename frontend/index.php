@@ -22,6 +22,7 @@ $(document).ready(function(){
   Space and Satellite Technologies studies of Gdańsk University of Technology.</p>
 
 
+  <p>Software project homepage: <a href="https://gitlab.klub.com.pl:30000/astro/satnog-gdn">link</a></p>
 <?php
 
 function showStats($dbconn) {
@@ -81,7 +82,7 @@ function showSats($sats) {
 
 function showObservations($dbconn, $sats) {
         echo "<h3>Observations</h3>";
-        $query = 'SELECT * FROM observations';
+        $query = 'SELECT * FROM observations ORDER by aos desc';
         $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
         // Printing results in HTML
@@ -102,7 +103,7 @@ function showObservations($dbconn, $sats) {
             echo "<td>" . $line["los"] . "</td>";
 
             echo "<td> <a href=\"" . $sats[strtoupper($line["sat_name"])][1] . "\">". strtoupper($line["sat_name"]) . "</a></td>";
-            echo "<td><a href=\"data/" . $line["filename"] . "\">" . $line["filename"] . "</a></td>";
+            echo "<td><a href=\"data/" . $line["filename"] . "\"> <img src=\"data/thumb-" . $line["filename"] . "\"></a></td>";
 
             // echo "<td>" . $line["notes"] . "</td>";
 
