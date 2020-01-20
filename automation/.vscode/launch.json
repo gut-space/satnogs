@@ -16,6 +16,13 @@
                 "DEV_ENVIRONMENT": "0"
             },
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Tests",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "args": ["-m", "unittest" "discover"]
         }
     ]
 }
