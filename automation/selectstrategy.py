@@ -62,3 +62,10 @@ def max_elevation_selector(_, pass_, left_range, right_range):
             return r
     return None
 max_elevation_strategy = create_strategy(lambda o: -o.pass_.max_elevation_deg, max_elevation_selector)
+
+def strategy_factory(name: str):
+    if name == "aos":
+        return aos_priority_strategy
+    if name == "max-elevation":
+        return max_elevation_strategy
+    raise LookupError("Unknown strategy")

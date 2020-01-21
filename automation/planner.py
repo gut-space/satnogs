@@ -9,11 +9,9 @@ from orbit_predictor.locations import Location
 from orbit_predictor.predictors import PredictedPass
 from datetimerange import DateTimeRange
 
-from selectstrategy import aos_priority_strategy, Observation
+from selectstrategy import strategy_factory, Observation
 from utils import COMMENT_PASS_TAG, open_config, get_receiver_command, open_crontab, utc_to_local
 from orbitdb import OrbitDatabase
-
-strategy = aos_priority_strategy
 
 RECEIVER_COMMAND = get_receiver_command()
 
@@ -27,8 +25,10 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
         config["location"]["latitude"], config["location"]["longitude"],
         config["location"]["elevation"])
     satellties = config["satellites"]
+    strategy_name = config.get("strategy", "max-elevation")
 
     orbit_db = OrbitDatabase(config["norad"])
+    strategy = strategy_factory(strategy_name)
     
     init = []
     for sat in satellties:

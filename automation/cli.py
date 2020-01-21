@@ -58,6 +58,7 @@ location_config_parser.add_argument("-ele", "--elevation", type=float, help="Ele
 prediction_config_parser = config_subparsers.add_parser("global", help="Change global prediction parameters")
 prediction_config_parser.add_argument("-aos", type=int, help="Elevation (in degress) on AOS")
 prediction_config_parser.add_argument("-me", "--max-elevation", type=int, help="Max elevation greater than")
+prediction_config_parser.add_argument("-s", "--strategy", choices=["aos", "max-elevation"], help="Select strategy to track satellites")
 satellite_config_parser = config_subparsers.add_parser("sat", help="Satellite configuration")
 satellite_config_parser.add_argument("name", type=str, help="Satellite name", nargs='?')
 satellite_config_parser.add_argument("-f", "--frequency", type=str, help="Frequency in Hz. Allowed scientific notation.")
@@ -124,7 +125,7 @@ elif command == "config":
         section = config["location"]
         update_config(section, args, ("latitude", "longitude", "elevation"))
     elif config_command == "global":
-        update_config(config, args, (("aos_at", "aos"), ("max_elevation_greater_than", "max-elevation")))
+        update_config(config, args, (("aos_at", "aos"), ("max_elevation_greater_than", "max-elevation"), "strategy"))
     elif config_command == "sat":
         section = config["satellites"]
         if args.name is not None:
