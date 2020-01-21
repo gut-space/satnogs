@@ -42,6 +42,7 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     return selected
 
 def plan_passes(selected: Iterable[Observation], cron):
+    selected = sorted(selected, key=lambda o: o.pass_.aos)
     for entry in selected:
         cmd = get_command(entry.data, entry.range)
         job = cron.new(cmd, COMMENT_PASS_TAG)
