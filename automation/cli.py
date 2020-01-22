@@ -125,7 +125,7 @@ elif command == "config":
         section = config["location"]
         update_config(section, args, ("latitude", "longitude", "elevation"))
     elif config_command == "global":
-        update_config(config, args, (("aos_at", "aos"), ("max_elevation_greater_than", "max-elevation"), "strategy"))
+        update_config(config, args, (("aos_at", "aos"), ("max_elevation_greater_than", "max_elevation"), "strategy"))
     elif config_command == "sat":
         section = config["satellites"]
         if args.name is not None:
@@ -142,7 +142,7 @@ elif command == "config":
             if args.delete:
                 section.remove(sat)
             else:
-                update_config(sat, args, ("frequency", ("aos_at", "aos"), ("max_elevation_greater_than", "max-elevation")))
+                update_config(sat, args, ("frequency", ("aos_at", "aos"), ("max_elevation_greater_than", "max_elevation")))
         elif args.delete:
             section.clear()
     elif config_command == "norad":
