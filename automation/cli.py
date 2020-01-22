@@ -174,7 +174,7 @@ elif command == "config":
         print("Configuration changed successfully")
         if args.replan:
             planner.execute(get_interval(planner_job))
-    pprint(section, sort_dicts=False)
+    pprint(section)
     
 else:
     parser.print_help()
