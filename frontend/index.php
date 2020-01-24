@@ -34,6 +34,8 @@ $(document).ready(function(){
 
 <?php
 
+require_once("./config.php"); // or die("Unable to load config.php");
+
 function showStats($dbconn) {
     $result = pg_query("SELECT count(*) FROM observations") or die('Query failed: ' . pg_last_error());
     $obsCnt = pg_fetch_row($result, 0) [0];
@@ -126,7 +128,7 @@ function showObservations($dbconn, $sats) {
 }
 
 // Connecting, selecting database
-$dbconn = pg_connect("host=localhost dbname=satnogs user=satnogs password=lie8Avie")
+$dbconn = pg_connect("host=$db_host dbname=$db_name user=$db_user password=$db_pass")
     or die('Could not connect: ' . pg_last_error());
 
 $sats = getSats($dbconn);
