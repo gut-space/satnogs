@@ -21,8 +21,17 @@ $(document).ready(function(){
   It's a project created by Sławek Figiel, Tomek Mrugalski and Ewelina Omernik, three students of
   Space and Satellite Technologies studies of Gdańsk University of Technology.</p>
 
+  <p>We're on <a href="https://github.com/gut-space/satnogs">github</a>.</p>
 
-  <p>Software project homepage: <a href="https://gitlab.klub.com.pl:30000/astro/satnog-gdn">link</a></p>
+  <p>Here are some materials:
+  <ul>
+    <li><a href="doc/satnogs-gdn-overview.pdf">Project presentation</a></li>
+    <li><a href="doc/satnogs-gdn-report.pdf">Project report - 2020-01-14</a></li>
+    <li><a href="doc/poster1-pl.jpg">Poster 1 [Polish]</a></li>
+    <li><a href="doc/poster2-en.jpg">Poster 2 [English]</a></li>
+  </ul>
+  </p>
+
 <?php
 
 function showStats($dbconn) {
@@ -30,7 +39,7 @@ function showStats($dbconn) {
     $obsCnt = pg_fetch_row($result, 0) [0];
     pg_free_result($result);
 
-    $result = pg_query("SELECT count(distinct sat_name) FROM observations") or die('Query failed: ' . pg_last_error());
+    $result = pg_query("SELECT distinct replace(upper(sat_name),' ', '-') FROM observations;") or die('Query failed: ' . pg_last_error());
     $satsCnt = pg_fetch_row($result, 0) [0];
     pg_free_result($result);
 
