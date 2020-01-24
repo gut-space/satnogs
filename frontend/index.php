@@ -39,7 +39,7 @@ function showStats($dbconn) {
     $obsCnt = pg_fetch_row($result, 0) [0];
     pg_free_result($result);
 
-    $result = pg_query("SELECT distinct replace(upper(sat_name),' ', '-') FROM observations;") or die('Query failed: ' . pg_last_error());
+    $result = pg_query("SELECT count(distinct replace(upper(sat_name),' ', '-')) FROM observations;") or die('Query failed: ' . pg_last_error());
     $satsCnt = pg_fetch_row($result, 0) [0];
     pg_free_result($result);
 
