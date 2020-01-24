@@ -1,8 +1,0 @@
-Notable upcoming passes:
-
-- noaa-18 2019-12-15 20:02 - max el 88 [deg]
-- noaa-19 2019-12-15 16:26 - max el 88
-- noaa-15 2019-12-15 17:44 - max el 61
-- noaa-18 2019-12-16 09:58 - max el 74
-- noaa-19 2019-12-16 06:22 - max el 75
-- noaa-16 2019-12-16 07:32 - max el 70
