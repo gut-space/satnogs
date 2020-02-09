@@ -1,0 +1,19 @@
+language: python
+
+python:
+  "3.6"
+  "3.7"
+
+before_install:
+  - pip3 install pytest
+  - pip3 install DateTimeRange
+  - pip3 install orbit_predictor
+
+script: pytest -v
+
+notifications:
+  recipients:
+    - spam.travis@klub.com.pl
+  email:
+    on_success: change
+    on_failure: always
