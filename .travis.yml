@@ -1,8 +1,8 @@
 language: python
 
 python:
-  "3.6"
-  "3.7"
+  - "3.6"
+  - "3.7"
 
 before_install:
   - pip3 install pytest
@@ -12,8 +12,8 @@ before_install:
 script: pytest -v
 
 notifications:
-  recipients:
-    - spam.travis@klub.com.pl
   email:
+    recipients:
+      - spam.travis@klub.com.pl
     on_success: change
     on_failure: always
