@@ -1,5 +1,6 @@
 from flask import render_template
 from app import app
+import sys
 import psycopg2
 
 @app.route('/obslist')
@@ -10,10 +11,10 @@ def obslist():
 
         # Open a connection
         # TODO: move this to a config file and read it in one common function
-        conn = psycopg2.connect(host="localhost", database="satnogs", user="satnogs")
+        conn = psycopg2.connect(host="localhost", database="satnogs", user="satnogs", password="")
 
         # Send query
-        q = "SELECT obs_id, aos, tca, los, sat_name, filename FROM observations ORDER by aos desc LIMIT 10"
+        q = "SELECT obs_id, aos, tca, los, sat_name, filename FROM observations ORDER by aos desc LIMIT 100"
         cursor = conn.cursor()
         cursor.execute(q)
 
@@ -22,7 +23,7 @@ def obslist():
         cursor.close()
         conn.close()
 
-    except psycopg2.Error as e:
+    except Exception as e:
         return "Unable to connect to Postgres DB: %s " % e
 
     # Now convert the data to a list of objects that we can pass to the template.
@@ -41,6 +42,6 @@ def obslist():
         obslist.append(x)
 
     # Generate some basic stats.
-    stats = "There are %d observations." % len(data)
+    stats = "Showing the last %d observations." % len(data)
 
     return render_template('obslist.html', obslist=obslist, stats=stats)
