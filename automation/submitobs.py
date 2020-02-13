@@ -42,17 +42,17 @@ def submit_observation(image_path, sat_name, aos, tca, los, notes):
 
     params.append("mkdir")
     params.append("-p")
-    params.append(("%s/%s" % (destdir, "data")))
+    params.append(("%s/data/thumbs" % (destdir, )))
     subprocess.call(params)
 
     # Make thumbnail
     thumbnail_path = os.path.join(directory, "thumb-" + filename)
     subprocess.call(["convert" ,"-thumbnail", "200", image_path, thumbnail_path])
     # Second step is to copy (cp or scp) the file to its destination
-    for path in [image_path, thumbnail_path]:
+    for path, subdir in [(image_path, "data"), (thumbnail_path, "data/thumbs")]:
         params = []
         if hostname != "localhost":
-            dst = "%s:%s/data" % (hostname, destdir)
+            dst = "%s:%s/%s" % (hostname, destdir, subdir)
             params.append("scp")
         else:
             dst = "%s/data" % destdir
