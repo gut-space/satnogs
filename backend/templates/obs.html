@@ -4,7 +4,12 @@
     <h3>Observation  {{ obs.obs_id }}</h3>
 
     <p>
-        <a href="data/{{ obs.filename }}">Image</a><br/>
+        Thumbnail:<br/>
+        <img src="/data/thumbs/{{ obs.thumbfile }}" />
+    </p>
+    <p>
+        Full resolution image:
+        <img src="/data/{{ obs.filename }}" />
     </p>
     <p>
         AOS: {{ obs.aos }}<br/>

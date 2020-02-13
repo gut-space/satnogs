@@ -18,7 +18,7 @@
             <td>{{ obs.tca }}</td>
             <td>{{ obs.los }}</td>
             <td><a href="{{ obs.sat_name }}">{{ obs.sat_name }}</a></td>
-            <td><a href="/obs/{{ obs.obs_id }}"> <img src="data/thumb-{{ obs.filename }}"></a></td>
+            <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbfile }}"></a></td>
         </tr>
     {% endfor %}
 </table>

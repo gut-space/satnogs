@@ -36,6 +36,8 @@ def obslist():
         x['los'] = row[3]
         x['sat_name'] = row[4]
         x['filename'] = row[5]
+        x['thumbfile'] = "thumb-" + row[5]
+
         obslist.append(x)
 
     # Generate some basic stats.
