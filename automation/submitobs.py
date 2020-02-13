@@ -16,11 +16,11 @@ import os.path
 username="satnogs"
 
 hostname="satnogs.klub.com.pl"
-destdir="public_html/data"
+destdir="data"
 
 # Uncomment this for local deployment
-hostname="localhost"
-destdir="/var/www/html"
+#hostname="localhost"
+#destdir="/var/www/html"
 
 # Postgres connection
 dbuser="satnogs"
@@ -42,17 +42,17 @@ def submit_observation(image_path, sat_name, aos, tca, los, notes):
 
     params.append("mkdir")
     params.append("-p")
-    params.append(("%s/data/thumbs" % (destdir, )))
+    params.append(os.path.join(destdir, "thumbs"))
     subprocess.call(params)
 
     # Make thumbnail
     thumbnail_path = os.path.join(directory, "thumb-" + filename)
     subprocess.call(["convert" ,"-thumbnail", "200", image_path, thumbnail_path])
     # Second step is to copy (cp or scp) the file to its destination
-    for path, subdir in [(image_path, "data"), (thumbnail_path, "data/thumbs")]:
+    for path, subdir in [(image_path, ""), (thumbnail_path, "thumbs")]:
         params = []
         if hostname != "localhost":
-            dst = "%s:%s/%s" % (hostname, destdir, subdir)
+            dst = "%s:%s" % (hostname, os.path.join(destdir, subdir))
             params.append("scp")
         else:
             dst = "%s/data" % destdir
