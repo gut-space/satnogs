@@ -1,0 +1,41 @@
+create table schema(version int);
+insert into schema values(1);
+
+/* Information about stations */
+create table stations (station_id serial PRIMARY KEY NOT NULL,
+                       name varchar[64] NOT NULL,
+                       lon float NOT NULL,
+                       lat float NOT NULL,
+                       descr varchar NOT NULL,
+                       config varchar,
+                       registered timestamp,
+                       firstobs timestamp,
+                       lastobs timestamp);
+
+/* List of photos for a station */
+create table station_photos (photo_id serial PRIMARY KEY NOT NULL,
+                             station_id serial,
+                             sort int NOT NULL, -- integer values so the photos can be sorted
+                             filename varchar NOT NULL,
+                             descr varchar,
+                             CONSTRAINT fk_station_id FOREIGN KEY (station_id) REFERENCES stations (station_id) );
+
+/* Ok, now insert a first station based on the historical records */
+INSERT INTO stations(name, lon, lat, descr, config, registered, firstobs, lastobs)
+    values('My first ground station', 0.0, 0.0, 'Description missing', 'Configuration unknown',
+           (select min(aos) from observations),
+           (select min(aos) from observations),
+           (select max(aos) from observations));
+
+/* Now extend existing observations table with extra data. In particular, add
+   column that references specific station-id. */
+ALTER TABLE observations ADD COLUMN station_id integer default 1,
+                         ADD CONSTRAINT fk_station_id FOREIGN KEY (station_id) REFERENCES stations (station_id);
+UPDATE observations SET station_id = 1 WHERE station_id is null;
+
+/* Now add field that specifies configurations and TLE */
+ALTER TABLE observations ADD COLUMN config varchar,
+                         ADD COLUMN tle varchar[240];
+
+/* Finally bump schema version to 2 */
+UPDATE schema SET version = 2;
