@@ -1,0 +1,7 @@
+[server]
+db_host = localhost
+db_name = satnogs
+db_user = satnogs
+db_pass = secret1
+debug = true
+

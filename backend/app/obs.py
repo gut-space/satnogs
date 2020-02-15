@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app
+from app import app, conf
 import psycopg2
 
 @app.route('/obs/<obs_id>')
@@ -7,9 +7,10 @@ def obs(obs_id = None):
 
     try:
 
+        cfg = conf.getConfig()
+
         # Open a connection
-        # TODO: move this to a config file and read it in one common function
-        conn = psycopg2.connect(host="localhost", database="satnogs", user="satnogs")
+        conn = psycopg2.connect(host= cfg.db_host, database=cfg.db_name, user=cfg.db_user, password=cfg.db_pass)
 
         # Send query
         q = "SELECT obs_id, aos, tca, los, sat_name, filename FROM observations WHERE obs_id = " + obs_id;
@@ -21,8 +22,8 @@ def obs(obs_id = None):
         cursor.close()
         conn.close()
 
-    except psycopg2.Error as e:
-        return "Unable to connect to Postgres DB: %s " % e
+    except Exception as e:
+        return "Error when connecting to DB: %s" % e
 
     row = data[0]
     x = {}
