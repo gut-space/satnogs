@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, conf
+from app import app, conf, utils
 import sys
 import psycopg2
 
@@ -38,7 +38,7 @@ def stations():
         x = {}
         x['station_id'] = row[0]
         x['name'] = row[1]
-        x['coords'] = coords(row[2], row[3])
+        x['coords'] = utils.coords(row[2], row[3])
         x['descr'] = row[4]
         x['config'] = row[5]
         x['registered'] = row[6]
@@ -52,16 +52,4 @@ def stations():
 
     return render_template('stations.html', stations=stationlist, stats=stats)
 
-def coords(lon, lat):
-    t = "%2.4f" % lat
-    if (lat>0):
-        t += "N"
-    else:
-        t += "S"
 
-    t += " %2.4f" % lon
-    if (lon>0):
-        t += "E"
-    else:
-        t += "W"
-    return t
