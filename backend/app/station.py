@@ -50,10 +50,10 @@ def station(station_id = None):
         x['cnt'] = row[8]
 
     for row in data2:
-        x = {}
-        x['filename'] = row[0]
-        x['descr'] = row[1]
-        x['sort'] = row[2]
-        files.append(x)
+        y = {}
+        y['filename'] = row[0]
+        y['descr'] = row[1]
+        y['sort'] = row[2]
+        files.append(y)
 
     return render_template('station.html', station = x, files = files)
