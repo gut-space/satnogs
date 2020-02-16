@@ -19,4 +19,15 @@
     <p>
         <b>Current configuration:</b> {{ station.config }}
     </p>
+
+    {% if files is defined %}
+    <table>
+    {% for f in files %}
+        <tr>
+            <td><a href="/data/stations/{{ station.station_id }}/{{ f.filename }}"><img src="/data/stations/{{ station.station_id }}/{{ f.filename }}" width=400></a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
 {% endblock %}
