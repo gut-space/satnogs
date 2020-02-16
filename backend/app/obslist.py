@@ -14,7 +14,7 @@ def obslist():
         conn = psycopg2.connect(host= cfg.db_host, database=cfg.db_name, user=cfg.db_user, password=cfg.db_pass)
 
         # Send query
-        q = "SELECT obs_id, aos, tca, los, sat_name, filename FROM observations ORDER by aos desc LIMIT 100"
+        q = "SELECT obs_id, aos, tca, los, sat_name, filename, station_id FROM observations ORDER by aos desc LIMIT 100"
         cursor = conn.cursor()
         cursor.execute(q)
 
@@ -38,6 +38,7 @@ def obslist():
         x['sat_name'] = row[4]
         x['filename'] = row[5]
         x['thumbfile'] = "thumb-" + row[5]
+        x['station_id'] = row[6]
 
         obslist.append(x)
 

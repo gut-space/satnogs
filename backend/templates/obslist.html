@@ -10,7 +10,9 @@
     <th><a href="#" data-toggle="tooltip" data-placement="top" title="Aquisition of Signal">AOS</a></th>
     <th><a href="#" data-toggle="tooltip" data-placement="top" title="Time of closest approach">TCA</a></th>
     <th><a href="#" data-toggle="tooltip" data-placement="top" title="Loss of Signal">LOS</a></th>
-    <th>Satellite</th><th>Image</th>
+    <th>Satellite</th>
+    <th>Station</th>
+    <th>Image</th>
     {% for obs in obslist %}
         <tr>
             <td><a href="/obs/{{ obs.obs_id }}">{{ obs.obs_id }}</a></td>
@@ -18,6 +20,7 @@
             <td>{{ obs.tca }}</td>
             <td>{{ obs.los }}</td>
             <td><a href="{{ obs.sat_name }}">{{ obs.sat_name }}</a></td>
+            <td><a href="/station/{{ obs.station_id }}">{{ obs.station_id}}</a></td>
             <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbfile }}"></a></td>
         </tr>
     {% endfor %}
