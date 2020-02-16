@@ -3,6 +3,7 @@ from app import app
 from app import obslist
 from app import obs
 from app import stations
+from app import station
 
 @app.route('/')
 @app.route('/index')

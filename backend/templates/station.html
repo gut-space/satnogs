@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Ground Station  {{ station.name }}</h3>
+
+    <p>
+        <ul>
+            <li>ID: {{ station.station_id }}</li>
+            <li>Station location: {{ station.coords }}</li>
+            <li>Station registration time: {{ station.registered }}</li>
+            <li>First recorded transmission: TBD</li>
+            <li>Most recent transmission: {{ station.lastobs }}</li>
+            <li>Number of transmissions: {{ station.cnt }}</li>
+        </ul>
+    </p>
+    <p>
+        <b>About the station</b>: {{ station.descr }}
+    </p>
+    <p>
+        <b>Current configuration:</b> {{ station.config }}
+    </p>
+{% endblock %}
