@@ -1,0 +1,3 @@
+ALTER TABLE stations ADD COLUMN secret char(16);
+
+UPDATE schema SET version = 3;
