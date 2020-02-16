@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+<h3>Ground stations</h3>
+
+<p>
+<table class='table table-striped table-hover'>
+    <tr><th>ID</th>
+    <th>Name</th>
+    <th>Coords</th>
+    <th># of observations</th>
+    <th>Registered</a></th>
+    <th>Last observation</th>
+    {% for s in stations %}
+        <tr>
+            <td><a href="/station/{{ s.station_id }}">{{ s.station_id }}</a></td>
+            <td><a href="/station/{{ s.station_id }}">{{ s.name }}</a></td>
+            <td>{{ s.coords }}</td>
+            <td>{{ s.cnt }}</td>
+            <td>{{ s.registered }}</td>
+            <td>{{ s.lastobs }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</p>
+
+<p>{{ stats }}</p>
+
+{% endblock %}
+
