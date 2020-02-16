@@ -15,10 +15,12 @@ def stations():
 
         # Send query
         q = """ SELECT t.station_id, t.name, t.lon, t.lat, t.descr, t.config, t.registered, t.lastobs, x.cnt
-                FROM stations t,
-                (select station_id, count(*) as cnt FROM observations GROUP BY station_id) x
-                where t.station_id = x.station_id
-                ORDER by cnt"""
+                FROM stations t
+                LEFT JOIN
+                (select station_id, count(*) as cnt FROM observations
+                GROUP BY station_id) x
+                ON t.station_id = x.station_id
+                ORDER BY cnt"""
         cursor = conn.cursor()
         cursor.execute(q)
 
