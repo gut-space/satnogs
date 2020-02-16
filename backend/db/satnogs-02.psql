@@ -3,7 +3,7 @@ insert into schema values(1);
 
 /* Information about stations */
 create table stations (station_id serial PRIMARY KEY NOT NULL,
-                       name varchar[64] NOT NULL,
+                       name varchar(64) NOT NULL,
                        lon float NOT NULL,
                        lat float NOT NULL,
                        descr varchar NOT NULL,
