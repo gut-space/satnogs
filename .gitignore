@@ -1,3 +1,8 @@
 /automation/config/config.yml
 /automation/config/http*
+backend/satnogs.ini
+__pycache__
+backend/app/data
 venv
+.DS_Store
+.vscode/
