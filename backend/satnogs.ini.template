@@ -1,0 +1,9 @@
+[database]
+host =
+database =
+user =
+password =
+
+[storage]
+image_root =
+

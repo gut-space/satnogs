@@ -1,0 +1,3 @@
+ALTER TABLE stations ALTER COLUMN secret TYPE bytea USING secret::bytea;
+
+UPDATE schema SET version = 4;

@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, conf, utils
+from app import app, utils
 import sys
 import psycopg2
 
@@ -8,10 +8,10 @@ def stations():
     '''This function retrieves list of all registered ground stations.'''
 
     try:
-        cfg = conf.getConfig()
+        cfg = app.config["database"]
 
         # Open a connection
-        conn = psycopg2.connect(host= cfg.db_host, database=cfg.db_name, user=cfg.db_user, password=cfg.db_pass)
+        conn = psycopg2.connect(**cfg)
 
         # Send query
         q = """ SELECT t.station_id, t.name, t.lon, t.lat, t.descr, t.config, t.registered, t.lastobs, x.cnt
