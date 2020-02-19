@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, conf
+from app import app
 import sys
 import psycopg2
 
@@ -8,10 +8,10 @@ def obslist():
     '''This function retrieves observations list from a local database and displays it.'''
 
     try:
-        cfg = conf.getConfig()
+        cfg = app.config["database"]
 
         # Open a connection
-        conn = psycopg2.connect(host= cfg.db_host, database=cfg.db_name, user=cfg.db_user, password=cfg.db_pass)
+        conn = psycopg2.connect(**cfg)
 
         # Send query
         q = "SELECT obs_id, aos, tca, los, sat_name, filename, station_id FROM observations ORDER by aos desc LIMIT 100"

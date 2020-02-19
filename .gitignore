@@ -6,3 +6,5 @@ backend/app/data
 venv
 .DS_Store
 .vscode/
+/backend/.env/bin/
+/backend/.env/
