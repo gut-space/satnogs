@@ -1,5 +1,4 @@
-
-
+import subprocess
 
 def coords(lon, lat):
     t = "%2.4f" % lat
@@ -14,3 +13,6 @@ def coords(lon, lat):
     else:
         t += "W"
     return t
+
+def make_thumbnail(input_path, output_path, width=200):
+    subprocess.check_call(["convert" ,"-thumbnail", str(width), input_path, output_path])

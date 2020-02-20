@@ -7,3 +7,6 @@ password =
 [storage]
 image_root =
 
+[security]
+ignore_hmac_validation_errors =
+
