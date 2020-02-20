@@ -1,17 +1,25 @@
 POST http://127.0.0.1:5000/receive HTTP/1.1
 Content-Type: multipart/form-data; boundary=boundary
-Authorization: HMAC-SHA256 1,2020-02-19T21:56,sig
+Authorization: HMAC-SHA256 1,2020-02-20T21:56,sig
 
 --boundary
-Content-Disposition: form-data; name="name"
+Content-Disposition: form-data; name="aos"
 
-foo
+2020-02-20T21:39:26
 --boundary
-Content-Disposition: form-data; name="pass"
+Content-Disposition: form-data; name="tca"
 
-bar
+2020-02-20T21:39:26
 --boundary
-Content-Disposition: form-data; name="image"; filename="x.png"
+Content-Disposition: form-data; name="los"
+
+2020-02-20T21:39:26
+--boundary
+Content-Disposition: form-data; name="sat"
+
+NOAA-15
+--boundary
+Content-Disposition: form-data; name="file"; filename="x.png"
 Content-Type: image/png
 
 < ./x.png
