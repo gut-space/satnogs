@@ -9,11 +9,25 @@ This package is designed for use in server and station side.
 It should have only standard library dependencies.
 '''
 
+AUTHORIZATION_ALGORITHM = "HMAC-SHA256"
 SIG_LIFETIME = datetime.timedelta(minutes=2, seconds=30)
+
+def _handle_files_in_body(body: Dict):
+    '''Replace file-like values with hashes'''
+    res = {}
+    for k, v in body.items():
+        if hasattr(v, "read") and hasattr(v, "seek"):
+            hash_ = hashlib.sha1(v.read()).hexdigest()
+            res[k] = hash_
+            v.seek(0)
+        else:
+            res[k] = v
+    return res
 
 def _get_sig_basestring(id_: str, body: Dict, date: datetime.datetime):
     '''Create basestring for signature'''
     timestamp = date.isoformat(timespec='seconds')
+    body = _handle_files_in_body(body)
 
     pairs = sorted(body.items(), key=lambda p: p[0])
     body_string = "&".join("%s=%s" % (k, v) for k, v in pairs)
@@ -58,7 +72,7 @@ def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
         Crypto-safe bytes used by HMAC algorithm
     body: Dict
         Dictionary with key-value pairs which are signed by HMAC signature in token
-        Key and values should be strings (or at lease primitive types)
+        Key and values should be strings (or at lease primitive types) or file-like
     check_date: datetime.datetime
         The moment when token should be valid. If None is passed then now is used.
 

@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8080/receive HTTP/1.1
+POST http://127.0.0.1:5000/receive HTTP/1.1
 Content-Type: multipart/form-data; boundary=boundary
 Authorization: HMAC-SHA256 1,2020-02-20T21:56,sig
 

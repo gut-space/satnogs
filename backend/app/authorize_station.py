@@ -7,29 +7,17 @@ from flask import abort, request
 import psycopg2
 
 from . import app
-from .hmac_token import parse_token, validate_token
-
-AUTHORIZATION_ALGORITHM = "HMAC-SHA256"
+from .hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
 
 cfg = app.config["database"]
 
 def _get_body(request):
     '''
-    Return dict with request arguments.
-    If request has attached files then it's content
-    is hashed using SHA-1.
-
-    ToDo: Now this function supports only form data.
+    Return dict with request arguments..
     '''
-    file_hashes = {}
-    for k, v in request.files.items():
-        hash_ = hashlib.sha1(v.read()).hexdigest()
-        file_hashes[k]: hash_
-        v.seek(0)
-
     body = {}
     body.update(request.form)
-    body.update(file_hashes)
+    body.update(request.files)
     return body
 
 def _get_secret(conn, station_id):

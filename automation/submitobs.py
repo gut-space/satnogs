@@ -1,85 +1,51 @@
-import os.path
 #!/usr/bin/python
-
-# This tool is used to upload recorded observations to the on-line database. Usage:
-#
-# ./submit-ops.py filename sat_name aos [tca] [los] [notes]
-#
-# filename - name of the PNG file
-# aos - timestamp, aquisiton of signal
-# tca - timestamp, time of closest approach
-# los - timestamp, loss of signal
-# sat_name - name of the satellite
-# notes - a string with notes
-
-# SSH connection
-username="satnogs"
-
-hostname="satnogs.klub.com.pl"
-destdir="data"
-
-# Uncomment this for local deployment
-#hostname="localhost"
-#destdir="/var/www/html"
-
-# Postgres connection
-dbuser="satnogs"
-dbname="satnogs"
-
-import sys
+import datetime
 import os
+import requests
 import subprocess
+import sys
 
-def submit_observation(image_path, sat_name, aos, tca, los, notes):
+from utils import open_config
+from hmac_token import get_token, AUTHORIZATION_ALGORITHM
 
-    directory, filename = os.path.split(image_path)
+config = open_config()
+section = config["server"]
+station_id = str(section["id"])
+secret = bytearray.fromhex(section["secret"])
+url = section["url"]
 
-    # First we need to make sure there's the destination directory
-    params = []
-    if hostname != "localhost":
-        params.append("ssh")
-        params.append(hostname)
+def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, tca: datetime.datetime, los: datetime.datetime, notes: str):
+    _, filename = os.path.split(image_path)
+    form_data = {
+        "aos": aos.isoformat(),
+        "tca": tca.isoformat(),
+        "los": los.isoformat(),
+        "sat": sat_name,
+        "notes": notes
+    }
 
-    params.append("mkdir")
-    params.append("-p")
-    params.append(os.path.join(destdir, "thumbs"))
-    subprocess.call(params)
+    file_obj = open(image_path, 'rb') 
+    body = {
+        "file": file_obj
+    }
+    body.update(form_data)
 
-    # Make thumbnail
-    thumbnail_path = os.path.join(directory, "thumb-" + filename)
-    subprocess.call(["convert" ,"-thumbnail", "200", image_path, thumbnail_path])
-    # Second step is to copy (cp or scp) the file to its destination
-    for path, subdir in [(image_path, ""), (thumbnail_path, "thumbs")]:
-        params = []
-        if hostname != "localhost":
-            dst = "%s:%s" % (hostname, os.path.join(destdir, subdir))
-            params.append("scp")
-        else:
-            dst = "%s/data" % destdir
-            params.append("cp")
-        params.append(path)
-        params.append(dst)
+    token = get_token(station_id, secret, body, datetime.datetime.utcnow())
 
-        subprocess.call(params)
-    os.remove(thumbnail_path)
+    headers = {
+        "Authorization": "%s %s" % (AUTHORIZATION_ALGORITHM, token)
+    }
 
-    # Finally, we need to create the DB entry
-    sqlcmd = "INSERT INTO observations(aos,tca,los,sat_name,filename) VALUES('%s', '%s', '%s', '%s', '%s');" % (aos, tca, los, sat_name, filename)
+    files = {
+        "file": (
+            filename,
+            file_obj,
+            "image/png",
+            {}
+        )
+    }
 
-    params = []
-    if hostname != "localhost":
-        params.append("ssh")
-        params.append(hostname)
-        params.append("psql -c \"%s\" %s" % (sqlcmd, dbname))
-    else:
-        params.append("psql")
-        params.append("-U")
-        params.append(dbuser)
-        params.append("-c")
-        params.append(sqlcmd)
-        params.append(dbname)
-    subprocess.call(params)
-
+    requests.post(url, form_data, headers=headers, files=files)
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
@@ -88,7 +54,7 @@ if __name__ == '__main__':
 
     filename=sys.argv[1]
     sat_name=sys.argv[2]
-    aos=tca=los=sys.argv[3]
+    aos=tca=los=datetime.datetime.fromisoformat(sys.argv[3])
     notes="..."
 
     if len(sys.argv) >= 5:
