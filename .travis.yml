@@ -10,7 +10,9 @@ before_install:
   - pip3 install DateTimeRange
   - pip3 install orbit_predictor
 
-script: pytest -v
+script:
+  - cd automation && pytest -v
+  - cd backend && pytest -v
 
 notifications:
   email:

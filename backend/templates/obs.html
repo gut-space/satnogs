@@ -3,6 +3,7 @@
 {% block content %}
     <h3>Observation  {{ obs.obs_id }}</h3>
 
+    {% if obs.filename %}
     <p>
         Thumbnail:<br/>
         <img src="/data/thumbs/{{ obs.thumbfile }}" />
@@ -17,4 +18,5 @@
         LOS: {{ obs.los }}<br/>
         Ground station: ... <br/>
     </p>
+    {% endif %}
 {% endblock %}

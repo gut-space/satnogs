@@ -25,14 +25,25 @@ def obs(obs_id = None):
     except Exception as e:
         return "Error when connecting to DB: %s" % e
 
-    row = data[0]
     x = {}
-    x['obs_id'] = row[0]
-    x['aos'] = row[1]
-    x['tca'] = row[2]
-    x['los'] = row[3]
-    x['sat_name'] = row[4]
-    x['filename'] = row[5]
-    x['thumbfile'] = "thumb-" + row[5]
+    if (len(data)):
+        # If there's a row (observation with specified obs_id found), then get the row data and use it.
+        row = data[0]
+        x['obs_id'] = row[0]
+        x['aos'] = row[1]
+        x['tca'] = row[2]
+        x['los'] = row[3]
+        x['sat_name'] = row[4]
+        x['filename'] = row[5]
+        x['thumbfile'] = "thumb-" + row[5]
+    else:
+        # If there's no row, then the obs_id is invalid.
+        x['obs_id'] = obs_id + " (not found)"
+        x['aos'] = None
+        x['tca'] = None
+        x['los'] = None
+        x['sat_name'] = None
+        x['filename'] = None
+        x['thumbfile'] = ""
 
     return render_template('obs.html', obs = x)
