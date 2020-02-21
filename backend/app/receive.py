@@ -25,7 +25,7 @@ cfg = app.config["database"]
 })
 def receive(station_id, args):
     if len(request.files) == 0:
-        abort(400)
+        abort(400, description="Missing file")
 
     file_ = args['file']
     filename = "%s-%s" % (str(uuid.uuid4()), file_.filename)
@@ -35,7 +35,7 @@ def receive(station_id, args):
             cursor.execute("SELECT sat_id FROM satellites WHERE sat_name = %s LIMIT 1;", (args["sat"],))
             row = cursor.fetchone()
             if row is None:
-                abort(400)
+                abort(400, description="Unknown satellite")
             sat_id = row[0]
             cursor.execute(
                 "INSERT INTO observations (aos, tca, los, sat_id, sat_name, filename, notes, station_id)"
