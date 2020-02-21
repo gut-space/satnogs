@@ -12,7 +12,7 @@ before_install:
 
 script:
   - cd automation && pytest -v
-  - cd ../backend && pytest -v
+  - cd ../backend && PYTHONTEST=. pytest -v
 
 notifications:
   email:
