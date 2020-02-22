@@ -37,6 +37,13 @@ def update_config(config, args, names):
 def get_hash(obj):
     return DeepHash(obj)[obj]
 
+def hex_bytes(value):
+    try:
+        bytearray.fromhex(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%s is invalid hex bytes value" % (value,))
+    return value
+
 parser = argparse.ArgumentParser(APP_NAME)
 subparsers = parser.add_subparsers(help='commands', dest="command")
 
@@ -69,6 +76,10 @@ norad_config_parser = config_subparsers.add_parser("norad", help="Manage sources
 norad_config_parser.add_argument("urls", nargs="*", type=str, help="URLs of NORAD data")
 norad_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete NORAD")
 norad_config_parser.add_argument("-r", "--refresh", action="store_true", default=False, help="Re-fetch necessary NORAD files")
+server_config_parser = config_subparsers.add_parser("server", help="Manage credentials to connect to content server")
+server_config_parser.add_argument("-u", "--url", type=str, help="URL of content server")
+server_config_parser.add_argument("--id", type=str, help="Station ID")
+server_config_parser.add_argument("-s", "--secret", type=hex_bytes, help="HMAC secret shared with content server")
 
 args = parser.parse_args()
 command = args.command
@@ -168,6 +179,9 @@ elif command == "config":
                 else:
                     db = OrbitDatabase(section)
                     print(db)
+    elif config_command == "server":
+        section = config["server"]
+        update_config(section, args, ("id", "url", "secret"))
     is_changed = get_hash(config) != init_hash
     if is_changed:
         save_config(config)
