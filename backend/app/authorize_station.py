@@ -47,6 +47,10 @@ def _verify_request():
     station_id, *_ = parse_token(token)
     with psycopg2.connect(**cfg) as conn:
         secret = _get_secret(conn, station_id)
+    
+    if secret is None:
+        return False, station_id
+
     body = _get_body(request)
 
     return validate_token(token, secret, body)
