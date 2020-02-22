@@ -99,5 +99,5 @@ if __name__ == '__main__':
         os.remove(wav_filename)
 
     if not debug and os.path.exists(png_filename):
-        submit_observation(png_filename, name, str(now_datetime), str(now_datetime), str(los_datetime), "")
+        submit_observation(png_filename, name, now_datetime, now_datetime, los_datetime, "")
         os.remove(png_filename)

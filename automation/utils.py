@@ -34,7 +34,7 @@ def get_planner_command(directory=None):
 def get_receiver_command(directory=None):
     return _get_command(directory, "receiver.py")
 
-DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.3833\n  longitude: 18.4667\n  name: Taneczna\nmax_elevation_greater_than: 0\nsatellites:\n- freq: 137.62e6\n  name: NOAA 15\n- freq: 137.9125e6\n  name: NOAA 18\n- freq: 137.1e6\n  name: NOAA 19\nnorad:\n- https://celestrak.com/NORAD/elements/noaa.txt\n- https://celestrak.com/NORAD/elements/active.txt'
+DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.9\n  longitude: 54.9\n  name: Taneczna\nmax_elevation_greater_than: 0\nnorad:\n- https://celestrak.com/NORAD/elements/noaa.txt\n- https://celestrak.com/NORAD/elements/active.txt\nsatellites:\n- freq: 137.62e6\n  name: NOAA 15\n- freq: 137.9125e6\n  name: NOAA 18\n- freq: 137.1e6\n  name: NOAA 19\nserver:\n  id: 1\n  secret: 873730d540e1154cf3203b09546ac1fe\n  url: http://127.0.0.1:5000/receive\nstrategy: max-elevation\n'
 
 def open_crontab() -> CronTab:
     if DEV_ENVIRONEMT:

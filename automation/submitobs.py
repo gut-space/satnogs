@@ -15,6 +15,24 @@ secret = bytearray.fromhex(section["secret"])
 url = section["url"]
 
 def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, tca: datetime.datetime, los: datetime.datetime, notes: str):
+    '''
+    Submit observation to content server.
+
+    Parameters
+    ==========
+    image_path: str
+        Path to PNG image
+    sat_name: str
+        Satellite name compatible with NORAD format
+    aos: datetime.datetime
+        Acquisition of Signal (or Satellite)
+    tca: datetime.datetime
+        Time of Closest Approach
+    los: datetime.datetime
+        Loss of Signal (or Satellite)
+    notes: str
+        Any text note
+    '''
     _, filename = os.path.split(image_path)
     form_data = {
         "aos": aos.isoformat(),
