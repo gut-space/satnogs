@@ -56,6 +56,6 @@ def receive(station_id, args):
     root = app.config["storage"]['image_root']
     path = os.path.join(root, filename)
     file_.save(path)
-    thumb_path = os.path.join(root, "thumb", "thumb-" + filename)
+    thumb_path = os.path.join(root, "thumbs", "thumb-" + filename)
     make_thumbnail(path, thumb_path)
     return '', 204

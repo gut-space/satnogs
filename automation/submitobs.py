@@ -63,8 +63,7 @@ def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, t
         )
     }
 
-    response = requests.post(url, form_data, headers=headers, files=files)
-    print(response.content)
+    requests.post(url, form_data, headers=headers, files=files)
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
