@@ -79,7 +79,7 @@ def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
     Returns
     =======
     Pair with validation result and id_ - (bool, str).
-    Validation result is True if token was verified successfully or False if it didn't.
+    Validation result is None if token verify successfully or string with error message otherwise.
     Id is returned even if validation fails, but you shouldn't trust that it is valid.
 
     Notes
@@ -92,11 +92,11 @@ def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
     secret = b'\x9a\x19=\xfc\xd8\xe6\x13V4tD%\xf1\xfe\x1c\xdd'
     body = { 'foo': 4, 'bar':2 }
     token = '1,2020-02-21T21:09:45,2a6b59a8971f6c98bafa73abbfc8bc2809f31d205a3b081f8bc1b55a9970e778'
-    res, id_ = validate_token(token, secret, body)
-    if res:
+    error, id_ = validate_token(token, secret, body)
+    if error is None:
         print("Authorized with %s id" % (id_,))
     else:
-        print("Unauthorized")
+        print("Unauthorized: %s" % (error,))
     '''
     id_, create_date, sig = parse_token(token)
 
@@ -104,9 +104,9 @@ def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
         check_date = datetime.datetime.utcnow()
     delta = abs(check_date - create_date)
     if delta > SIG_LIFETIME:
-        return False, id_
+        return "Token expired", id_
 
     if _verify_signature(sig, secret, id_, body, create_date):
-        return True, id_
+        return None, id_
     else:
-        return False, id_
+        return "Invalid signature", id_

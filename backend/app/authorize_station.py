@@ -40,25 +40,25 @@ def _verify_request() -> Tuple[bool, str]:
     '''Verify Authorization header in current request.
 
     Returns
-        -------
+    -------
         bool
-            True if successful, False otherwise.
+            None if successful, error message otherwise.
         str
             station_id (if successful) or None (if unsuccessful)
     '''
     header = request.headers.get("Authorization")
     if header is None:
-        return False, None
+        return "Missing Authorization header", None
     algorithm, token = header.split()
     if algorithm != AUTHORIZATION_ALGORITHM:
-        return False, None
+        return "Wrong authorization method", None
 
     station_id, *_ = parse_token(token)
     with psycopg2.connect(**cfg) as conn:
         secret = _get_secret(conn, station_id)
 
     if secret is None:
-        return False, station_id
+        return "Secret not set", station_id
 
     body = _get_body(request)
 
@@ -127,8 +127,9 @@ def authorize_station(f):
     '''
     @wraps(f)
     def decorated_function(*args, **kws):
-        res, id_ = _verify_request()
-        if not res and not app.config["security"].get("ignore_hmac_validation_errors"):
-            abort(401, description="Authorization failed")
+        err, id_ = _verify_request()
+        if err is not None:
+            if app.config["security"].get("ignore_hmac_validation_errors", "false").lower() != "true":
+                abort(401, description="Authorization failed: %s" % (err,))
         return f(id_, *args, **kws)
     return decorated_function
