@@ -79,12 +79,12 @@ def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
     Returns
     =======
     Pair with validation result and id_ - (bool, str).
-    Validation result is True if token verify successfully or False if not.
-    Id is returned even if validation fail, but you shouldn't trust that it is valid.
+    Validation result is True if token was verified successfully or False if it didn't.
+    Id is returned even if validation fails, but you shouldn't trust that it is valid.
 
     Notes
     =====
-    Timestamp may be max 2.5 minute older or newer
+    Timestamp may be max 2.5 minutes older or newer
     then now. It means that max token lifetime is 5 minutes.
 
     Examples
