@@ -3,6 +3,7 @@ import hashlib
 
 from functools import wraps
 
+from typing import Tuple
 from flask import abort, request
 import psycopg2
 
@@ -35,19 +36,27 @@ def _get_secret(conn, station_id):
             return None
         return row[0].tobytes()
 
-def _verify_request():
-    '''Verify Authorization header in current request'''
+def _verify_request() -> Tuple[bool, str]:
+    '''Verify Authorization header in current request.
+
+    Returns
+        -------
+        bool
+            True if successful, False otherwise.
+        str
+            station_id (if successful) or None (if unsuccessful)
+    '''
     header = request.headers.get("Authorization")
     if header is None:
         return False, None
     algorithm, token = header.split()
     if algorithm != AUTHORIZATION_ALGORITHM:
         return False, None
-    
+
     station_id, *_ = parse_token(token)
     with psycopg2.connect(**cfg) as conn:
         secret = _get_secret(conn, station_id)
-    
+
     if secret is None:
         return False, station_id
 
@@ -104,7 +113,7 @@ def authorize_station(f):
            For example for id equals "1", create date 2020-02-20 18:59:59 UTC,
            and body { 'foo': 1, 'bar': 2 } you should get:
              1:2020-02-20T18:59:59:bar=2&foo=1
-    Next you should create signature:   
+    Next you should create signature:
         7. Use HMAC algorithm with your secret on basestring
 
     Secret must be at least 16 cryptographic-safe random bytes.
@@ -121,5 +130,5 @@ def authorize_station(f):
         res, id_ = _verify_request()
         if not res and not app.config["security"].get("ignore_hmac_validation_errors"):
             abort(401, description="Authorization failed")
-        return f(id_, *args, **kws)            
+        return f(id_, *args, **kws)
     return decorated_function
