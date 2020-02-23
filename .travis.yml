@@ -9,6 +9,7 @@ before_install:
   - pip3 install pytest
   - pip3 install DateTimeRange
   - pip3 install orbit_predictor
+  - pip3 install flask
 
 script:
   - cd automation && pytest -v
