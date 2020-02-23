@@ -8,3 +8,4 @@ venv
 .vscode/
 /backend/.env/bin/
 /backend/.env/
+/backend/data/
