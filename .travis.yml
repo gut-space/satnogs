@@ -7,9 +7,8 @@ python:
 
 before_install:
   - pip3 install pytest
-  - pip3 install DateTimeRange
-  - pip3 install orbit_predictor
-  - pip3 install flask
+  - pip3 install DateTimeRange orbit_predictor
+  - pip3 install flask psycopg2 webargs
 
 script:
   - cd automation && pytest -v
