@@ -1,59 +1,36 @@
-from flask import render_template
+from app.repository import Repository
+from flask import render_template, abort
 from app import app, utils
-import psycopg2
 
 @app.route('/station/<station_id>')
 def station(station_id = None):
 
-    try:
+    repository = Repository()
+    item = repository.read_station(station_id)
+    if item is None:
+        abort(404, "Station not found")
 
-        cfg = app.config["database"]
-
-        # Open a connection
-        conn = psycopg2.connect(**cfg)
-
-        # Send query
-        q = """ SELECT t.station_id, t.name, t.lon, t.lat, t.descr, t.config, t.registered, t.lastobs, x.cnt
-                FROM stations t
-                LEFT JOIN
-                (select station_id, count(*) as cnt FROM observations WHERE station_id = """ + station_id + """
-                GROUP BY station_id) x
-                ON t.station_id = x.station_id WHERE t.station_id = """ + station_id + """
-                """
-        cursor = conn.cursor()
-        cursor.execute(q)
-
-        # Fetch the data
-        data = cursor.fetchall()
-
-        q2 = "SELECT filename, descr, sort FROM station_photos WHERE station_id=" + station_id
-        cursor.execute(q2)
-        data2 = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-    except Exception as e:
-        return "Error when connecting to DB: %s" % e
+    station, count, lastobs = item
+    photos = repository.read_station_photos(station_id)
 
     x = {}
     files = []
 
-    for row in data:
-        x['station_id'] = row[0]
-        x['name'] = row[1]
-        x['coords'] = utils.coords(row[2], row[3])
-        x['descr'] = row[4]
-        x['config'] = row[5]
-        x['registered'] = row[6]
-        x['lastobs'] = row[7]
-        x['cnt'] = row[8]
+    x = {}
+    x['station_id'] = station['station_id']
+    x['name'] = station['name']
+    x['coords'] = utils.coords(station['lon'], station['lat'])
+    x['descr'] = station['descr']
+    x['config'] = station['config']
+    x['registered'] = station['registered']
+    x['lastobs'] = lastobs
+    x['cnt'] = count
 
-    for row in data2:
+    for photo in photos:
         y = {}
-        y['filename'] = row[0]
-        y['descr'] = row[1]
-        y['sort'] = row[2]
+        y['filename'] = photo['filename']
+        y['descr'] = photo['descr']
+        y['sort'] = photo['sort']
         files.append(y)
 
     return render_template('station.html', station = x, files = files)
