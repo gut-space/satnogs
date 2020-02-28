@@ -1,49 +1,17 @@
-from flask import render_template
+from flask import render_template, abort
 from . import app
+from app.repository import Repository
 import psycopg2
 
 @app.route('/obs/<obs_id>')
 def obs(obs_id = None):
+    if obs_id is None:
+        abort(300, description="ID is required")
 
-    try:
+    repository = Repository()
+    observation = repository.read_observation(obs_id)
 
-        cfg = app.config["database"]
+    if observation is None:
+        abort(404, "Observation not found")
 
-        # Open a connection
-        conn = psycopg2.connect(**cfg)
-
-        # Send query
-        q = "SELECT obs_id, aos, tca, los, sat_name, filename FROM observations WHERE obs_id = " + obs_id;
-        cursor = conn.cursor()
-        cursor.execute(q)
-
-        # Fetch the data
-        data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-    except Exception as e:
-        return "Error when connecting to DB: %s" % e
-
-    x = {}
-    if (len(data)):
-        # If there's a row (observation with specified obs_id found), then get the row data and use it.
-        row = data[0]
-        x['obs_id'] = row[0]
-        x['aos'] = row[1]
-        x['tca'] = row[2]
-        x['los'] = row[3]
-        x['sat_name'] = row[4]
-        x['filename'] = row[5]
-        x['thumbfile'] = "thumb-" + row[5]
-    else:
-        # If there's no row, then the obs_id is invalid.
-        x['obs_id'] = obs_id + " (not found)"
-        x['aos'] = None
-        x['tca'] = None
-        x['los'] = None
-        x['sat_name'] = None
-        x['filename'] = None
-        x['thumbfile'] = ""
-
-    return render_template('obs.html', obs = x)
+    return render_template('obs.html', obs = observation)

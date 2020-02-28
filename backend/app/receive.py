@@ -1,15 +1,35 @@
+import abc
 import datetime
 import os.path
 import uuid
+from typing import TypedDict, IO, Union
 
 from flask import request, abort
-import psycopg2
 from webargs import fields
 from webargs.flaskparser import use_args
 
 from . import app
 from .authorize_station import authorize_station
 from .utils import make_thumbnail
+from .repository import Observation, ObservationId, Repository, SatelliteId, StationId
+from abc import abstractmethod
+
+class WebFileLike(abc.ABC):
+    @property
+    @abstractmethod
+    def filename(self) -> str:
+        pass
+    @abstractmethod
+    def save(self, path: str) -> None:
+        pass
+
+class RequestArguments(TypedDict):
+    file: WebFileLike
+    aos: datetime.datetime
+    tca: datetime.datetime
+    los: datetime.datetime
+    sat: str
+    notes: str
 
 cfg = app.config["database"]
 
@@ -23,35 +43,34 @@ cfg = app.config["database"]
     'sat': fields.Str(required=True),
     'notes': fields.Str(required=False)
 })
-def receive(station_id, args):
+def receive(station_id: str, args: RequestArguments):
     if len(request.files) == 0:
         abort(400, description="Missing file")
 
     file_ = args['file']
     filename = "%s-%s" % (str(uuid.uuid4()), file_.filename)
 
-    with psycopg2.connect(**cfg) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT sat_id FROM satellites WHERE sat_name = %s LIMIT 1;", (args["sat"],))
-            row = cursor.fetchone()
-            if row is None:
-                abort(400, description="Unknown satellite")
-            sat_id = row[0]
-            cursor.execute(
-                "INSERT INTO observations (aos, tca, los, sat_id, sat_name, filename, notes, station_id)"
-                "VALUES (%(aos)s, %(tca)s, %(los)s, %(sat_id)s, %(sat_name)s, %(filename)s, %(notes)s, %(station_id)s);",
-                {
-                    'aos': args['aos'].isoformat(),
-                    'tca': args['tca'].isoformat(),
-                    'los': args['los'].isoformat(),
-                    'sat_id': sat_id,
-                    'sat_name': args['sat'],
-                    'filename': filename,
-                    'notes': args.get('notes'),
-                    'station_id': int(station_id)
-                }
-            )
-            conn.commit()
+    repository = Repository()
+
+    satellite = repository.read_satellite(args["sat"])
+    if satellite is None:
+        abort(400, description="Unknown satellite")
+
+    sat_id = SatelliteId(satellite["sat_id"])
+    observation: Observation = {
+        'obs_id': ObservationId(0),
+        'aos': args['aos'],
+        'tca': args['tca'],
+        'los': args['los'],
+        'sat_id': sat_id,
+        'sat_name': satellite["sat_name"],
+        'filename': filename,
+        'thumbfile': '',
+        'notes': args.get('notes'),
+        'station_id': StationId(station_id)
+    }
+
+    repository.insert_observation(observation)
 
     root = app.config["storage"]['image_root']
     path = os.path.join(root, filename)

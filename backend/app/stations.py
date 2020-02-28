@@ -1,51 +1,27 @@
+from app.repository import Repository
 from flask import render_template
 from app import app, utils
-import sys
-import psycopg2
 
 @app.route('/stations')
 def stations():
     '''This function retrieves list of all registered ground stations.'''
 
-    try:
-        cfg = app.config["database"]
-
-        # Open a connection
-        conn = psycopg2.connect(**cfg)
-
-        # Send query
-        q = """ SELECT t.station_id, t.name, t.lon, t.lat, t.descr, t.config, t.registered, t.lastobs, x.cnt
-                FROM stations t
-                LEFT JOIN
-                (select station_id, count(*) as cnt FROM observations
-                GROUP BY station_id) x
-                ON t.station_id = x.station_id
-                ORDER BY cnt"""
-        cursor = conn.cursor()
-        cursor.execute(q)
-
-        # Fetch the data
-        data = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-    except Exception as e:
-        return "Unable to connect to Postgres DB: %s " % e
+    repository = Repository()
+    data = repository.read_stations()
 
     # Now convert the data to a list of objects that we can pass to the template.
     stationlist = []
 
-    for row in data:
+    for station, count, lastobs in data:
         x = {}
-        x['station_id'] = row[0]
-        x['name'] = row[1]
-        x['coords'] = utils.coords(row[2], row[3])
-        x['descr'] = row[4]
-        x['config'] = row[5]
-        x['registered'] = row[6]
-        x['lastobs'] = row[7]
-        x['cnt'] = row[8]
+        x['station_id'] = station['station_id']
+        x['name'] = station['name']
+        x['coords'] = utils.coords(station['lon'], station['lat'])
+        x['descr'] = station['descr']
+        x['config'] = station['config']
+        x['registered'] = station['registered']
+        x['lastobs'] = lastobs
+        x['cnt'] = count
 
         stationlist.append(x)
 

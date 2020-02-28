@@ -1,11 +1,9 @@
-import datetime
-import hashlib
+from app.repository import Repository
 
 from functools import wraps
 
-from typing import Tuple
+from typing import Optional, Tuple
 from flask import abort, request
-import psycopg2
 
 from . import app
 from .hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
@@ -21,22 +19,17 @@ def _get_body(request):
     body.update(request.files)
     return body
 
-def _get_secret(conn, station_id):
+def _get_secret(station_id) -> bytes:
     '''
     Fetch station secret from database
 
     ToDo: Returned value should be cached to avoid DDoS and
           DB call before authorization
     '''
-    with conn.cursor() as c:
-        query = "SELECT secret FROM stations WHERE station_id = %s"
-        c.execute(query, (station_id,))
-        row = c.fetchone()
-        if row is None:
-            return None
-        return row[0].tobytes()
+    repository = Repository()
+    return repository.read_station_secret(station_id)
 
-def _verify_request() -> Tuple[bool, str]:
+def _verify_request() -> Tuple[Optional[str], Optional[str]]:
     '''Verify Authorization header in current request.
 
     Returns
@@ -46,7 +39,7 @@ def _verify_request() -> Tuple[bool, str]:
         str
             station_id (if successful) or None (if unsuccessful)
     '''
-    header = request.headers.get("Authorization")
+    header = request.headers.get("Authorization") # type: ignore
     if header is None:
         return "Missing Authorization header", None
     algorithm, token = header.split()
@@ -54,8 +47,7 @@ def _verify_request() -> Tuple[bool, str]:
         return "Wrong authorization method", None
 
     station_id, *_ = parse_token(token)
-    with psycopg2.connect(**cfg) as conn:
-        secret = _get_secret(conn, station_id)
+    secret = _get_secret(station_id)
 
     if secret is None:
         return "Secret not set", station_id
