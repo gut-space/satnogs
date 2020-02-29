@@ -26,10 +26,18 @@ $(document).ready(function(){
                 </a>
             </div>
             <ul class="nav navbar-nav">
-                <li class="active"><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('obslist') }}">Observations</a></li>
-                <li><a href="{{ url_for('stations') }}">Ground stations</a></li>
-                <li><a href="/viewer/">Orbit Viewer</a></li>
+                <li {% if request.path == "/" or request.path == "/index" %}class="active"{% endif %}>
+                    <a href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li {% if request.path == "/obslist" %}class="active"{% endif %}>
+                    <a href="{{ url_for('obslist') }}">Observations</a>
+                </li>
+                <li {% if request.path == "/stations" %}class="active"{% endif %}>
+                    <a href="{{ url_for('stations') }}">Ground stations</a>
+                </li>
+                <li {% if request.path == "/viewer" %}class="active"{% endif %}>
+                    <a href="/viewer/">Orbit Viewer</a>
+                </li>
             </ul>
         </div>
     </nav>
