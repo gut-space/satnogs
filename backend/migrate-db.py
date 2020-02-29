@@ -57,7 +57,10 @@ def migrate(config=None, migration_directory="db"):
     '''
     repository = Repository(config)
 
-    db_version = repository.get_database_version()
+    if repository.is_database_empty():
+        db_version = 0
+    else:
+        db_version = repository.get_database_version()
 
     migrations = list_migrations(migration_directory)
 
