@@ -1,3 +1,8 @@
+'''
+Module encapsulate database operations.
+It is responsible for create and execute SQL queries and support transactional.
+'''
+
 from configparser import Error
 from datetime import datetime
 from functools import wraps
@@ -5,26 +10,7 @@ from typing import Any, Dict, List, TypedDict, NewType, Sequence, NoReturn, Unio
 
 import psycopg2
 
-from psycopg2 import connect
-
-Connection = Any
-Cursor = Any
-
-class RepositoryError(Exception):
-    def __init__(self, message: str):
-        super().__init__(message)
-
-class VersionTableNotExistsError(RepositoryError):
-    def __init__(self):
-        super().__init__("Version table not exists. Your database is in unsupported version. Migrate it manually to 05 version")
-
-class VersionNotSetError(RepositoryError):
-    def __init__(self):
-        super().__init__("Table version is empty")
-
-class TransactionContext(TypedDict):
-    conn: Connection
-    cursor: Cursor
+# Data model
 
 ObservationId = NewType("ObservationId", int)
 StationId = NewType("StationId", int)
@@ -63,7 +49,46 @@ class StationPhoto(TypedDict):
     filename: str
     descr: str
 
+# Errors
+
+class RepositoryError(Exception):
+    '''Base class for Repository module errors.'''
+    def __init__(self, message: str):
+        super().__init__(message)
+
+class VersionTableNotExistsError(RepositoryError):
+    def __init__(self):
+        super().__init__("Version table not exists. Your database is in unsupported version. Migrate it manually to 05 version")
+
+class VersionNotSetError(RepositoryError):
+    def __init__(self):
+        super().__init__("Table version is empty")
+
+class TransactionAlreadyOpenError(RepositoryError):
+    def __init__(self):
+        super().__init__("Other transaction is already open on this repository. " \
+                        "You may to have only one transaction opened in the same time")
+
+# Psycopg2 doesn't provide typing in current version.
+Connection = Any
+Cursor = Any
+
+class _TransactionContext(TypedDict):
+    conn: Connection
+    cursor: Cursor
+
 def use_cursor(f):
+    '''
+    Decorator who ensures that connection is establish and has created cursor.
+
+    If no transaction is pending then it will be create before execution and commit
+    (if execution not throw exceptions) and close after.
+
+    If transaction is pending then it will be used, but not commit after execution.
+
+    You need use this decorator before any public method (endpoint) in repository
+    if it uses database connection.
+    '''
     @wraps(f)
     def wrapper(*args, **kwargs):
         self_obj: Repository = args[0]
@@ -80,15 +105,29 @@ def use_cursor(f):
     return wrapper
 
 class Repository:
+    '''
+    Class for communication with database.
+
+    You can use it with or without transactional.
+    If you don't open transaction manually then it will
+    be create, commit and close automatically.
+
+    For transactional use .transaction method with context manager.
+    '''
     def __init__(self, config=None):
+        '''
+        Config is dictionary of psycopg2.connect method. If you don't
+        provide it then data from INI will be used.
+        '''
         if config is None:
             import app
             config = app.config["database"]
         self._config = config
-        self._transaction_context: Optional[TransactionContext] = None # type: ignore
+        self._transaction_context: Optional[_TransactionContext] = None # type: ignore
 
     @staticmethod
     def _row_to_object(row: Sequence[Any], columns: Sequence[str]) -> Dict[str, Any]:
+        '''Convert sequence of values to dictionary using provided labels as keys.'''
         obj = {}
         for label, value in zip(columns, row):
             obj[label] = value
@@ -100,6 +139,7 @@ class Repository:
 
     @property
     def _cursor(self) -> Cursor:
+        '''Return Cursor in curret transacion.'''
         context = self._transaction_context
         return context.get("cursor")
 
@@ -292,6 +332,10 @@ class Repository:
         cursor.execute(query)
 
     def transaction(self):
+        '''
+        Create new transaction.
+
+        '''
         return Transaction(self)
 
     
@@ -301,29 +345,38 @@ class Transaction:
         self._repository = repository
 
     @property
-    def _transaction_context(self) -> Optional[TransactionContext]:
+    def _transaction_context(self) -> Optional[_TransactionContext]:
+        '''Retrive context from repository'''
         repository = self._repository
         return repository._transaction_context
 
     @_transaction_context.setter
-    def _transaction_context(self, transaction_context: Optional[TransactionContext]):
+    def _transaction_context(self, transaction_context: Optional[_TransactionContext]):
+        '''Set new context in repository'''
         self._repository._transaction_context = transaction_context
 
     def commit(self):
+        '''Save changes permanently'''
         context = self._transaction_context
         conn = context["conn"]
         conn.commit()
 
     def rollback(self):
+        '''Revert changes'''
         context = self._transaction_context
         conn = context["conn"]
         conn.rollback()
 
     def __enter__(self):
+        '''Open new connection and cursor. Store them in repository.'''
+        transaction_context = self._transaction_context
+        if transaction_context is not None:
+            raise TransactionAlreadyOpenError()
+
         config = self._repository._config
         conn: Connection = psycopg2.connect(**config)
         cursor: Cursor = conn.cursor()
-        transaction_context: TransactionContext = {
+        transaction_context: _TransactionContext = {
             'conn': conn,
             'cursor': cursor
         }
@@ -331,6 +384,11 @@ class Transaction:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        '''
+        Close connections. If changes aren't committed then
+        they are lost. If any exception is thrown then connection
+        is closed safely and exception is propagate.
+        '''
         context = self._transaction_context
         context["cursor"].close()
         context["conn"].close()

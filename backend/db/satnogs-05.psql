@@ -1,3 +1,5 @@
+-- Migration add version table for support migration process
+
 CREATE TABLE version (
     id serial primary key,
     "version" int not null

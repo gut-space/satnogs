@@ -5,6 +5,13 @@ from typing import Tuple
 from app.repository import Repository, RepositoryError, VersionTableNotExistsError
 
 def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tuple[int, str]:
+    '''
+    List all files in @directory meet the convention:
+        [@prefix][XX][@extension]
+    where XX is number.
+
+    Function return list of pairs: XX number and path. List is sorted by XX number.
+    '''
     filenames = os.listdir(directory)
 
     migrations = []
@@ -27,6 +34,27 @@ def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tup
     return migrations
 
 def migrate(config=None, migration_directory="db"):
+    '''
+    Perform migrations.
+    
+    Parameters
+    ==========
+    config
+        Dictionary with psycopg2 "connect" method arguments.
+        If None then read INI file
+    migration_directory: str
+        Directory with .psql files. Files must to keep naming convention:
+            satnogs-XX.psql
+        where XX is number of database revision.
+
+    Returns
+    =======
+    Function print migration status on console. Changes are save in database.
+
+    Notes
+    =====
+    If any migration fail then all changes are revert.
+    '''
     repository = Repository(config)
 
     db_version = repository.get_database_version()
