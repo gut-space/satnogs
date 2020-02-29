@@ -327,6 +327,24 @@ class Repository:
         return row[0]
 
     @use_cursor
+    def is_database_empty(self):
+        '''
+        Returns True if no table is in database.
+        @see: https://stackoverflow.com/a/42693458
+        '''
+        query = "SELECT count(*) " \
+                "FROM pg_class c " \
+                "JOIN pg_namespace s ON s.oid = c.relnamespace " \
+                "WHERE s.nspname NOT IN ('pg_catalog', 'information_schema') " \
+                        "AND s.nspname NOT LIKE 'pg_temp%' " \
+                        "AND s.nspname <> 'pg_toast'"
+
+        cursor = self._cursor
+        cursor.execute(query)
+        count = cursor.fetchone()[0]
+        return count == 0
+
+    @use_cursor
     def execute_raw_query(self, query):
         cursor = self._cursor
         cursor.execute(query)
