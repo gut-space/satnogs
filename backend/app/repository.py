@@ -56,14 +56,6 @@ class RepositoryError(Exception):
     def __init__(self, message: str):
         super().__init__(message)
 
-class VersionTableNotExistsError(RepositoryError):
-    def __init__(self):
-        super().__init__("Version table not exists. Your database is in unsupported version. Migrate it manually to 05 version")
-
-class VersionNotSetError(RepositoryError):
-    def __init__(self):
-        super().__init__("Table version is empty")
-
 class TransactionAlreadyOpenError(RepositoryError):
     def __init__(self):
         super().__init__("Other transaction is already open on this repository. " \
@@ -308,31 +300,11 @@ class Repository:
 
     @use_cursor
     def get_database_version(self) -> int:
-        exists_query = "SELECT EXISTS ( " \
-                        "SELECT FROM information_schema.tables " \
-                        "WHERE table_schema = 'public' " \
-                            "AND  table_name = 'version' " \
-                        ");"
-        cursor = self._cursor
-        cursor.execute(exists_query)
-        is_table_version_exists = cursor.fetchone()[0]
-        if not is_table_version_exists:
-            raise VersionTableNotExistsError()
-
-        version_query = 'SELECT "version" FROM "version" LIMIT 1'
-        cursor.execute(version_query)
-        row = cursor.fetchone()
-        if row is None:
-            raise VersionNotSetError()
-        return row[0]
-
-    @use_cursor
-    def is_database_empty(self):
         '''
-        Returns True if no table is in database.
+        Returns database version. Return 0 if database is empty.
         @see: https://stackoverflow.com/a/42693458
         '''
-        query = "SELECT count(*) " \
+        is_database_empty_query = "SELECT count(*) " \
                 "FROM pg_class c " \
                 "JOIN pg_namespace s ON s.oid = c.relnamespace " \
                 "WHERE s.nspname NOT IN ('pg_catalog', 'information_schema') " \
@@ -340,9 +312,29 @@ class Repository:
                         "AND s.nspname <> 'pg_toast'"
 
         cursor = self._cursor
-        cursor.execute(query)
-        count = cursor.fetchone()[0]
-        return count == 0
+        cursor.execute(is_database_empty_query)
+        is_database_empty = cursor.fetchone()[0] == 0
+        
+        if is_database_empty:
+            return 0
+
+        exists_query = "SELECT EXISTS ( " \
+                        "SELECT FROM information_schema.tables " \
+                        "WHERE table_schema = 'public' " \
+                            "AND  table_name = 'schema' " \
+                        ");"
+        cursor = self._cursor
+        cursor.execute(exists_query)
+        is_table_version_exists = cursor.fetchone()[0]
+        if not is_table_version_exists:
+            return 1
+
+        version_query = 'SELECT "version" FROM "schema" LIMIT 1'
+        cursor.execute(version_query)
+        row = cursor.fetchone()
+        if row is None:
+            raise VersionNotSetError()
+        return row[0]
 
     @use_cursor
     def execute_raw_query(self, query):
@@ -350,10 +342,7 @@ class Repository:
         cursor.execute(query)
 
     def transaction(self):
-        '''
-        Create new transaction.
-
-        '''
+        '''Create new transaction.'''
         return Transaction(self)
 
     

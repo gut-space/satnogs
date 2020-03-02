@@ -2,7 +2,7 @@ import os
 import traceback
 from typing import Tuple
 
-from app.repository import Repository, RepositoryError, VersionTableNotExistsError
+from app.repository import Repository
 
 def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tuple[int, str]:
     '''
@@ -57,10 +57,7 @@ def migrate(config=None, migration_directory="db"):
     '''
     repository = Repository(config)
 
-    if repository.is_database_empty():
-        db_version = 0
-    else:
-        db_version = repository.get_database_version()
+    db_version = repository.get_database_version()
 
     migrations = list_migrations(migration_directory)
 
