@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import sys
+from typing import TypedDict, List, Optional, Literal, Iterable, TypeVar, Callable
 
 from crontab import CronTab
 import yaml
@@ -18,6 +19,42 @@ logging.basicConfig(level=logging.DEBUG if DEV_ENVIRONEMT else logging.ERROR,
                     format='%(asctime)s %(levelname)s %(filename)s:%(lineno)d: %(message)s',
                     filename=os.path.join(CONFIG_DIRECTORY, "log") if not DEV_ENVIRONEMT else None)
 
+
+class LocationConfiguration(TypedDict):
+    elevation: float
+    latitude: float
+    longitude: float
+    name: str
+
+SATELLITE_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL"]
+GLOBAL_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "NONE"]
+
+class SatelliteConfiguration(TypedDict, total=False):
+    freq: str
+    name: str
+    submit: Optional[bool]
+    save_to_disk: Optional[SATELLITE_SAVE_MODE]
+    aos_at: Optional[int]
+    max_elevation_greater_than: Optional[int]
+
+class ServerConfiguration(TypedDict):
+    id: str
+    secret: str
+    url: str
+
+STRATEGY = Literal["max-elevation", "aos"]
+
+class Configuration(TypedDict):
+    aos_at: int
+    location: LocationConfiguration
+    max_elevation_greater_than: int
+    norad: List[str]
+    satellites: List[SatelliteConfiguration]
+    save_to_disk: Optional[GLOBAL_SAVE_MODE]
+    server: ServerConfiguration
+    strategy: Optional[STRATEGY]
+    submit: Optional[bool]
+    obsdir: Optional[str]
 
 def _get_command(directory, filename):
     if directory is None:
@@ -46,7 +83,7 @@ def open_crontab() -> CronTab:
     else:
         return CronTab(user=True)
 
-def open_config():
+def open_config() -> Configuration:
     config_path = CONFIG_PATH
     config_exists = os.path.exists(config_path)
     if not config_exists:
@@ -58,11 +95,13 @@ def open_config():
     with open(config_path) as f:
         return yaml.safe_load(f)
 
-def save_config(config):
+def save_config(config: Configuration):
     with open(CONFIG_PATH, "w") as f:
         return yaml.safe_dump(config, f)
 
-def first(iterable, condition = lambda x: True):
+T = TypeVar("T")
+
+def first(iterable: Iterable[T], condition: Callable[[T], bool] = lambda x: True) -> Optional[T]:
     """
     Returns the first item in the `iterable` that
     satisfies the `condition`.

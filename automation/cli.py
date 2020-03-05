@@ -10,7 +10,7 @@ from deepdiff import DeepHash
 
 import planner
 from orbitdb import OrbitDatabase
-from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, first, \
+from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, SatelliteConfiguration, first, \
                 get_planner_command, get_receiver_command, open_config, save_config, \
                 APP_NAME, open_crontab
 
@@ -44,6 +44,18 @@ def hex_bytes(value):
         raise argparse.ArgumentTypeError("%s is invalid hex bytes value" % (value,))
     return value
 
+def extant_directory(x: str) -> str:
+    """
+    'Type' for argparse - checks that directory exists but does not open.
+    """
+    if not os.path.exists(x):
+        # Argparse uses the ArgumentTypeError to give a rejection message like:
+        # error: argument input: x does not exist
+        raise argparse.ArgumentTypeError("{0} does not exist".format(x))
+    if not os.path.isdir(x):
+        raise argparse.ArgumentTypeError("%s isn't a directory" % (x,))
+    return x
+
 parser = argparse.ArgumentParser(APP_NAME)
 subparsers = parser.add_subparsers(help='commands', dest="command")
 
@@ -62,16 +74,27 @@ location_config_parser = config_subparsers.add_parser("location", help="Change g
 location_config_parser.add_argument("-lat", "--latitude", type=float, help="Latitude in degrees")
 location_config_parser.add_argument("-lng", "--longitude", type=float, help="Longitude in degrees")
 location_config_parser.add_argument("-ele", "--elevation", type=float, help="Elevation in meters")
-prediction_config_parser = config_subparsers.add_parser("global", help="Change global prediction parameters")
-prediction_config_parser.add_argument("-aos", type=int, help="Elevation (in degress) on AOS")
-prediction_config_parser.add_argument("-me", "--max-elevation", type=int, help="Max elevation greater than")
-prediction_config_parser.add_argument("-s", "--strategy", choices=["aos", "max-elevation"], help="Select strategy to track satellites")
+global_config_parser = config_subparsers.add_parser("global", help="Change global prediction parameters")
+global_config_parser.add_argument("-aos", type=int, help="Elevation (in degress) on AOS")
+global_config_parser.add_argument("-me", "--max-elevation", type=int, help="Max elevation greater than")
+global_config_parser.add_argument("-s", "--strategy", choices=["aos", "max-elevation"], help="Select strategy to track satellites")
+submit_global_config_parser = global_config_parser.add_mutually_exclusive_group()
+submit_global_config_parser.add_argument("--submit", action="store_true", help="Submit observations to content server", dest="submit", default=None)
+submit_global_config_parser.add_argument("--no-submit", action="store_false", help="Don't submit observations to content server", dest="submit", default=None)
+global_config_parser.add_argument("--save-to-disk", choices=("NONE", "SIGNAL", "PRODUCT", "ALL"),
+    help="Choose data saved on disk (SIGNAL - WAV file, PRODUCT - exported imageries, ALL - both, NONE - nothing")
+global_config_parser.add_argument("--directory", type=extant_directory, help="Directory to store observations")
 satellite_config_parser = config_subparsers.add_parser("sat", help="Satellite configuration")
 satellite_config_parser.add_argument("name", type=str, help="Satellite name", nargs='?')
 satellite_config_parser.add_argument("-f", "--frequency", type=str, help="Frequency in Hz. Allowed scientific notation.")
 satellite_config_parser.add_argument("-aos", type=int, help="Elevation (in degress) on AOS")
 satellite_config_parser.add_argument("-me", "--max-elevation", type=int, help="Max elevation greater than")
 satellite_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete satellite")
+submit_satellite_config_parser = satellite_config_parser.add_mutually_exclusive_group()
+submit_satellite_config_parser.add_argument("--submit", action="store_true", help="Submit observations to content server", dest="submit", default=None)
+submit_satellite_config_parser.add_argument("--no-submit", action="store_false", help="Don't submit observations to content server", dest="submit", default=None)
+satellite_config_parser.add_argument("--save-to-disk", choices=("SIGNAL", "PRODUCT", "ALL", "INHERIT"),
+    help="Choose data saved on disk (SIGNAL - WAV file, PRODUCT - exported imageries, ALL - both, INHERIT - as in global")
 norad_config_parser = config_subparsers.add_parser("norad", help="Manage sources NORAD data")
 norad_config_parser.add_argument("urls", nargs="*", type=str, help="URLs of NORAD data")
 norad_config_parser.add_argument("-d", "--delete", action="store_true", default=False, help="Delete NORAD")
@@ -130,30 +153,53 @@ elif command == "config":
 
     config = open_config()
     section = config
-    init_hash = get_hash(config)
+    init_hash = get_hash(config)    
 
     if config_command == "location":
         section = config["location"]
         update_config(section, args, ("latitude", "longitude", "elevation"))
     elif config_command == "global":
-        update_config(config, args, (("aos_at", "aos"), ("max_elevation_greater_than", "max_elevation"), "strategy"))
+        update_config(config, args, (
+            ("aos_at", "aos"),
+            ("max_elevation_greater_than", "max_elevation"),
+            "strategy",
+            "submit",
+            "save_to_disk",
+            ("directory", "obsdir")
+        ))
     elif config_command == "sat":
         section = config["satellites"]
         if args.name is not None:
-            name = args.name
+            name: str = args.name
             sat = first(section, lambda item: item["name"] == name)
             if sat is None:
-                if not hasattr(args, "frequency"):
+                if not hasattr(args, "frequency") or args.frequency is None:
                     print("Frequency is required for new satellite")
                     sys.exit(1)
-                sat = {
+                new_sat: SatelliteConfiguration = {
                     "name": name,
+                    "freq": ""
                 }
-                section.append(sat)
+                section.append(new_sat)
+                sat = new_sat
             if args.delete:
                 section.remove(sat)
             else:
-                update_config(sat, args, ("frequency", ("aos_at", "aos"), ("max_elevation_greater_than", "max_elevation")))
+                section = sat
+                update_config(sat, args, (
+                    "frequency",
+                    ("aos_at", "aos"),
+                    ("max_elevation_greater_than", "max_elevation")
+                ))
+                if args.submit and 'submit' in sat:
+                    del sat['submit']
+                elif args.submit is False:
+                    sat['submit'] = args.submit
+
+                if args.save_to_disk == "INHERIT" and 'save_to_disk' in sat:
+                    del sat['save_to_disk']
+                else:
+                    sat["save_to_disk"] = args.save_to_disk
         elif args.delete:
             section.clear()
     elif config_command == "norad":
@@ -163,7 +209,7 @@ elif command == "config":
                 section.clear()
             elif args.refresh:
                 db = OrbitDatabase(section)
-                db.refresh_satellites(s.name for s in config["satellites"])
+                db.refresh_satellites(s['name'] for s in config["satellites"])
         elif args.urls is not None:
             if args.delete:
                 for url in args.urls:

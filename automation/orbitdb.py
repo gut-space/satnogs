@@ -2,12 +2,13 @@ import datetime
 import logging
 import os
 import requests
+import requests.exceptions
 import time
 
 from orbit_predictor.sources import NoradTLESource
 from orbit_predictor.predictors.base import Predictor
 
-from utils import DEV_ENVIRONEMT, CONFIG_DIRECTORY, first, APP_NAME, safe_filename
+from utils import CONFIG_DIRECTORY, APP_NAME, safe_filename
 
 CELESTRAK = [
     r"https://celestrak.com/NORAD/elements/active.txt"
@@ -83,14 +84,14 @@ class OrbitDatabase:
         all_sat_ids = set(sat_ids)
         found_sat_ids = set()
         for url in self.urls:
-            sats_to_search = all_sat_ids.difference(found_sat_ids)
-            if len(sats_to_search) == 0:
+            satellites_to_search = all_sat_ids.difference(found_sat_ids)
+            if len(satellites_to_search) == 0:
                 return
 
             path = self._get_current_tle_file(url, force_fetch=True)
             source = NoradTLESource.from_file(path)
             
-            for sat_id in sats_to_search:
+            for sat_id in satellites_to_search:
                 if self._is_in_source(source, sat_id):
                     found_sat_ids.add(sat_id)        
 

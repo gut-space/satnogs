@@ -2,8 +2,8 @@
 import datetime
 import os
 import requests
-import subprocess
 import sys
+from typing import Any, Dict
 
 from utils import open_config
 from hmac_token import get_token, AUTHORIZATION_ALGORITHM
@@ -43,7 +43,7 @@ def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, t
     }
 
     file_obj = open(image_path, 'rb') 
-    body = {
+    body: Dict[str, Any] = {
         "file": file_obj
     }
     body.update(form_data)
