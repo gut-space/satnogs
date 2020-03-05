@@ -6,7 +6,6 @@ import sys
 from typing import Iterable, Tuple
 
 from orbit_predictor.locations import Location
-from orbit_predictor.predictors import PredictedPass
 from datetimerange import DateTimeRange
 
 from selectstrategy import strategy_factory, Observation

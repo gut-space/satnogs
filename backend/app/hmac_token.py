@@ -1,7 +1,7 @@
 import datetime
 import hashlib
 import hmac
-from typing import Dict
+from typing import Dict, Union
 
 '''
 HMAC based token processing - creation, parsing and verification.
@@ -34,7 +34,7 @@ def _get_sig_basestring(id_: str, body: Dict, date: datetime.datetime):
     sig_basestring = ("%s:%s:%s" % (id_, timestamp, body_string)).encode()
     return sig_basestring
 
-def _get_signature(secret: bytes, id_: str,  body: Dict, date: datetime.datetime):
+def _get_signature(secret: Union[bytes, bytearray], id_: str,  body: Dict, date: datetime.datetime):
     '''Create HMAC signature using provided parameters.'''
     sig_basestring = _get_sig_basestring(id_, body, date)
     return hmac.new(secret, sig_basestring, digestmod=hashlib.sha256).hexdigest()
@@ -47,7 +47,7 @@ def _verify_signature(sig: str, secret: bytes, id_: str, body: Dict, create_date
     computed_sig = _get_signature(secret, id_, body, create_date)
     return sig == computed_sig
 
-def get_token(id_: str, secret: bytes, body: Dict, date: datetime.datetime):
+def get_token(id_: str, secret: Union[bytes, bytearray], body: Dict, date: datetime.datetime):
     '''Create HMAC based token using provided parameters.'''
     sig = _get_signature(secret, id_, body, date)
     token = ",".join((id_, date.isoformat(timespec='seconds'), sig))
