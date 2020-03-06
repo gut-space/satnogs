@@ -93,6 +93,9 @@ satellite_config_parser.add_argument("-d", "--delete", action="store_true", defa
 submit_satellite_config_parser = satellite_config_parser.add_mutually_exclusive_group()
 submit_satellite_config_parser.add_argument("--submit", action="store_true", help="Submit observations to content server", dest="submit", default=None)
 submit_satellite_config_parser.add_argument("--no-submit", action="store_false", help="Don't submit observations to content server", dest="submit", default=None)
+disabled_satellite_config_parser = satellite_config_parser.add_mutually_exclusive_group()
+disabled_satellite_config_parser.add_argument("--enabled", action="store_false", help="Enable plan observations", dest="disabled", default=None)
+disabled_satellite_config_parser.add_argument("--disabled", action="store_true", help="Disable plan observations", dest="disabled", default=None)
 satellite_config_parser.add_argument("--save-to-disk", choices=("SIGNAL", "PRODUCT", "ALL", "INHERIT"),
     help="Choose data saved on disk (SIGNAL - WAV file, PRODUCT - exported imageries, ALL - both, INHERIT - as in global")
 norad_config_parser = config_subparsers.add_parser("norad", help="Manage sources NORAD data")
@@ -200,6 +203,12 @@ elif command == "config":
                     del sat['save_to_disk']
                 elif args.save_to_disk is not None:
                     sat["save_to_disk"] = args.save_to_disk
+
+                if args.disabled:
+                    sat["disabled"] = True
+                elif "disabled" in sat:
+                    del sat['disabled']
+
         elif args.delete:
             section.clear()
     elif config_command == "norad":

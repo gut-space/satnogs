@@ -23,7 +23,7 @@ def get_passes(config, from_: datetime.datetime, to: datetime.datetime):
     location = Location(config["location"]["name"],
         config["location"]["latitude"], config["location"]["longitude"],
         config["location"]["elevation"])
-    satellties = config["satellites"]
+    satellties = filter(lambda s: not getattr(s, "disabled", False), config["satellites"])
     strategy_name = config.get("strategy", "max-elevation")
 
     orbit_db = OrbitDatabase(config["norad"])
