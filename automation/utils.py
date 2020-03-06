@@ -2,11 +2,16 @@ import datetime
 import logging
 import os
 import sys
-from typing import TypedDict, List, Optional, Literal, Iterable, TypeVar, Callable
+from typing import List, Optional, Literal, Iterable, TypeVar, Callable
 
 from crontab import CronTab
 import yaml
 
+if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+    from typing import TypedDict
+else:
+    class TypedDict:
+        pass
 
 DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
 APP_NAME = "SatNOG-PG"
