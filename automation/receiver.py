@@ -119,15 +119,15 @@ if __name__ == '__main__':
 
     postprocess_path = factory.get_postprocess_result(name, wav_filename)
 
-    if save_mode not in ("SIGNAL", "ALL"):
-        os.remove(wav_filename)
-    else:
+    if save_mode in ("SIGNAL", "ALL"):
         move_to_satellite_directory(root_directory, name, wav_filename)
+    else:
+        os.remove(wav_filename)
 
     if should_submit:
         submit_observation(postprocess_path, name, now_datetime, now_datetime, los_datetime, "")
 
-    if save_mode not in ("PRODUCT", "ALL"):
-        os.remove(postprocess_path)
-    else:
+    if save_mode in ("PRODUCT", "ALL"):
         move_to_satellite_directory(root_directory, name, postprocess_path)
+    else:
+        os.remove(postprocess_path)
