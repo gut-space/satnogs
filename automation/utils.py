@@ -10,11 +10,11 @@ import yaml
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict, Literal
 else:
+    from typing import _SpecialForm
     class TypedDict:
         pass
 
-    class Literal:
-        pass
+    Literal = _SpecialForm('Literal', doc="Missing doc") # type: ignore
 
 DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
 APP_NAME = "SatNOG-PG"
