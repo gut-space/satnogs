@@ -187,7 +187,7 @@ elif command == "config":
             else:
                 section = sat
                 update_config(sat, args, (
-                    "frequency",
+                    ("freq", "frequency"),
                     ("aos_at", "aos"),
                     ("max_elevation_greater_than", "max_elevation")
                 ))
@@ -198,7 +198,7 @@ elif command == "config":
 
                 if args.save_to_disk == "INHERIT" and 'save_to_disk' in sat:
                     del sat['save_to_disk']
-                else:
+                elif args.save_to_disk is not None:
                     sat["save_to_disk"] = args.save_to_disk
         elif args.delete:
             section.clear()
