@@ -1,6 +1,6 @@
 import subprocess
 
-from commons import input_output_parser
+from .commons import input_output_parser
 
 def decode_apt(input_path: str, output_path: str):
     subprocess.check_call([

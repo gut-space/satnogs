@@ -1,6 +1,6 @@
 import subprocess
 
-from commons import input_output_parser
+from .commons import input_output_parser
 
 def create_spectogram(input_path: str, output_path: str):
     subprocess.check_call(["sox", input_path, "-n", "spectrogram", "-o", output_path])
