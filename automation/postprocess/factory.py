@@ -1,7 +1,7 @@
 import os.path
 
-from apt import decode_apt
-from spectrogram import create_spectogram
+from .apt import decode_apt
+from .spectrogram import create_spectogram
 
 def create_output_path(input_path: str, method: str, extension: str) -> str:
     directory, base = os.path.split(input_path)
