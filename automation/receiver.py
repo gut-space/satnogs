@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # Post-processing
     save_mode: Optional[Union[SATELLITE_SAVE_MODE, GLOBAL_SAVE_MODE]]
     save_mode = satellite.get("save_to_disk", None)
-    if save_mode is None:
+    if save_mode is None or save_mode == "INHERIT":
         save_mode = config.get("save_to_disk", None)
     if save_mode is None:
         save_mode = "NONE"

@@ -35,7 +35,7 @@ class LocationConfiguration(TypedDict):
     longitude: float
     name: str
 
-SATELLITE_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL"]
+SATELLITE_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "INHERIT"]
 GLOBAL_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "NONE"]
 
 class SatelliteConfiguration(TypedDict, total=False):
@@ -45,6 +45,7 @@ class SatelliteConfiguration(TypedDict, total=False):
     save_to_disk: Optional[SATELLITE_SAVE_MODE]
     aos_at: Optional[int]
     max_elevation_greater_than: Optional[int]
+    disabled: Optional[bool]
 
 class ServerConfiguration(TypedDict):
     id: str
