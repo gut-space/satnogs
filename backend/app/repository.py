@@ -7,6 +7,7 @@ from configparser import Error
 from datetime import datetime
 from functools import wraps
 from typing import Any, Dict, List, NewType, Sequence, NoReturn, Union, Optional, Tuple
+import sys
 
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict, Literal
