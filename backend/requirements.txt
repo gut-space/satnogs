@@ -4,21 +4,28 @@
 #
 #    pip-compile requirements.in
 #
-chardet==3.0.4            # via mbstrdecoder
+certifi==2019.11.28       # via requests
+chardet==3.0.4            # via mbstrdecoder, requests
 click==7.0                # via flask
 datetimerange==0.6.1      # via -r requirements.in
 flask==1.1.1              # via -r requirements.in
+idna==2.9                 # via requests
 itsdangerous==1.1.0       # via flask
 jinja2==2.11.1            # via flask
 markupsafe==1.1.1         # via jinja2
 marshmallow==3.5.0        # via webargs
 mbstrdecoder==0.8.4       # via typepy
+numpy==1.18.1             # via orbit-predictor
+orbit-predictor==1.12.0   # via -r requirements.in
 psycopg2==2.8.4           # via -r requirements.in
 python-dateutil==2.8.1    # via datetimerange, typepy
 pytz==2019.3              # via typepy
+requests==2.23.0          # via orbit-predictor
+sgp4==2.4                 # via orbit-predictor
 six==1.14.0               # via python-dateutil, typepy
 typepy[datetime]==0.6.6   # via datetimerange
 typing==3.7.4.1           # via -r requirements.in
+urllib3==1.25.8           # via requests
 webargs==5.5.3            # via -r requirements.in
 werkzeug==1.0.0           # via flask
 
