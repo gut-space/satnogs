@@ -12,6 +12,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
 else:
     from typing_extensions import Literal
 
+RECIPE_DIR = "recipes"
 BASE_DIR = "/tmp/observations_tmp"
 os.makedirs(BASE_DIR, exist_ok=True)
 
@@ -23,7 +24,7 @@ def get_recipe(sat: SatelliteConfiguration) -> str:
     else:
         raise LookupError("Unknown recipe")
 
-    recipe_filename = os.path.join("recipes", recipe + ".sh")
+    recipe_filename = os.path.join(RECIPE_DIR, recipe + ".sh")
     if os.path.exists(recipe_filename):
         return recipe_filename
     else:
@@ -58,4 +59,16 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
         results.append((category, path))
     return results
 
-
+def get_recipe_names():
+    filenames = os.listdir(RECIPE_DIR)
+    recipes = []
+    for filename in filenames:
+        if not filename.endswith(".sh"):
+            continue
+        path = os.path.join(RECIPE_DIR, filename)
+        if not os.path.isfile(path):
+            continue
+        recipe_name, _ = os.path.splitext(filename)
+        recipes.append(recipe_name)
+    return recipes
+        
