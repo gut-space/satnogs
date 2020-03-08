@@ -24,6 +24,7 @@ before_script:
   - psql -c 'create database satnogs;' -U postgres
   - cp backend/.satnogs.ini.travis backend/satnogs.ini
   - cd backend && python migrate-db.py && cd ..
+  - psql -f backend/tests/db-data.psql satnogs
 
 script:
   - # cd automation && pytest -v && cd ..

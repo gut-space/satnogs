@@ -1,0 +1,31 @@
+--
+-- Data for Name: observations; Type: TABLE DATA; Schema: public; Owner: satnogs
+--
+
+--
+-- Data for Name: stations; Type: TABLE DATA; Schema: public; Owner: satnogs
+--
+
+COPY public.stations (station_id, name, lon, lat, descr, config, registered, firstobs, lastobs, secret) FROM stdin;
+1	TKiS-1	18.5317870000000013	54.3524689999999993	The TKiS-1 station was created by Slawek Figiel, Tomek Mrugalski and Ewelina Omernik as part of the group project during \ntheir MSc studies at Gdansk University of Technology.	WiMo TA-1 antenna (omni), RTL-SDR v3, Raspberry Pi 4B	2019-12-15 08:54:53	2019-12-15 08:54:53	2020-02-16 18:26:01.722841	\\x0123456789abcdef
+2	ETI-1	18.6132530000000003	54.3708900000000028	Planned ground station at ETI faculty of Gdansk University of Technology	Configuration is TBD	2020-02-16 21:15:20.615274	\N	\N	\N
+\.
+
+
+COPY public.observations (obs_id, aos, tca, los, sat_id, sat_name, filename, notes, config, tle, station_id) FROM stdin;
+750	2020-03-08 15:35:02.042786	2020-03-08 15:35:02.042786	2020-03-08 15:51:33.972692	33591	NOAA 19	eb38486b-cd40-4879-81e9-31131766e84b-NOAA 19_2020-03-08T15:51:33.972692_apt.png		\N	\N	1
+751	2020-03-08 16:17:02.639337	2020-03-08 16:17:02.639337	2020-03-08 16:32:56.1666	25338	NOAA 15	72e94349-19ad-428c-b812-526971705607-NOAA 15_2020-03-08T16:32:56.166600_apt.png		\N	\N	1
+752	2020-03-08 17:24:02.088677	2020-03-08 17:24:02.088677	2020-03-08 17:39:06.960326	28654	NOAA 18	f6b927bf-1472-4ea6-8657-48265cfae5ca-NOAA 18_2020-03-08T17:39:06.960326_apt.png		\N	\N	1
+\.
+
+--
+-- Data for Name: station_photos; Type: TABLE DATA; Schema: public; Owner: satnogs
+--
+
+COPY public.station_photos (photo_id, station_id, sort, filename, descr) FROM stdin;
+1	1	1	wimo-ta1-antenna.jpg	WiMo antenna
+2	1	2	malina4.jpg	Pi + SDR module
+\.
+
+
+
