@@ -6,7 +6,12 @@ It is responsible for create and execute SQL queries and support transactional.
 from configparser import Error
 from datetime import datetime
 from functools import wraps
-from typing import Any, Dict, List, TypedDict, NewType, Sequence, NoReturn, Union, Optional, Tuple
+from typing import Any, Dict, List, NewType, Sequence, NoReturn, Union, Optional, Tuple
+
+if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+    from typing import TypedDict, Literal
+else:
+    from typing_extensions import TypedDict, Literal
 
 import psycopg2
 
