@@ -24,7 +24,8 @@ for recipe_candidate_name in os.listdir(RECIPE_DIR):
     if not recipe_candidate_name.endswith(".sh"):
         continue
     recipe_path = os.path.join(RECIPE_DIR, recipe_candidate_name)
-    os.chmod(recipe_path, stat.S_IXUSR) 
+    st = os.stat(recipe_path)
+    os.chmod(recipe_path, st.st_mode | stat.S_IXUSR) 
 
 setup(name='SatNOG PG',
       version='1.0',

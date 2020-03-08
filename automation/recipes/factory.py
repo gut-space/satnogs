@@ -23,7 +23,7 @@ def get_recipe(sat: SatelliteConfiguration) -> str:
     else:
         raise LookupError("Unknown recipe")
 
-    recipe_filename = recipe + ".sh"
+    recipe_filename = os.path.join("recipes", recipe + ".sh")
     if os.path.exists(recipe_filename):
         return recipe_filename
     else:
@@ -38,19 +38,31 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
     record_interval = los - now
     record_seconds = record_interval.total_seconds()
 
-    output: str = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)]) # type: ignore
+    output_raw = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)])
+    output = output_raw.decode()
 
     results = []
-    for line in output.split(r"\n"):
+    for line in output.split("\n"):
         line = line.strip()
-        parts = line.split(maxsplit=1)
-        if len(parts) != 2:
+        parts = line.split(maxsplit=2)
+        if len(parts) != 3:
             continue
-        category, path = parts
+        mark, category, path = parts
+        if mark != "!!":
+            continue
         if not category.endswith(":"):
             continue
+        print(line)
         if not os.path.exists(path):
             continue
         category = category.rstrip(":").lower()
         results.append((category, path))
     return results
+
+if __name__ == '__main__':
+    sat = { 'name': 'NOAA UNKNOWN', 'freq': '137e6' }
+    now = datetime.datetime.utcnow()
+    los = now + datetime.timedelta(seconds=5)
+    res = execute_recipe(sat, los)
+    print(res)
+
