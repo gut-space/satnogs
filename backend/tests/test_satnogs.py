@@ -37,8 +37,12 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_obs(self):
-        response = self.app.get('/obs/32', follow_redirects=True)
+        response = self.app.get('/obs/750', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
+
+    def test_obs_missing(self):
+        response = self.app.get('/obs/1', follow_redirects=True)
+        self.assertEqual(response.status_code, 404)
 
     def test_stations(self):
         response = self.app.get('/stations', follow_redirects=True)
