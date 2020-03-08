@@ -1,6 +1,7 @@
 {
     "python.pythonPath": ".env/bin/python",
     "cSpell.words": [
+        "IXUSR",
         "hmac"
     ]
 }

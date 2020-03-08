@@ -3,7 +3,6 @@ import datetime
 import calendar
 import os
 from pprint import pprint
-import subprocess
 import sys
 
 from deepdiff import DeepHash

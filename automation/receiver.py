@@ -9,60 +9,9 @@ import sys
 import typing
 from typing import Union, Optional
 
-from utils import GLOBAL_SAVE_MODE, SATELLITE_SAVE_MODE, first, get_receiver_command, get_planner_command, open_config, SatelliteConfiguration
+from utils import GLOBAL_SAVE_MODE, SATELLITE_SAVE_MODE, first, open_config, SatelliteConfiguration
 from submitobs import submit_observation
-from postprocess import factory
-
-RECEIVER_COMMAND = get_receiver_command()
-
-current_process_terminate: Optional[typing.Callable] = lambda: None
-
-def sigint_handler(signal, frame):
-    logging.debug("Terminate")
-    if current_process_terminate is not None:
-        current_process_terminate()
-    os.kill(os.getpid(), signal.SIGTERM)
-
-signal.signal(signal.SIGINT, sigint_handler)
-
-def record(frequency: str, output_filename: str):
-    logging.debug("Start recording")
-    rtl_process = subprocess.Popen(
-        ["rtl_fm", 
-         "-d", "0",
-         "-f", frequency,
-         "-s", "48000",
-         "-g", "49.6",
-         "-p", "1",
-         "-F", "9",
-         "-A", "fast",
-         "-E", "DC",
-         "-"
-        ], stdout=subprocess.PIPE
-    )
-    sox = subprocess.Popen(
-        ["sox",
-         "-t", "raw",
-         "-b16",
-         "-es",
-         "-r", "48000",
-         "-c1",
-         "-V1",
-         "-", 
-         output_filename,
-         "rate", "11025"], stdin=rtl_process.stdout
-    )
-
-    terminate = lambda: rtl_process.terminate()
-    global current_process_terminate
-    current_process_terminate = terminate
-    return sox, terminate
-
-def on_stop_recording(terminate):
-    terminate()
-    global current_process_terminate
-    current_process_terminate = None
-    logging.debug("Stop recording")
+from recipes import factory
 
 def move_to_satellite_directory(root: str, sat_name: str, path: str):
     now = datetime.datetime.utcnow()
@@ -85,18 +34,10 @@ if __name__ == '__main__':
         logging.error("Unknown satellite")
         sys.exit(1)
 
-    now_datetime = datetime.datetime.utcnow()
+    aos_datetime = datetime.datetime.utcnow()
     los_datetime = datetime.datetime.fromisoformat(los)
-    delta = los_datetime - now_datetime
 
-    wav_filename = "/tmp/%s_%s.wav" % (name, los)
-    frequency = satellite["freq"]
-    process, terminate = record(frequency, wav_filename)
-
-    scheduler = sched.scheduler()
-    scheduler.enter(delta.total_seconds(), 1, on_stop_recording, (terminate,))
-    scheduler.run()
-    process.wait()
+    results = factory.execute_recipe(satellite, los_datetime)
 
     # Post-processing
     save_mode: Optional[Union[SATELLITE_SAVE_MODE, GLOBAL_SAVE_MODE]]
@@ -117,17 +58,21 @@ if __name__ == '__main__':
     if root_directory is None:
         root_directory = "/tmp/observations"
 
-    postprocess_path = factory.get_postprocess_result(name, wav_filename)
+    signal = first(results, lambda r: r[0] == "signal")
+    products = filter(lambda r: r[0] == "product", results)
 
-    if save_mode in ("SIGNAL", "ALL"):
-        move_to_satellite_directory(root_directory, name, wav_filename)
-    else:
-        os.remove(wav_filename)
+    if save_mode in ("SIGNAL", "ALL") and signal is not None:
+        move_to_satellite_directory(root_directory, name, signal[1])
 
     if should_submit:
-        submit_observation(postprocess_path, name, now_datetime, now_datetime, los_datetime, "")
+        product = first(products, lambda _: True)
+        if product is not None:
+            submit_observation(product[1], name, aos_datetime, aos_datetime, los_datetime, "")
 
     if save_mode in ("PRODUCT", "ALL"):
-        move_to_satellite_directory(root_directory, name, postprocess_path)
-    else:
-        os.remove(postprocess_path)
+        for _, path in products:
+            move_to_satellite_directory(root_directory, name, path)
+
+    for _, path in results:
+        if os.path.exists(path):
+            os.remove(path)

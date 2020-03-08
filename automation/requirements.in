@@ -5,3 +5,4 @@ cron-descriptor
 PyYAML
 deepdiff
 matplotlib
+typing-extensions
