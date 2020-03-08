@@ -52,17 +52,10 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
             continue
         if not category.endswith(":"):
             continue
-        print(line)
         if not os.path.exists(path):
             continue
         category = category.rstrip(":").lower()
         results.append((category, path))
     return results
 
-if __name__ == '__main__':
-    sat = { 'name': 'NOAA UNKNOWN', 'freq': '137e6' }
-    now = datetime.datetime.utcnow()
-    los = now + datetime.timedelta(seconds=5)
-    res = execute_recipe(sat, los)
-    print(res)
 
