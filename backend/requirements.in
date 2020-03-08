@@ -2,5 +2,3 @@ Flask
 psycopg2
 webargs
 typing
-datetimerange
-orbit_predictor

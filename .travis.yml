@@ -16,6 +16,7 @@ addons:
     - postgresql-client-10
 
 install:
+  - # pip install -r automation/requirements.txt
   - pip install -r backend/requirements.txt
   - pip install pytest
 
@@ -23,8 +24,8 @@ before_script:
   - psql -c 'create database satnogs;' -U postgres
 
 script:
-  - cd automation && pytest -v
-  - cd ../backend && PYTHONTEST=. pytest -v
+  - # cd automation && pytest -v && cd ..
+  - cd backend && PYTHONTEST=. pytest -v
 
 notifications:
   email:
