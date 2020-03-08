@@ -23,7 +23,7 @@ python-dateutil==2.8.1    # via datetimerange, matplotlib, python-crontab, typep
 pytz==2019.3              # via typepy
 pyyaml==5.3               # via -r requirements.in
 requests==2.23.0          # via orbit-predictor
-sgp4==2.4                 # via orbit-predictor
+sgp4==2.3                 # via orbit-predictor
 six==1.14.0               # via cycler, python-dateutil, typepy
 typepy[datetime]==0.6.6   # via datetimerange
 typing-extensions==3.7.4.1  # via -r requirements.in
