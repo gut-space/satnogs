@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-
+import os
 from setuptools import setup, find_packages
 import shutil
+import stat
 import sys
 
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
 EXTERNAL_DEPENDENCIES = ["noaa-apt", "rtl_fm", "sox"]
+
+RECIPE_DIR = "recipes"
 
 for dep in EXTERNAL_DEPENDENCIES:
     print('Checking if "%s" is installed...' % (dep,), end="")
@@ -15,6 +18,13 @@ for dep in EXTERNAL_DEPENDENCIES:
         sys.exit(1)
     else:
         print("OK")
+
+
+for recipe_candidate_name in os.listdir(RECIPE_DIR):
+    if not recipe_candidate_name.endswith(".sh"):
+        continue
+    recipe_path = os.path.join(RECIPE_DIR, recipe_candidate_name)
+    os.chmod(recipe_path, stat.S_IXUSR) 
 
 setup(name='SatNOG PG',
       version='1.0',

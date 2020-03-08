@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 import sys
-from typing import List, Optional, Iterable, TypeVar, Callable
+from typing import List, Optional, Iterable, TypeVar, Callable, Union
 
 from crontab import CronTab
 import yaml
@@ -10,12 +10,7 @@ import yaml
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict, Literal
 else:
-    from typing import Union
-    class TypedDict:
-        def __init_subclass__(cls, **kwargs):
-            pass
-
-    Literal = Union
+    from typing_extensions import TypedDict, Literal
 
 DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
 APP_NAME = "SatNOG-PG"
@@ -46,6 +41,7 @@ class SatelliteConfiguration(TypedDict, total=False):
     aos_at: Optional[int]
     max_elevation_greater_than: Optional[int]
     disabled: Optional[bool]
+    recipe: Optional[str]
 
 class ServerConfiguration(TypedDict):
     id: str
@@ -103,7 +99,7 @@ def open_config() -> Configuration:
             f.write(DEFAULT_CONFIG)
 
     with open(config_path) as f:
-        return yaml.safe_load(f)
+        return yaml.safe_load(f) # type: ignore
 
 def save_config(config: Configuration):
     with open(CONFIG_PATH, "w") as f:
