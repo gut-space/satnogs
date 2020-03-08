@@ -4,13 +4,23 @@
 #
 #    pip-compile requirements.in
 #
+chardet==3.0.4            # via mbstrdecoder
 click==7.0                # via flask
+datetimerange==0.6.1      # via -r requirements.in
 flask==1.1.1              # via -r requirements.in
 itsdangerous==1.1.0       # via flask
 jinja2==2.11.1            # via flask
 markupsafe==1.1.1         # via jinja2
 marshmallow==3.5.0        # via webargs
+mbstrdecoder==0.8.4       # via typepy
 psycopg2==2.8.4           # via -r requirements.in
+python-dateutil==2.8.1    # via datetimerange, typepy
+pytz==2019.3              # via typepy
+six==1.14.0               # via python-dateutil, typepy
+typepy[datetime]==0.6.6   # via datetimerange
 typing==3.7.4.1           # via -r requirements.in
 webargs==5.5.3            # via -r requirements.in
 werkzeug==1.0.0           # via flask
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
