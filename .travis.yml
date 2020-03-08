@@ -23,7 +23,7 @@ install:
 before_script:
   - psql -c 'create database satnogs;' -U postgres
   - cp backend/.satnogs.ini.travis backend/satnogs.ini
-  - python backend/migrate-db.py
+  - cd backend && python migrate-db.py && cd ..
 
 script:
   - # cd automation && pytest -v && cd ..
