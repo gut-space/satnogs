@@ -1,0 +1,13 @@
+[database]
+host = localhost
+database = satnogs
+user = satnogs
+password = ""
+
+[storage]
+image_root = ~/tmp
+
+[security]
+ignore_hmac_validation_errors = False
+
+
