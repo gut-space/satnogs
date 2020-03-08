@@ -2,7 +2,7 @@ import abc
 import datetime
 import os.path
 import uuid
-from typing import TypedDict, IO, Union
+from typing import IO, Union
 
 from flask import request, abort
 from webargs import fields
@@ -13,6 +13,12 @@ from .authorize_station import authorize_station
 from .utils import make_thumbnail
 from .repository import Observation, ObservationId, Repository, SatelliteId, StationId
 from abc import abstractmethod
+
+import sys
+if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+    from typing import TypedDict, Literal
+else:
+    from typing_extensions import TypedDict, Literal
 
 class WebFileLike(abc.ABC):
     @property

@@ -11,6 +11,7 @@ jinja2==2.11.1            # via flask
 markupsafe==1.1.1         # via jinja2
 marshmallow==3.5.0        # via webargs
 psycopg2==2.8.4           # via -r requirements.in
+typing-extensions==3.7.4.1  # via -r requirements.in
 typing==3.7.4.1           # via -r requirements.in
 webargs==5.5.3            # via -r requirements.in
 werkzeug==1.0.0           # via flask
