@@ -2,6 +2,7 @@ orbit-predictor
 DateTimeRange
 python-crontab
 cron-descriptor
+croniter
 PyYAML
 deepdiff
 matplotlib
