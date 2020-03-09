@@ -12,7 +12,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
 else:
     from typing_extensions import Literal
 
-RECIPE_DIR = "recipes"
+RECIPE_DIR = os.path.join(os.path.split(os.path.abspath(__file__))[0], "recipes")
 BASE_DIR = "/tmp/observations_tmp"
 os.makedirs(BASE_DIR, exist_ok=True)
 
