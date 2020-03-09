@@ -25,7 +25,7 @@ def move_to_satellite_directory(root: str, sat_name: str, path: str):
 
 config = open_config()
 
-if __name__ == '__main__':
+def cmd():
     _, name, los, *opts = sys.argv
     debug = len(opts) != 0
 
@@ -76,3 +76,10 @@ if __name__ == '__main__':
     for _, path in results:
         if os.path.exists(path):
             os.remove(path)
+
+if __name__ == '__main__':
+    try:
+        cmd()
+    except:
+        _, name, los, *opts = sys.argv
+        logging.error("Failed receive %s (LOS: %s)" % (name, los), exc_info=True)
