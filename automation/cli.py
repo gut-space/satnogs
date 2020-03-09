@@ -146,11 +146,32 @@ elif command == "plan":
         print("%s Planner" % (planner_job.description(
             use_24hour_time_format=True, verbose=True)))
 
-        print("\n".join(
-            ("%s %s" % (j.description(use_24hour_time_format=True),
-                        j.command.replace(RECEIVER_COMMAND, ""))
-             for j in pass_jobs)
-        ))
+        for j in pass_jobs:
+            description = j.description(use_24hour_time_format=True)
+            parameters = j.command.replace(RECEIVER_COMMAND, "")
+            schedule = j.schedule()
+            now = datetime.datetime.now()
+            next_ = schedule.get_next()
+            prev = schedule.get_prev()
+            if abs(now - next_) < abs(now - prev):
+                aos = next_
+            else:
+                aos = prev
+
+            try:
+                los_raw = j.command.split()[-1]
+                los = datetime.datetime.fromisoformat(los_raw)
+            except:
+                los = aos
+
+            if now < aos:
+                status = "[ ]"
+            elif now > los:
+                status = "[x]"
+            else:
+                status = ">>>"
+
+            print(" ".join([status, description, parameters]))
 
 elif command == "config":
     config_command = args.config_command

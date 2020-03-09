@@ -7,6 +7,7 @@
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via mbstrdecoder, requests
 cron-descriptor==1.2.24   # via -r requirements.in
+croniter==0.3.31          # via -r requirements.in
 cycler==0.10.0            # via matplotlib
 datetimerange==0.6.1      # via -r requirements.in
 deepdiff==4.2.0           # via -r requirements.in
@@ -19,7 +20,7 @@ orbit-predictor==1.12.0   # via -r requirements.in
 ordered-set==3.1.1        # via deepdiff
 pyparsing==2.4.6          # via matplotlib
 python-crontab==2.4.0     # via -r requirements.in
-python-dateutil==2.8.1    # via datetimerange, matplotlib, python-crontab, typepy
+python-dateutil==2.8.1    # via croniter, datetimerange, matplotlib, python-crontab, typepy
 pytz==2019.3              # via typepy
 pyyaml==5.3               # via -r requirements.in
 requests==2.23.0          # via orbit-predictor

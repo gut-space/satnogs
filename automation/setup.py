@@ -7,7 +7,7 @@ import sys
 
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
-EXTERNAL_DEPENDENCIES = ["noaa-apt", "rtl_fm", "sox", "meteor_demod", "medet"]
+EXTERNAL_DEPENDENCIES = ["noaa-apt", "rtl_fm", "sox", "meteor-demod", "medet"]
 
 RECIPE_DIR = "recipes"
 
@@ -18,7 +18,6 @@ for dep in EXTERNAL_DEPENDENCIES:
         sys.exit(1)
     else:
         print("OK")
-
 
 for recipe_candidate_name in os.listdir(RECIPE_DIR):
     if not recipe_candidate_name.endswith(".sh"):
