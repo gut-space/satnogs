@@ -7,7 +7,7 @@ import sys
 
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
-EXTERNAL_DEPENDENCIES = ["noaa-apt", "rtl_fm", "sox", "meteor-demod", "medet"]
+EXTERNAL_DEPENDENCIES = ["noaa-apt", "rtl_fm", "sox", "meteor-demod", "medet", "convert"]
 
 RECIPE_DIR = "recipes"
 
