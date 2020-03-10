@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from dateutil import tz
 import calendar
 import os
 from pprint import pprint
@@ -151,8 +152,11 @@ elif command == "plan":
             parameters = j.command.replace(RECEIVER_COMMAND, "")
             schedule = j.schedule()
             now = datetime.datetime.now()
+            now = now.replace(tzinfo=tz.tzlocal())
             next_ = schedule.get_next()
+            next_ = next_.replace(tzinfo=tz.tzlocal())
             prev = schedule.get_prev()
+            prev = prev.replace(tzinfo=tz.tzlocal())
             if abs(now - next_) < abs(now - prev):
                 aos = next_
             else:
@@ -161,6 +165,7 @@ elif command == "plan":
             try:
                 los_raw = j.command.split()[-1]
                 los = datetime.datetime.fromisoformat(los_raw)
+                los = los.replace(tzinfo=tz.tzutc())
             except:
                 los = aos
 
