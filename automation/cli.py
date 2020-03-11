@@ -163,7 +163,7 @@ elif command == "plan":
                 aos = prev
 
             try:
-                los_raw = j.command.split()[-1]
+                los_raw = j.command.split()[-1].strip('"')
                 los = datetime.datetime.fromisoformat(los_raw)
                 los = los.replace(tzinfo=tz.tzutc())
             except:
