@@ -2,7 +2,7 @@ import datetime
 import os
 import subprocess
 import sys
-from typing import Iterable, Tuple
+from typing import Iterable, List, Tuple
 import uuid
 
 from utils import SatelliteConfiguration
@@ -12,11 +12,57 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
 else:
     from typing_extensions import Literal
 
+'''
+The different satellites require different software and configuration. We need
+a possibility to add new configurations without rewrite our receive scripts or
+write wrappers in Python for each new subprogram.
+This is a recipe-based solution. "Recipe" is a shell script which is responsible
+for receive signal and decode it.
+
+As input each recipe gets three parameters:
+
+* Base path - it is a prefix for all files created by script. It contains
+              writable directory and random, unique token. It ensure that any
+            file with this prefix may be safe created.
+* Frequency - it is frequency for SDR. It is passed as parameter, because some
+              satellites may to use the same receive and decode flow as NOAA
+              familly
+* LOS date - it is date when script should stop SDR
+
+As output the script should print on standard output in format:
+    !! CATEGORY: PATH
+where CATEGORY is category of file. Now I use "Signal" for initial WAV file and
+"Product" for decoded imagery. I think that we will need a category for waterfall
+and text, binary data in future.
+
+User should have a possibility to execute recipe without using Python code.
+
+Recipe is responsible for cleanup all created files excluded the files printed
+as output. These files are clean up by Python code.
+
+User has a possibility to select recipe by "recipe" parameter in satellite
+config. Now it is optional and script try to deduce recipe based on satellite. 
+(For example if recipe isn't provided and name starts with NOAA then we use
+recipe for NOAA).
+
+All recipes must be located in directory with this file ("recipes"), have ".sh"
+extensions and set execute rights for owner.
+
+Your shell script should starts with the shebang (e.g. #!/bin/sh).
+'''
+
 RECIPE_DIR = os.path.split(os.path.abspath(__file__))[0]
 BASE_DIR = "/tmp/observations_tmp"
 os.makedirs(BASE_DIR, exist_ok=True)
 
 def get_recipe(sat: SatelliteConfiguration) -> str:
+    '''
+    Returns path to recipe file assigned with passed satellite.
+    If recipe doesn't exist throw LookupError.
+    
+    Function check "recipe" field in passed configuration for recipe.
+    If it is empty then check built-in list with compatible recipes.
+    '''
     if "recipe" in sat:
         recipe = sat["recipe"]
     elif sat["name"].startswith("NOAA"):
@@ -31,6 +77,19 @@ def get_recipe(sat: SatelliteConfiguration) -> str:
         raise LookupError("Recipe not exists")
 
 def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Iterable[Tuple[Literal["signal", "product"], str]]:
+    '''
+    Execute recipe for passed satellite and return results.
+
+    Return collection of tuples with category and path.
+    If no recipe found then throw LookupError.
+
+    We use "signal" category for not processed, received signal file
+    and "product" for finish data (e. q. imagery) extracted from signal.
+    You may get multiple files with the same category.
+
+    Caller is responsible for cleanup results.
+    You need delete or move returned files when you don't need them.
+    '''
     recipe_path = get_recipe(sat)
 
     uid = uuid.uuid4()
@@ -59,7 +118,8 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
         results.append((category, path))
     return results
 
-def get_recipe_names():
+def get_recipe_names() -> List[str]:
+    '''Returns all recipe names.'''
     filenames = os.listdir(RECIPE_DIR)
     recipes = []
     for filename in filenames:

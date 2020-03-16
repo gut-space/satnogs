@@ -45,7 +45,7 @@ def hex_bytes(value):
         raise argparse.ArgumentTypeError("%s is invalid hex bytes value" % (value,))
     return value
 
-def extant_directory(x: str) -> str:
+def exist_directory(x: str) -> str:
     """
     'Type' for argparse - checks that directory exists but does not open.
     """
@@ -84,7 +84,7 @@ submit_global_config_parser.add_argument("--submit", action="store_true", help="
 submit_global_config_parser.add_argument("--no-submit", action="store_false", help="Don't submit observations to content server", dest="submit", default=None)
 global_config_parser.add_argument("--save-to-disk", choices=("NONE", "SIGNAL", "PRODUCT", "ALL"),
     help="Choose data saved on disk (SIGNAL - WAV file, PRODUCT - exported imageries, ALL - both, NONE - nothing")
-global_config_parser.add_argument("--directory", type=extant_directory, help="Directory to store observations")
+global_config_parser.add_argument("--directory", type=exist_directory, help="Directory to store observations")
 satellite_config_parser = config_subparsers.add_parser("sat", help="Satellite configuration")
 satellite_config_parser.add_argument("name", type=str, help="Satellite name", nargs='?')
 satellite_config_parser.add_argument("-f", "--frequency", type=str, help="Frequency in Hz. Allowed scientific notation.")

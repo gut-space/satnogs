@@ -13,7 +13,7 @@ else:
     from typing_extensions import TypedDict, Literal
 
 DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
-APP_NAME = "SatNOG-PG"
+APP_NAME = "satnogs-gut"
 COMMENT_PASS_TAG = APP_NAME + "-Pass"
 COMMENT_PLAN_TAG = APP_NAME + "-Plan"
 CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,)) if not DEV_ENVIRONEMT else os.path.abspath("./config")
