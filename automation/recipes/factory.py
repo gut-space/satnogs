@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import subprocess
 import sys
@@ -98,7 +99,12 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
     record_interval = los - now
     record_seconds = record_interval.total_seconds()
 
-    output_raw = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)])
+    try:
+        output_raw = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)])
+    except subprocess.CalledProcessError as ex:
+        logging.error("Command %s exited with code: %d. Output: %s" % (ex.cmd, int(ex.returncode), ex.output.decode()))
+        output_raw = ex.output
+        
     output = output_raw.decode()
 
     results = []

@@ -2,11 +2,22 @@
 # See: https://www.reddit.com/r/RTLSDR/comments/abn29d/automatic_meteor_m2_reception_on_linux_using_rtl/ed2teuv/
 # Meteor-M 2 satellite reception
 
+# Arguments
+# 1: Prefix path. All path created by this script will be start with it
+# 2: Freqency. Value can be specified as an integer (89100000), a float (89.1e6) or as a metric suffix (89.1M).
+# 3: Recording duration in seconds
+
+# Returns
+# Print on stdout in format:
+#	!! CATEGORY: PATH
+# where CATEGORY is label, tag, category of file and PATH is path to this file.
+# Caller is responsible for returned paths.
+
 BASENAME=$1
 FREQUENCY=$2
 RECEIVE_TIMEOUT=$3
 
-NON_NORMALIZED_SIGNAL_FILENAME=${BASENAME}_non_normalized_signal.wav
+NORMALIZED_SIGNAL_FILENAME=${BASENAME}_normalized_signal.wav
 QPSK_FILENAME=${BASENAME}_qpsk.qpsk
 DUMP_PREFIX_FILENAME=${BASENAME}_dump
 PRODUCT_FILENAME_WITOUT_EXT=${BASENAME}_product
@@ -18,33 +29,38 @@ PRODUCT_FILENAME=${PRODUCT_FILENAME_WITOUT_EXT}.png
 # Record raw IQ data
 timeout $RECEIVE_TIMEOUT \
     rtl_fm -M raw -f $FREQUENCY -s 288k -g 48 -p 1 | \
-    sox -t raw -r 288k -c 2 -b 16 -e s - -t wav $NON_NORMALIZED_SIGNAL_FILENAME rate 96k
+    sox -t raw -r 288k -c 2 -b 16 -e s - -t wav $SIGNAL_FILENAME rate 96k
 
+retVal=$?
+if [ retVal -ne 0]; then
+	exit $retVal
+fi
+
+echo !! Signal: $SIGNAL_FILENAME
 # Normalize .wav
-sox $NON_NORMALIZED_SIGNAL_FILENAME $SIGNAL_FILENAME gain -n
+sox $SIGNAL_FILENAME $NORMALIZED_SIGNAL_FILENAME gain -n || exit $?
 
 # Demodulate .wav to QPSK
-yes | meteor-demod -o $QPSK_FILENAME $SIGNAL_FILENAME
+yes | meteor-demod -o $QPSK_FILENAME $NORMALIZED_SIGNAL_FILENAME || exit $?
 
 # Keep original file timestamp
-touch -r $NON_NORMALIZED_SIGNAL_FILENAME $QPSK_FILENAME
+touch -r $SIGNAL_FILENAME $QPSK_FILENAME || exit $?
 
 # Decode QPSK
-medet $QPSK_FILENAME ${DUMP_PREFIX_FILENAME} -cd
+medet $QPSK_FILENAME ${DUMP_PREFIX_FILENAME} -cd || exit $?
 
 # Generate images
-medet ${DUMP_PREFIX_FILENAME}.dec $PRODUCT_FILENAME_WITOUT_EXT -r 68 -g 65 -b 64 -d
+medet ${DUMP_PREFIX_FILENAME}.dec $PRODUCT_FILENAME_WITOUT_EXT -r 68 -g 65 -b 64 -d || exit $?
 
 # Convert to PNG
-convert $PRODUCT_BITMAP_FILENAME $PRODUCT_FILENAME
+convert $PRODUCT_BITMAP_FILENAME $PRODUCT_FILENAME || exit $?
 
-rm $NON_NORMALIZED_SIGNAL_FILENAME
+echo !! Product: $PRODUCT_FILENAME
+
+rm $NORMALIZED_SIGNAL_FILENAME
 rm $QPSK_FILENAME
 rm $PRODUCT_BITMAP_FILENAME
 rm ${DUMP_PREFIX_FILENAME}*
-
-echo !! Signal: $SIGNAL_FILENAME
-echo !! Product: $PRODUCT_FILENAME
 
 # Demodulator from: https://github.com/dbdexter-dev/meteor_demod
 # Decoder from: https://github.com/artlav/meteor_decoder
