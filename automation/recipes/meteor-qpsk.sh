@@ -32,7 +32,7 @@ timeout $RECEIVE_TIMEOUT \
     sox -t raw -r 288k -c 2 -b 16 -e s - -t wav $SIGNAL_FILENAME rate 96k
 
 retVal=$?
-if [ retVal -ne 0]; then
+if [ $retVal -ne 0]; then
 	exit $retVal
 fi
 
