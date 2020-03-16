@@ -74,7 +74,7 @@ def get_recipe(sat: SatelliteConfiguration) -> str:
     if os.path.exists(recipe_filename):
         return recipe_filename
     else:
-        raise LookupError("Recipe not exists")
+        raise LookupError("Recipe doesn't exist")
 
 def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Iterable[Tuple[Literal["signal", "product"], str]]:
     '''
