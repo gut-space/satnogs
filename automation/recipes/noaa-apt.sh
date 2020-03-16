@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Recipe for receive NOAA APT transmissions
 
@@ -26,8 +26,8 @@ timeout $RECEIVE_TIMEOUT \
 	sox -t raw -b16 -es -r 48000 -c1 -V1 - $SIGNAL_FILENAME rate 11025
 
 retVal=$?
-if [ retVal -ne 0]; then
-	exit $retVal
+if [ $retVal -ne 0 ]; then
+    exit $retVal
 fi
 
 echo !! Signal: $SIGNAL_FILENAME
