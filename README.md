@@ -19,3 +19,6 @@ As of March 2020, the following features are working:
 
 - [Installation](doc/install.md)
 - [Architecture](doc/arch.md)
+- [Project report](doc/satnogs-gdn-report.pdf)
+- [Project poster 1](doc/poster/best/poster1-pl.jpg)
+- [Project poster 2](doc/poster/best/poster2-en.jpg)
