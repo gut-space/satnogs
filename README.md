@@ -8,7 +8,7 @@ Project founders: [Sławek Figiel](https://github.com/fivitti) and [Tomek Mrugal
 
 # Project status
 
-As of Feb 2020, the following features are working:
+As of March 2020, the following features are working:
 
 - WiMo TA-1 antenna, SDR and RPi4 are working
 - Automated reception and transmission decoding for NOAA-15, NOAA-18 and NOAA-19 satellites (APT)
