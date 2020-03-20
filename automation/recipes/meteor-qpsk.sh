@@ -60,7 +60,7 @@ echo !! Product: $PRODUCT_FILENAME
 rm "$NORMALIZED_SIGNAL_FILENAME"
 rm "$QPSK_FILENAME"
 rm "$PRODUCT_BITMAP_FILENAME"
-rm "${DUMP_PREFIX_FILENAME}*"
+rm "${DUMP_PREFIX_FILENAME}"*
 
 # Demodulator from: https://github.com/dbdexter-dev/meteor_demod
 # Decoder from: https://github.com/artlav/meteor_decoder
