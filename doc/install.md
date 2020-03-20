@@ -35,10 +35,19 @@ su - satnogs
 git clone https://github.com/gut-space/satnogs
 ```
 
-5. **Run the initial setup** script:
+5. **Install python dependencies**:
 
 ```
 cd satnogs
+pip install -r station/requirements.txt
+```
+
+This step will install necessary dependencies. It is a good practice to install them in virtual environment. However,
+since the scripts will be called using crontab, it would've complicated the setup.
+
+5. **Run the initial setup** script:
+
+```
 python3 station/setup.py
 ```
 this script will conduct several things, such as setting up crontab to run observations periodically, create config file if there isn't any etc.
