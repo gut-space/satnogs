@@ -27,7 +27,7 @@ before_script:
   - psql -f backend/tests/db-data.psql satnogs
 
 script:
-  - # cd automation && pytest -v && cd ..
+  - cd automation && pytest -v && cd ..
   - cd backend && PYTHONTEST=. pytest -v
 
 notifications:
