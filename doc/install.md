@@ -30,3 +30,17 @@ su - satnogs
 ```
 
 4. This and following steps should be done as satnogs user.
+
+```
+git clone https://github.com/gut-space/satnogs
+```
+
+5. Run the initial setup script:
+
+```
+cd satnogs
+python3 station/setup.py
+```
+this script will conduct several things, such as setting up crontab to run observations periodically, create config file if there isn't any etc.
+
+6. You should tweak the ~/.config/satnogs-gut/config.yml file. In particular, you should tweak the location section. At the very least you need to specify the longitude and lattitude of your station. This is essential to predict satellite flyovers.
