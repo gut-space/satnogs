@@ -100,7 +100,7 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
     record_seconds = record_interval.total_seconds()
 
     try:
-        output_raw = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)])
+        output_raw = subprocess.check_output([recipe_path, base_path, sat["freq"], str(record_seconds)], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
         logging.error("Command %s exited with code: %d. Output: %s" % (ex.cmd, int(ex.returncode), ex.output.decode()))
         output_raw = ex.output

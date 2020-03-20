@@ -29,38 +29,38 @@ PRODUCT_FILENAME=${PRODUCT_FILENAME_WITOUT_EXT}.png
 # Record raw IQ data
 timeout $RECEIVE_TIMEOUT \
     rtl_fm -M raw -f $FREQUENCY -s 288k -g 48 -p 1 | \
-    sox -t raw -r 288k -c 2 -b 16 -e s - -t wav $SIGNAL_FILENAME rate 96k
+    sox -t raw -r 288k -c 2 -b 16 -e s - -t wav "$SIGNAL_FILENAME" rate 96k
 
 retVal=$?
-if [ $retVal -ne 0]; then
+if [ $retVal -ne 0 ]; then
 	exit $retVal
 fi
 
 echo !! Signal: $SIGNAL_FILENAME
 # Normalize .wav
-sox $SIGNAL_FILENAME $NORMALIZED_SIGNAL_FILENAME gain -n || exit $?
-
+sox "$SIGNAL_FILENAME" "$NORMALIZED_SIGNAL_FILENAME" gain -n || exit $?
+echo "Normalized"
 # Demodulate .wav to QPSK
-yes | meteor-demod -o $QPSK_FILENAME $NORMALIZED_SIGNAL_FILENAME || exit $?
-
+yes | meteor-demod -o "$QPSK_FILENAME" -B "$NORMALIZED_SIGNAL_FILENAME" || exit $?
+echo "Demodulated"
 # Keep original file timestamp
-touch -r $SIGNAL_FILENAME $QPSK_FILENAME || exit $?
-
+touch -r "$SIGNAL_FILENAME" "$QPSK_FILENAME" || exit $?
+echo "Touched"
 # Decode QPSK
-medet $QPSK_FILENAME ${DUMP_PREFIX_FILENAME} -cd || exit $?
-
+medet "$QPSK_FILENAME" "${DUMP_PREFIX_FILENAME}" -cd || exit $?
+echo "Dumped"
 # Generate images
-medet ${DUMP_PREFIX_FILENAME}.dec $PRODUCT_FILENAME_WITOUT_EXT -r 68 -g 65 -b 64 -d || exit $?
-
+medet "${DUMP_PREFIX_FILENAME}.dec" "$PRODUCT_FILENAME_WITOUT_EXT" -r 68 -g 65 -b 64 -d || exit $?
+echo "Decoded"
 # Convert to PNG
-convert $PRODUCT_BITMAP_FILENAME $PRODUCT_FILENAME || exit $?
-
+convert "$PRODUCT_BITMAP_FILENAME" "$PRODUCT_FILENAME" || exit $?
+echo "Converted"
 echo !! Product: $PRODUCT_FILENAME
 
-rm $NORMALIZED_SIGNAL_FILENAME
-rm $QPSK_FILENAME
-rm $PRODUCT_BITMAP_FILENAME
-rm ${DUMP_PREFIX_FILENAME}*
+rm "$NORMALIZED_SIGNAL_FILENAME"
+rm "$QPSK_FILENAME"
+rm "$PRODUCT_BITMAP_FILENAME"
+rm "${DUMP_PREFIX_FILENAME}*"
 
 # Demodulator from: https://github.com/dbdexter-dev/meteor_demod
 # Decoder from: https://github.com/artlav/meteor_decoder
