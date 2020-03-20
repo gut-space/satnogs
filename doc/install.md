@@ -75,3 +75,44 @@ optional arguments:
 ```
 
 You can use it to inspect your configuration, clear or schedule upcoming transmissions.
+
+# Server installation
+
+Server installation is a manual process. It is assumed that you already have running apache server. Here are the steps needed to get it up and running.
+
+1. **Get the latest code**
+
+```
+git clone https://github.com/gut-space/satnogs
+```
+
+2. **Install PostgreSQL**:
+
+```
+apt install postgresql postgresql-client
+su - postgres
+psql
+CREATE DATABASE satnogs;
+CREATE USER satnogs WITH PASSWORD 'secret'; -- make sure to use an actual password here
+GRANT ALL PRIVILEGES ON DATABASE satnogs TO satnogs;
+```
+
+3. **Modify your apache configuration**
+
+The general goal is to have an apache2 running with WSGI scripting capability that runs Flask. See an [example
+apache2 configuation](apache2/satnogs.conf). You may want to tweak the paths and TLS configuration to use LetsEncrypt
+or another certificate of your choice. Make sure the paths are actually pointing to the right directory.
+
+4. **Install Flask dependencies**
+
+```
+cd satnogs/backend
+pip install -r requirements.txt
+```
+
+You can start flask manually to check if it's working. This is not needed once you have apache integration complete.
+
+```
+cd backend
+./satnogs-web.py
+```
