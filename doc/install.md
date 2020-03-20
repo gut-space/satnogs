@@ -11,31 +11,31 @@ You need to install [Rasbian](https://www.raspbian.org/) on your Raspberry Pi. P
 instruction, such as [this one](https://www.raspberrypi.org/documentation/installation/installing-images/). Once
 done, connect to your Pi and do the following as root:
 
-1. Install necessary dependencies:
+1. **Install necessary dependencies**:
 
 ```
 apt update
 apt install python3-minimal git
 ```
 
-2. Create satnogs user:
+2. **Create satnogs user**:
 
 ```
 # useradd satnogs
 ```
 
-3. Now switch to the satnogs user:
+3. Now **switch to the satnogs user**:
 ```
 su - satnogs
 ```
 
-4. This and following steps should be done as satnogs user.
+4. **Get the latest satnogs-gut code**. This and following steps should be done as satnogs user.
 
 ```
 git clone https://github.com/gut-space/satnogs
 ```
 
-5. Run the initial setup script:
+5. **Run the initial setup** script:
 
 ```
 cd satnogs
@@ -43,4 +43,4 @@ python3 station/setup.py
 ```
 this script will conduct several things, such as setting up crontab to run observations periodically, create config file if there isn't any etc.
 
-6. You should tweak the ~/.config/satnogs-gut/config.yml file. In particular, you should tweak the location section. At the very least you need to specify the longitude and lattitude of your station. This is essential to predict satellite flyovers.
+6. **Tweak the ~/.config/satnogs-gut/config.yml file**. In particular, you should tweak the location section. At the very least you need to specify the longitude and lattitude of your station. This is essential to predict satellite flyovers.
