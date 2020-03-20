@@ -1,6 +1,6 @@
-[top](../README.md)
+[doc](../README.md) > Architecture
 
-# Project architecture
+# Satnogs-GDN Architecture
 
 <img align="center" src="https://github.com/gut-space/satnogs/blob/master/doc/automation-server-arch.png" />
 
@@ -10,4 +10,3 @@ and does most of the data processing. Once an observation is completed, it is up
 intended to be fully automated.
 
 The server is able to receive decoded information from multiple stations.
-
