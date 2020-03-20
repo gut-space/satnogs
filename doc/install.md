@@ -106,13 +106,13 @@ or another certificate of your choice. Make sure the paths are actually pointing
 4. **Install Flask dependencies**
 
 ```
-cd satnogs/backend
+cd satnogs/server
 pip install -r requirements.txt
 ```
 
 You can start flask manually to check if it's working. This is not needed once you have apache integration complete.
 
 ```
-cd backend
+cd server
 ./satnogs-web.py
 ```
