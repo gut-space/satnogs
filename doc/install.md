@@ -53,3 +53,25 @@ python3 station/setup.py
 this script will conduct several things, such as setting up crontab to run observations periodically, create config file if there isn't any etc.
 
 6. **Tweak the ~/.config/satnogs-gut/config.yml file**. In particular, you should tweak the location section. At the very least you need to specify the longitude and lattitude of your station. This is essential to predict satellite flyovers.
+
+# Station management
+
+There is a command line tool used to manage the station. You can run it with:
+
+```
+station/cli.py
+
+usage: satnogs-gut [-h] {clear,plan,config} ...
+
+positional arguments:
+  {clear,plan,config}  commands
+    clear              Clear all schedule receiving
+    plan               Schedule planning receiving
+    config             Configuration
+
+optional arguments:
+  -h, --help           show this help message and exit
+  
+```
+
+You can use it to inspect your configuration, clear or schedule upcoming transmissions.
