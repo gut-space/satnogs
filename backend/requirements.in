@@ -1,5 +1,4 @@
 Flask
 psycopg2
 webargs
-typing
 typing_extensions
