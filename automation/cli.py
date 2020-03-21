@@ -5,14 +5,15 @@ import calendar
 import os
 from pprint import pprint
 import sys
+import itertools
 
 from deepdiff import DeepHash
 
 import planner
 from orbitdb import OrbitDatabase
-from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, SatelliteConfiguration, first, \
-                get_planner_command, get_receiver_command, open_config, save_config, \
-                APP_NAME, open_crontab
+from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, SatelliteConfiguration, first, get_location, \
+                get_planner_command, get_receiver_command, get_satellite, open_config, save_config, \
+                APP_NAME, open_crontab, LOG_FILE
 from recipes.factory import get_recipe_names
 
 def get_interval(job):
@@ -57,18 +58,58 @@ def exist_directory(x: str) -> str:
         raise argparse.ArgumentTypeError("%s isn't a directory" % (x,))
     return x
 
+def parse_receiver_job(job):
+    parameters = job.command.replace(RECEIVER_COMMAND, "")
+    sat_name, los_raw = parameters.rsplit(maxsplit=1)
+    sat_name = sat_name.strip('"')
+    los_raw = los_raw.strip('"')
+
+    now = datetime.datetime.now()
+    now = now.replace(tzinfo=tz.tzlocal())
+
+    schedule = job.schedule()
+    next_ = schedule.get_next()
+    next_ = next_.replace(tzinfo=tz.tzlocal())
+    prev = schedule.get_prev()
+    prev = prev.replace(tzinfo=tz.tzlocal())
+
+    if abs(now - next_) < abs(now - prev):
+        aos = next_
+    else:
+        aos = prev
+
+    los = datetime.datetime.fromisoformat(los_raw)
+    los = los.replace(tzinfo=tz.tzutc())
+
+    return sat_name, aos, los
+
 parser = argparse.ArgumentParser(APP_NAME)
 subparsers = parser.add_subparsers(help='commands', dest="command")
 
 clear_parser = subparsers.add_parser(
     'clear', help='Clear all schedule receiving')
+
+log_parser = subparsers.add_parser(
+    'logs', help='Show logs'
+)
+
 plan_parser = subparsers.add_parser('plan', help='Schedule planning receiving')
 plan_parser.add_argument("--cron", type=str, help='Cron format required. Default "0 4 * * *" for 4:00 AM')
-plan_parser.add_argument("--force", action="store_true", default=False, help="Perform planning now")
+plan_parser.add_argument("--force", action="store_true", default=False, help="Perform planning now. (default: %(default)s)")
+
+pass_parser = subparsers.add_parser("pass", help="Information about passes")
+pass_parser.add_argument("target", type=str, help="Pass number or satellite name")
+pass_parser.add_argument("--aos", help="AOS in ISO format. If not provided then display next pass", type=datetime.datetime.fromisoformat, required=False)
+pass_parser.add_argument("--step", help="Time step to draw diagram [seconds] (default: 60)", type=lambda v: datetime.timedelta(seconds=int(v)), default=datetime.timedelta(minutes=1))
+pass_parser.add_argument("--width", help="Plot width (default: %(default)s)", default=50, type=int)
+pass_parser.add_argument("--height", help="Plot height (default: %(default)s)", default=20, type=int)
+scale_elevation_pass_parser = pass_parser.add_mutually_exclusive_group()
+scale_elevation_pass_parser.add_argument("--scale-elevation", action="store_true", help="Scale 4x elevation series (default: %(default)s)", dest="scale_elevation", default=True)
+scale_elevation_pass_parser.add_argument("--no-scale-elevation", action="store_false", dest="scale_elevation")
 
 config_parser = subparsers.add_parser("config", help="Configuration")
 replan_config_parser_group = config_parser.add_mutually_exclusive_group()
-replan_config_parser_group.add_argument("-r", "--replan", action="store_true", help="Force plan now", dest="replan")
+replan_config_parser_group.add_argument("-r", "--replan", action="store_true", help="Force plan now (default: %(default)s)", dest="replan")
 replan_config_parser_group.add_argument("--no-replan", action="store_false", help="No force plan now", dest="replan", default=False)
 config_subparsers = config_parser.add_subparsers(help="Configurations", dest="config_command")
 location_config_parser = config_subparsers.add_parser("location", help="Change groundstation location")
@@ -124,6 +165,12 @@ if command == "clear":
     cron.remove_all(comment=COMMENT_PLAN_TAG)
     cron.write()
     print("Cleared all existing jobs")
+elif command == "logs":
+    if LOG_FILE is None:
+        print("Log on console. History not available.")
+    else:
+        with open(LOG_FILE, "rt") as f:
+            print(f.read())
 elif command == "plan":
 
     if planner_job is None:
@@ -148,27 +195,13 @@ elif command == "plan":
         print("%s Planner" % (planner_job.description(
             use_24hour_time_format=True, verbose=True)))
 
-        for j in pass_jobs:
+        for idx, j in enumerate(pass_jobs):
             description = j.description(use_24hour_time_format=True)
             parameters = j.command.replace(RECEIVER_COMMAND, "")
-            schedule = j.schedule()
+            
             now = datetime.datetime.now()
             now = now.replace(tzinfo=tz.tzlocal())
-            next_ = schedule.get_next()
-            next_ = next_.replace(tzinfo=tz.tzlocal())
-            prev = schedule.get_prev()
-            prev = prev.replace(tzinfo=tz.tzlocal())
-            if abs(now - next_) < abs(now - prev):
-                aos = next_
-            else:
-                aos = prev
-
-            try:
-                los_raw = j.command.split()[-1].strip('"')
-                los = datetime.datetime.fromisoformat(los_raw)
-                los = los.replace(tzinfo=tz.tzutc())
-            except:
-                los = aos
+            _, aos, los = parse_receiver_job(j)
 
             if now < aos:
                 status = "[ ]"
@@ -177,8 +210,45 @@ elif command == "plan":
             else:
                 status = ">>>"
 
-            print(" ".join([status, description, parameters]))
+            print(" ".join([str(idx).rjust(2), status, description, parameters]))
+elif command == "pass":
+    pass_target = args.target
+    if pass_target.isdecimal():
+        try:
+            pass_jobs = cron.find_comment(COMMENT_PASS_TAG)
+            index = int(pass_target)
+            job = next(itertools.islice(pass_jobs, index, None))
+            sat_name, aos, los = parse_receiver_job(job)
+        except StopIteration:
+            raise LookupError("Job not found in CronTab.")
+    else:
+        sat_name = pass_target
+        if args.aos is not None:
+            aos: datetime.datetime = args.aos
+            aos = aos.replace(tzinfo=tz.tzutc())
+        else:
+            aos = datetime.datetime.utcnow()
+            aos = aos.replace(tzinfo=tz.tzutc())
 
+    aos = aos.astimezone(tz.tzutc())
+    db = OrbitDatabase()
+    config = open_config()
+    from orbit_predictor.locations import Location
+    location = Location(*get_location(config))
+    satellite = get_satellite(config, sat_name)
+    predictor = db.get_predictor(sat_name)
+    pass_ = predictor.get_next_pass(location, aos, 0, 0)
+
+    print("Satellite:", sat_name)
+    print("AOS:", str(pass_.aos))
+    print("LOS:", str(pass_.los))
+    print("Duration:", str(datetime.timedelta(seconds=pass_.duration_s)))
+    print("Max elevation:", str(pass_.max_elevation_deg), "deg", str(pass_.max_elevation_date))
+    print("Off nadir", str(pass_.off_nadir_deg), "deg")
+    
+    import azimuth_elevation_diagram
+    azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
+        args.step, args.width, args.height, args.scale_elevation) 
 elif command == "config":
     config_command = args.config_command
 

@@ -1,11 +1,13 @@
 from collections import namedtuple
-from typing import Dict, Iterable, List, Tuple, TypeVar, Callable, Hashable
+from typing import Any, Iterable, List, Optional, Sequence, Tuple, TypeVar, Callable, Hashable
 
 from datetimerange import DateTimeRange
 from orbit_predictor.predictors import PredictedPass
 
 T = TypeVar('T')
 Observation = namedtuple("Entry", ("data", "pass_", "range"))
+Strategy = Callable[[Sequence[Tuple[T, PredictedPass]]], Sequence[Tuple[T, PredictedPass, DateTimeRange]]]
+Selector = Callable[[T, PredictedPass, Optional[DateTimeRange], Optional[DateTimeRange]], Optional[DateTimeRange]]
 
 def _to_observations(data: Iterable[Tuple[T, PredictedPass]]) -> List[Observation]:
     entries: List[Observation] = []
@@ -16,8 +18,8 @@ def _to_observations(data: Iterable[Tuple[T, PredictedPass]]) -> List[Observatio
     return entries
 
 def create_strategy(sort_key: Callable[[Observation], Hashable],
-        selector: Callable[[T, PredictedPass, DateTimeRange, DateTimeRange], DateTimeRange],
-        min_seconds=1):
+        selector: Selector,
+        min_seconds=1) -> Strategy:
     def strategy(data: Iterable[Tuple[T, PredictedPass]]) -> Iterable[Tuple[T, PredictedPass, DateTimeRange]]:
         entries = _to_observations(data)
 
@@ -55,7 +57,8 @@ def create_strategy(sort_key: Callable[[Observation], Hashable],
     return strategy
 
 aos_priority_strategy = create_strategy(lambda o: o.pass_.aos, lambda _d, _p, _lr, rr: rr)
-def max_elevation_selector(_, pass_, left_range, right_range):
+
+def max_elevation_selector(_: Any, pass_: PredictedPass, left_range: Optional[DateTimeRange], right_range: Optional[DateTimeRange]) -> Optional[DateTimeRange]:
     max_elevation_date = pass_.max_elevation_date
     for r in (left_range, right_range):
         if r is not None and max_elevation_date in r:

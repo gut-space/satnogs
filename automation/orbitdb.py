@@ -1,14 +1,15 @@
 import datetime
 import logging
 import os
+from typing import Sequence
 import requests
 import requests.exceptions
 import time
 
 from orbit_predictor.sources import NoradTLESource
-from orbit_predictor.predictors.base import Predictor
+from orbit_predictor.predictors.base import CartesianPredictor
 
-from utils import CONFIG_DIRECTORY, APP_NAME, safe_filename
+from utils import CONFIG_DIRECTORY, APP_NAME, safe_filename, open_config
 
 CELESTRAK = [
     r"https://celestrak.com/NORAD/elements/active.txt"
@@ -18,7 +19,11 @@ class OrbitDatabase:
     def __init__(self, urls=None, max_period=7*24*60*60):
         self.max_period = max_period
         if urls is None:
+            config = open_config()
+            urls = config['norad']
+        if urls is None:
             urls = CELESTRAK
+        self.urls: Sequence[str]
         self.urls = urls
 
     def _get_tle_from_url(self, url):
@@ -72,7 +77,7 @@ class OrbitDatabase:
         except LookupError:
             return False
 
-    def get_predictor(self, sat_id) -> Predictor:
+    def get_predictor(self, sat_id) -> CartesianPredictor:
         for url in self.urls:
             path = self._get_current_tle_file(url)
             source = NoradTLESource.from_file(path)

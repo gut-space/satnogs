@@ -1,15 +1,10 @@
 import datetime
 import logging
 import os
-import signal
-import subprocess
-import sched
 import shutil
 import sys
-import typing
-from typing import Union, Optional
 
-from utils import GLOBAL_SAVE_MODE, SATELLITE_SAVE_MODE, first, open_config, SatelliteConfiguration
+from utils import first, open_config, get_satellite
 from submitobs import submit_observation
 from recipes import factory
 
@@ -27,12 +22,8 @@ config = open_config()
 
 def cmd():
     _, name, los, *opts = sys.argv
-    debug = len(opts) != 0
 
-    satellite = first(config["satellites"], lambda s: s["name"] == name)
-    if satellite is None:
-        logging.error("Unknown satellite")
-        sys.exit(1)
+    satellite = get_satellite(config, name)
 
     aos_datetime = datetime.datetime.utcnow()
     los_datetime = datetime.datetime.fromisoformat(los)
@@ -40,19 +31,8 @@ def cmd():
     results = factory.execute_recipe(satellite, los_datetime)
 
     # Post-processing
-    save_mode: Optional[Union[SATELLITE_SAVE_MODE, GLOBAL_SAVE_MODE]]
-    save_mode = satellite.get("save_to_disk", None)
-    if save_mode is None or save_mode == "INHERIT":
-        save_mode = config.get("save_to_disk", None)
-    if save_mode is None:
-        save_mode = "NONE"
-
-    should_submit: Optional[bool]
-    should_submit = satellite.get("submit", None)
-    if should_submit is None:
-        should_submit = config.get("submit", None)
-    if should_submit is None:
-        should_submit = True
+    save_mode = satellite["save_to_disk"]
+    should_submit = satellite["submit"]
 
     root_directory = config.get("obsdir")
     if root_directory is None:

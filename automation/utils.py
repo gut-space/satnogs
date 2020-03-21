@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 import sys
-from typing import List, Optional, Iterable, TypeVar, Callable, Union
+from typing import List, Optional, Iterable, TypeVar, Callable, Tuple
 
 from crontab import CronTab
 import yaml
@@ -18,13 +18,14 @@ COMMENT_PASS_TAG = APP_NAME + "-Pass"
 COMMENT_PLAN_TAG = APP_NAME + "-Plan"
 CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,)) if not DEV_ENVIRONEMT else os.path.abspath("./config")
 CONFIG_PATH = os.path.join(CONFIG_DIRECTORY, "config.yml")
+LOG_FILE = os.path.join(CONFIG_DIRECTORY, "log") if not DEV_ENVIRONEMT else None
 
 if not os.path.exists(CONFIG_DIRECTORY):
     os.makedirs(CONFIG_DIRECTORY, exist_ok=True)
 
 logging.basicConfig(level=logging.DEBUG if DEV_ENVIRONEMT else logging.ERROR,
                     format='%(asctime)s %(levelname)s %(filename)s:%(lineno)d: %(message)s',
-                    filename=os.path.join(CONFIG_DIRECTORY, "log") if not DEV_ENVIRONEMT else None)
+                    filename=LOG_FILE)
 
 
 class LocationConfiguration(TypedDict):
@@ -33,7 +34,7 @@ class LocationConfiguration(TypedDict):
     longitude: float
     name: str
 
-SATELLITE_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "INHERIT"]
+SATELLITE_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "INHERIT", "NONE"]
 GLOBAL_SAVE_MODE = Literal["SIGNAL", "PRODUCT", "ALL", "NONE"]
 
 class SatelliteConfiguration(TypedDict, total=False):
@@ -166,3 +167,42 @@ def is_safe_filename_character(c: str) -> bool:
 def safe_filename(filename: str, replacement: str="_") -> str:
     chars = [c if is_safe_filename_character(c) else replacement for c in filename]
     return "".join(chars).rstrip()
+
+
+def get_location(config: Configuration) -> Tuple[str, float, float, float]:
+    location = (config["location"]["name"],
+            config["location"]["latitude"], config["location"]["longitude"],
+            config["location"]["elevation"])
+    return location
+
+def fill_satellite(config: Configuration, satellite: SatelliteConfiguration):
+    if 'submit' not in satellite:
+        global_submit = config.get('submit', None)
+        if global_submit is None:
+            global_submit = True
+        satellite['submit'] = global_submit
+    if 'save_to_disk' not in satellite or satellite['save_to_disk'] == 'INHERIT':
+        global_ = config.get('save_to_disk')
+        if global_ is None:
+            global_ = "NONE"
+        satellite["save_to_disk"] = global_
+    if 'aos_at' not in satellite:
+        global_ = config.get('aos_at')
+        if global_ is None:
+            global_ = 0
+        satellite['aos_at'] = global_
+    if 'max_elevation_greater_than' not in satellite:
+        global_ = config.get('max_elevation_greater_than')
+        if global_ is None:
+            global_ = 0
+        satellite['max_elevation_greater_than'] = global_
+    if 'disabled' not in satellite:
+        satellite['disabled'] = False
+
+def get_satellite(config: Configuration, sat: str) -> SatelliteConfiguration:
+    satellites = config['satellites']
+    satellite = first(satellites, lambda s: s['name'] == sat)
+    if satellite is None:
+        raise LookupError("Satellite %s not found" % (sat,))
+    fill_satellite(config, satellite)
+    return satellite

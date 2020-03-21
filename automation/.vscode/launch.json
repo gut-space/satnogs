@@ -15,12 +15,14 @@
             "name": "Python: CLI - config",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "${cwd}/cli.py",
             "args": [
-                "config"
+                "pass",
+                "2",
+                "--step", "1000"
             ],
             "env": {
-                "DEV_ENVIRONMENT": "0"
+                "DEV_ENVIRONMENT": "1"
             },
             "console": "integratedTerminal"
         },
