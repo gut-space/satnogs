@@ -14,7 +14,7 @@ def plot(sat_id: str,
         aos: datetime.datetime, los: datetime.datetime,
         location: Optional[Location]=None,
         time_step: Optional[datetime.timedelta]=None,
-        width=50, height=20, scale_elevation=True):
+        width=50, height=20, scale_elevation=True, axis_in_local_time=True):
 
     tzutc = tz.tzutc()
     assert aos.tzinfo == tzutc
@@ -36,6 +36,8 @@ def plot(sat_id: str,
     for date in DateTimeRange(aos, los).range(time_step):
         position = predictor.get_position(date)
         az, el = location.get_azimuth_elev_deg(position)
+        if axis_in_local_time:
+            date = date.astimezone(tz.tzlocal())
         date_series.append(date) # type: ignore
         azimuth_series.append(az)
         # We scale elevation, because plotille library allow draw only one
@@ -61,6 +63,7 @@ def plot(sat_id: str,
         fig.plot(date_series, [90,] * len(date_series), interp=None, label="Y=90")
     fig.plot(date_series, elevation_series, label=elevation_label, lc=1)
     fig.y_label = "Degrees"
+    x_label = "Time (%s)" % ("local" if axis_in_local_time else "UTC",) 
     fig.x_label = "Time"
     print(fig.show(legend=True))
 

@@ -106,6 +106,9 @@ pass_parser.add_argument("--height", help="Plot height (default: %(default)s)", 
 scale_elevation_pass_parser = pass_parser.add_mutually_exclusive_group()
 scale_elevation_pass_parser.add_argument("--scale-elevation", action="store_true", help="Scale 4x elevation series (default: %(default)s)", dest="scale_elevation", default=True)
 scale_elevation_pass_parser.add_argument("--no-scale-elevation", action="store_false", dest="scale_elevation")
+utc_group_pass_parser = pass_parser.add_mutually_exclusive_group()
+utc_group_pass_parser.add_argument("--utc", action="store_true", help="Print dates in UTC (default: %(default)s)", dest="print_utc", default=False)
+utc_group_pass_parser.add_argument("--no-utc", action="store_false", dest="print_utc")
 
 config_parser = subparsers.add_parser("config", help="Configuration")
 replan_config_parser_group = config_parser.add_mutually_exclusive_group()
@@ -239,16 +242,18 @@ elif command == "pass":
     predictor = db.get_predictor(sat_name)
     pass_ = predictor.get_next_pass(location, aos, 0, 0)
 
+    target_tz = tz.tzutc if args.print_utc else tz.tzlocal()
+
     print("Satellite:", sat_name)
-    print("AOS:", str(pass_.aos))
-    print("LOS:", str(pass_.los))
+    print("AOS:", str(pass_.aos.astimezone(target_tz)))
+    print("LOS:", str(pass_.los.astimezone(target_tz)))
     print("Duration:", str(datetime.timedelta(seconds=pass_.duration_s)))
-    print("Max elevation:", str(pass_.max_elevation_deg), "deg", str(pass_.max_elevation_date))
+    print("Max elevation:", str(pass_.max_elevation_deg), "deg", str(pass_.max_elevation_date.astimezone(target_tz)))
     print("Off nadir", str(pass_.off_nadir_deg), "deg")
     
     import azimuth_elevation_diagram
     azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
-        args.step, args.width, args.height, args.scale_elevation) 
+        args.step, args.width, args.height, args.scale_elevation, axis_in_local_time=not args.print_utc) 
 elif command == "config":
     config_command = args.config_command
 
