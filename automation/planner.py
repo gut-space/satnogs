@@ -1,7 +1,7 @@
 import datetime
 from pprint import pprint
 import sys
-from typing import Iterable
+from typing import Sequence
 
 from orbit_predictor.locations import Location
 from datetimerange import DateTimeRange
@@ -38,7 +38,7 @@ def get_passes(config: Configuration, from_: datetime.datetime, to: datetime.dat
     selected = strategy(init)
     return selected
 
-def plan_passes(selected: Iterable[Observation], cron):
+def plan_passes(selected: Sequence[Observation], cron):
     selected = sorted(selected, key=lambda o: o.pass_.aos)
     for entry in selected:
         cmd = get_command(entry.data, entry.range)

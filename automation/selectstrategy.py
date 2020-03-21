@@ -6,7 +6,7 @@ from orbit_predictor.predictors import PredictedPass
 
 T = TypeVar('T')
 Observation = namedtuple("Entry", ("data", "pass_", "range"))
-Strategy = Callable[[Sequence[Tuple[T, PredictedPass]]], Sequence[Tuple[T, PredictedPass, DateTimeRange]]]
+Strategy = Callable[[Sequence[Tuple[T, PredictedPass]]], Sequence[Observation]]
 Selector = Callable[[T, PredictedPass, Optional[DateTimeRange], Optional[DateTimeRange]], Optional[DateTimeRange]]
 
 def _to_observations(data: Iterable[Tuple[T, PredictedPass]]) -> List[Observation]:
@@ -20,7 +20,7 @@ def _to_observations(data: Iterable[Tuple[T, PredictedPass]]) -> List[Observatio
 def create_strategy(sort_key: Callable[[Observation], Hashable],
         selector: Selector,
         min_seconds=1) -> Strategy:
-    def strategy(data: Iterable[Tuple[T, PredictedPass]]) -> Iterable[Tuple[T, PredictedPass, DateTimeRange]]:
+    def strategy(data: Iterable[Tuple[T, PredictedPass]]) -> Sequence[Observation]:
         entries = _to_observations(data)
 
         entries.sort(key=sort_key)
