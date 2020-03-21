@@ -64,7 +64,7 @@ def plot(sat_id: str,
     fig.plot(date_series, elevation_series, label=elevation_label, lc=1)
     fig.y_label = "Degrees"
     x_label = "Time (%s)" % ("local" if axis_in_local_time else "UTC",) 
-    fig.x_label = "Time"
+    fig.x_label = x_label
     print(fig.show(legend=True))
 
 if __name__ == '__main__':

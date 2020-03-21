@@ -242,7 +242,7 @@ elif command == "pass":
     predictor = db.get_predictor(sat_name)
     pass_ = predictor.get_next_pass(location, aos, 0, 0)
 
-    target_tz = tz.tzutc if args.print_utc else tz.tzlocal()
+    target_tz = tz.tzutc() if args.print_utc else tz.tzlocal()
 
     print("Satellite:", sat_name)
     print("AOS:", str(pass_.aos.astimezone(target_tz)))
