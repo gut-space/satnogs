@@ -25,7 +25,7 @@ before_script:
   - cp backend/.satnogs.ini.travis backend/satnogs.ini
   - cd backend && python migrate-db.py && cd ..
   - psql -f backend/tests/db-data.psql satnogs
-  - mkdir -p .config/satnogs-gut
+  - mkdir -p ~/.config/satnogs-gut
 
 script:
   - cd automation && pytest -v && cd ..
