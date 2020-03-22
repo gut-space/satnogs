@@ -120,11 +120,10 @@ def plot_polar_azimuth_elevation(azimuth_series: Sequence[float], elevation_seri
 
     for (x1, y1), (x2, y2) in edges:
         canvas.line(x1, y1, x2, y2, color=COLOR_BLUE)
-        #canvas.point(x1, y1, color=COLOR_BLUE)
 
     canvas.point(first_point[0], first_point[1], color=COLOR_RED)
     print(canvas.plot())
-    print("Red dot is start point\n")
+    print("Red dot is AOS point\n")
 
 if __name__ == '__main__':
     sat = "METEOR-M 2"
