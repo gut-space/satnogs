@@ -248,8 +248,8 @@ elif command == "pass":
     print("AOS:", str(pass_.aos.astimezone(target_tz)))
     print("LOS:", str(pass_.los.astimezone(target_tz)))
     print("Duration:", str(datetime.timedelta(seconds=pass_.duration_s)))
-    print("Max elevation:", str(pass_.max_elevation_deg), "deg", str(pass_.max_elevation_date.astimezone(target_tz)))
-    print("Off nadir", str(pass_.off_nadir_deg), "deg")
+    print("Max elevation:", "%.2f" % (pass_.max_elevation_deg,), "deg", str(pass_.max_elevation_date.astimezone(target_tz)))
+    print("Off nadir", "%.2f" % (pass_.off_nadir_deg,), "deg")
     
     import azimuth_elevation_diagram
     azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
