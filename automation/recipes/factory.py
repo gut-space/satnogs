@@ -56,6 +56,14 @@ RECIPE_DIR = os.path.split(os.path.abspath(__file__))[0]
 BASE_DIR = "/tmp/observations_tmp"
 os.makedirs(BASE_DIR, exist_ok=True)
 
+KNOWN_RECIPES = {
+    "NOAA 15": "noaa-apt",
+    "NOAA 18": "noaa-apt",
+    "NOAA 19": "noaa-apt",
+    "METEOR-M 2": "meteor-qpsk",
+    "METEOR-M2 2": "meteor-oqpsk"
+}
+
 def get_recipe(sat: SatelliteConfiguration) -> str:
     '''
     Returns path to recipe file assigned with passed satellite.
@@ -66,8 +74,8 @@ def get_recipe(sat: SatelliteConfiguration) -> str:
     '''
     if "recipe" in sat:
         recipe = sat["recipe"]
-    elif sat["name"].startswith("NOAA"):
-        recipe = "noaa-apt"
+    elif sat["name"] in KNOWN_RECIPES:
+        recipe = KNOWN_RECIPES[sat["name"]]
     else:
         raise LookupError("Unknown recipe")
 

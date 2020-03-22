@@ -1,6 +1,6 @@
 #!/bin/bash
 # See: https://www.reddit.com/r/RTLSDR/comments/abn29d/automatic_meteor_m2_reception_on_linux_using_rtl/ed2teuv/
-# Meteor-M 2 satellite reception
+# Meteor-M2 2 satellite reception
 
 # Arguments
 # 1: Prefix path. All path created by this script will be start with it
@@ -18,7 +18,7 @@ FREQUENCY=$2
 RECEIVE_TIMEOUT=$3
 
 NORMALIZED_SIGNAL_FILENAME=${BASENAME}_normalized_signal.wav
-QPSK_FILENAME=${BASENAME}_qpsk.qpsk
+DEMODULATED_FILENAME=${BASENAME}_demodulated.oqpsk
 DUMP_PREFIX_FILENAME=${BASENAME}_dump
 PRODUCT_FILENAME_WITOUT_EXT=${BASENAME}_product
 PRODUCT_BITMAP_FILENAME=${PRODUCT_FILENAME_WITOUT_EXT}.bmp
@@ -41,25 +41,26 @@ echo !! Signal: $SIGNAL_FILENAME
 sox "$SIGNAL_FILENAME" "$NORMALIZED_SIGNAL_FILENAME" gain -n || exit $?
 echo "Normalized"
 # Demodulate .wav to QPSK
-yes | meteor-demod -o "$QPSK_FILENAME" -B -q "$NORMALIZED_SIGNAL_FILENAME" || exit $?
+yes | meteor-demod -o "$DEMODULATED_FILENAME" -B -q -m oqpsk "$NORMALIZED_SIGNAL_FILENAME" || exit $?
 rm "$NORMALIZED_SIGNAL_FILENAME"
 echo "Demodulated"
 # Keep original file timestamp
-touch -r "$SIGNAL_FILENAME" "$QPSK_FILENAME" || exit $?
+touch -r "$SIGNAL_FILENAME" "$DEMODULATED_FILENAME" || exit $?
 echo "Touched"
-# Decode QPSK
-medet "$QPSK_FILENAME" "${DUMP_PREFIX_FILENAME}" -cd || exit $?
-rm "$QPSK_FILENAME"
+# Decode
+medet "$DEMODULATED_FILENAME" "${DUMP_PREFIX_FILENAME}" -cd -int -diff || exit $?
+rm "$DEMODULATED_FILENAME"
 echo "Dumped"
 # Generate images
-medet "${DUMP_PREFIX_FILENAME}.dec" "$PRODUCT_FILENAME_WITOUT_EXT" -r 68 -g 65 -b 64 -d || exit $?
+medet "${DUMP_PREFIX_FILENAME}.dec" "$PRODUCT_FILENAME_WITOUT_EXT" -int -diff -r 68 -g 65 -b 64 -d || exit $?
 rm "${DUMP_PREFIX_FILENAME}"*
 echo "Decoded"
 # Convert to PNG
 convert "$PRODUCT_BITMAP_FILENAME" "$PRODUCT_FILENAME" || exit $?
-rm "$PRODUCT_BITMAP_FILENAME"
 echo "Converted"
 echo !! Product: $PRODUCT_FILENAME
+
+rm "$PRODUCT_BITMAP_FILENAME"
 
 # Demodulator from: https://github.com/dbdexter-dev/meteor_demod
 # Decoder from: https://github.com/artlav/meteor_decoder
