@@ -1,0 +1,22 @@
+aos_at: 12
+location:
+  elevation: 123
+  latitude: 45.6
+  longitude: 78.9
+  name: Secret Lair
+max_elevation_greater_than: 0
+norad:
+- https://celestrak.com/NORAD/elements/noaa.txt
+- https://celestrak.com/NORAD/elements/active.txt
+satellites:
+- freq: 137.62e6
+  name: NOAA 15
+- freq: 137.9125e6
+  name: NOAA 18
+- freq: 137.1e6
+  name: NOAA 19
+server:
+  id: 1
+  secret: 1234567890abcdef01234567890abcde
+  url: http://127.0.0.1:5000/receive
+strategy: max-elevation
