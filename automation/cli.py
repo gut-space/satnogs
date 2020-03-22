@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import datetime
 from dateutil import tz
@@ -33,7 +35,7 @@ def update_config(config, args, names):
         arg = getattr(args, args_name, None)
         if arg is None:
             continue
-        
+
         config[config_name] = getattr(args, args_name)
 
 def get_hash(obj):
@@ -202,7 +204,7 @@ elif command == "plan":
         for idx, j in enumerate(pass_jobs):
             description = j.description(use_24hour_time_format=True)
             parameters = j.command.replace(RECEIVER_COMMAND, "")
-            
+
             now = datetime.datetime.now()
             now = now.replace(tzinfo=tz.tzlocal())
             _, aos, los = parse_receiver_job(j)
@@ -251,17 +253,17 @@ elif command == "pass":
     print("Duration:", str(datetime.timedelta(seconds=pass_.duration_s)))
     print("Max elevation:", "%.2f" % (pass_.max_elevation_deg,), "deg", str(pass_.max_elevation_date.astimezone(target_tz)))
     print("Off nadir", "%.2f" % (pass_.off_nadir_deg,), "deg")
-    
+
     import azimuth_elevation_diagram
     azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
         args.step, args.width, args.height, args.scale_elevation,
-        axis_in_local_time=not args.print_utc, scale_polar=args.scale_polar) 
+        axis_in_local_time=not args.print_utc, scale_polar=args.scale_polar)
 elif command == "config":
     config_command = args.config_command
 
     config = open_config()
     section = config
-    init_hash = get_hash(config)    
+    init_hash = get_hash(config)
 
     if config_command == "location":
         section = config["location"]
@@ -350,6 +352,6 @@ elif command == "config":
         if args.replan:
             planner.execute(get_interval(planner_job))
     pprint(section)
-    
+
 else:
     parser.print_help()
