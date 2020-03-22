@@ -103,6 +103,7 @@ pass_parser.add_argument("--aos", help="AOS in ISO format. If not provided then 
 pass_parser.add_argument("--step", help="Time step to draw diagram [seconds] (default: 60)", type=lambda v: datetime.timedelta(seconds=int(v)), default=datetime.timedelta(minutes=1))
 pass_parser.add_argument("--width", help="Plot width (default: %(default)s)", default=50, type=int)
 pass_parser.add_argument("--height", help="Plot height (default: %(default)s)", default=20, type=int)
+pass_parser.add_argument("--scale-polar", help="Scale width and height for polar plot (default: %(default)s)", default=0.5, type=float)
 scale_elevation_pass_parser = pass_parser.add_mutually_exclusive_group()
 scale_elevation_pass_parser.add_argument("--scale-elevation", action="store_true", help="Scale 4x elevation series (default: %(default)s)", dest="scale_elevation", default=True)
 scale_elevation_pass_parser.add_argument("--no-scale-elevation", action="store_false", dest="scale_elevation")
@@ -253,7 +254,8 @@ elif command == "pass":
     
     import azimuth_elevation_diagram
     azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
-        args.step, args.width, args.height, args.scale_elevation, axis_in_local_time=not args.print_utc) 
+        args.step, args.width, args.height, args.scale_elevation,
+        axis_in_local_time=not args.print_utc, scale_polar=args.scale_polar) 
 elif command == "config":
     config_command = args.config_command
 
