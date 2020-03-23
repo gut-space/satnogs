@@ -44,9 +44,9 @@ def _calculate_series(sat_id: str,
     date_series: sequence of datetime.datetime
         Dates for which samples were designated. In UTC.
     azimuth_series: sequence of float
-        Series of azumuths in degrees.
+        Series of azimuths in degrees.
     elevation_series: sequence of float
-        Series of elevations in degrees.
+        Series of elevation angles in degrees.
     '''
     tzutc = tz.tzutc()
     if aos.tzinfo != tzutc:
@@ -175,7 +175,7 @@ def _plot_polar_azimuth_elevation(azimuth_series: Sequence[float], elevation_ser
     AOS point is highlighted in red.
     '''
     # Max values is increased by 0.05. Without it points with any coordinate
-    # eqauls max were not drawed.
+    # eqauls max were not drawn.
     xmin, xmax, ymin, ymax = -1, 1.05, -1, 1.05
 
     canvas = plotille.Canvas(width, height, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, color_mode="byte")
