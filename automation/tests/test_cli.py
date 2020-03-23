@@ -10,7 +10,7 @@ from utils import CONFIG_DIRECTORY
 
 CLI = "./cli.py"
 
-class TestSelectStrategy(unittest.TestCase):
+class TestCli(unittest.TestCase):
 
     def setUp(self):
         makedirs(CONFIG_DIRECTORY, exist_ok=True)
