@@ -1,4 +1,5 @@
 import datetime
+import dateutil.parser
 import logging
 import os
 import sys
@@ -8,7 +9,7 @@ from typing import List, Optional, Iterable, TypeVar, Callable, Tuple
 from crontab import CronTab
 import yaml
 
-if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+if sys.version_info >= (3, 8):
     from typing import TypedDict, Literal
 else:
     from typing_extensions import TypedDict, Literal
@@ -220,3 +221,9 @@ def get_satellite(config: Configuration, sat: str) -> SatelliteConfiguration:
         raise LookupError("Satellite %s not found" % (sat,))
     set_satellite_defaults(config, satellite)
     return satellite
+
+def from_iso_format(raw: str) -> datetime.datetime:
+    if sys.version_info <= (3, 6):
+        return dateutil.parser.isoparse(raw)
+    else:
+        return datetime.datetime.fromisoformat(raw)
