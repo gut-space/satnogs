@@ -64,6 +64,5 @@ def execute(interval, cron=None):
     return passes
 
 if __name__ == '__main__':
-    interval = int(sys.argv[1]) if len(sys.argv) > 1 else 24 * 60 * 60
-    passes = execute(interval)
-    pprint([(e.pass_, e.range, "CRON: %s" % (utc_to_local(e.range.start_datetime).strftime("%m-%d %H:%M:%S`"))) for e in passes], width=180)
+5    interval = int(sys.argv[1]) if len(sys.argv) > 1 else 24 * 60 * 60
+    execute(interval)
