@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 
-from utils import first, open_config, get_satellite
+from utils import first, open_config, get_satellite, from_iso_format
 from submitobs import submit_observation
 from recipes import factory
 
@@ -26,7 +26,7 @@ def cmd():
     satellite = get_satellite(config, name)
 
     aos_datetime = datetime.datetime.utcnow()
-    los_datetime = datetime.datetime.fromisoformat(los)
+    los_datetime = from_iso_format(los)
 
     results = factory.execute_recipe(satellite, los_datetime)
 

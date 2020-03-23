@@ -16,7 +16,7 @@ import planner
 from orbitdb import OrbitDatabase
 from utils import COMMENT_PLAN_TAG, COMMENT_PASS_TAG, SatelliteConfiguration, first, get_location, \
                 get_planner_command, get_receiver_command, get_satellite, open_config, save_config, \
-                APP_NAME, open_crontab, LOG_FILE
+                APP_NAME, open_crontab, LOG_FILE, from_iso_format
 from recipes.factory import get_recipe_names
 
 def get_interval(job):
@@ -86,7 +86,7 @@ def parse_receiver_job(job) -> Tuple[str, datetime.datetime, datetime.datetime]:
     else:
         aos = prev
 
-    los = datetime.datetime.fromisoformat(los_raw)
+    los = from_iso_format(los_raw)
     los = los.replace(tzinfo=tz.tzutc())
 
     return sat_name, aos, los
@@ -107,7 +107,7 @@ plan_parser.add_argument("--force", action="store_true", default=False, help="Pe
 
 pass_parser = subparsers.add_parser("pass", help="Information about passes")
 pass_parser.add_argument("target", type=str, help="Pass number or satellite name")
-pass_parser.add_argument("--aos", help="AOS in ISO format. If not provided then display next pass", type=datetime.datetime.fromisoformat, required=False)
+pass_parser.add_argument("--aos", help="AOS in ISO format. If not provided then display next pass", type=from_iso_format, required=False)
 pass_parser.add_argument("--step", help="Time step to draw diagram [seconds] (default: 60)", type=lambda v: datetime.timedelta(seconds=int(v)), default=datetime.timedelta(minutes=1))
 pass_parser.add_argument("--width", help="Plot width (default: %(default)s)", default=30, type=int)
 pass_parser.add_argument("--height", help="Plot height (default: %(default)s)", default=15, type=int)

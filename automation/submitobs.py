@@ -5,7 +5,7 @@ import requests
 import sys
 from typing import Any, Dict
 
-from utils import open_config
+from utils import open_config, from_iso_format
 from hmac_token import get_token, AUTHORIZATION_ALGORITHM
 
 config = open_config()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     filename=sys.argv[1]
     sat_name=sys.argv[2]
-    aos=tca=los=datetime.datetime.fromisoformat(sys.argv[3])
+    aos=tca=los=from_iso_format(sys.argv[3])
     notes="..."
 
     if len(sys.argv) >= 5:

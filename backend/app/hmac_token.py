@@ -1,4 +1,5 @@
 import datetime
+from dateutil.parser import isoparse
 import hashlib
 import hmac
 from typing import Dict, Union
@@ -56,7 +57,7 @@ def get_token(id_: str, secret: Union[bytes, bytearray], body: Dict, date: datet
 def parse_token(token: str):
     '''Split token to id, timestamp and signature'''
     id_, timestamp, sig = token.split(",")
-    create_date = datetime.datetime.fromisoformat(timestamp)
+    create_date = isoparse(timestamp)
     return id_, create_date, sig
 
 def validate_token(token: str, secret: bytes, body: Dict, check_date=None):
