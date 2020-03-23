@@ -16,7 +16,14 @@ DEV_ENVIRONEMT =  os.environ.get("DEV_ENVIRONMENT") == '1'
 APP_NAME = "satnogs-gut"
 COMMENT_PASS_TAG = APP_NAME + "-Pass"
 COMMENT_PLAN_TAG = APP_NAME + "-Plan"
-CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,)) if not DEV_ENVIRONEMT else os.path.abspath("./config")
+
+CONFIG_DIRECTORY: str = os.environ.get("SATNOGS_GUT_CONFIG_DIR") # type: ignore
+if CONFIG_DIRECTORY is None:
+    if DEV_ENVIRONEMT:
+        CONFIG_DIRECTORY = os.path.abspath("./config")
+    else:
+        CONFIG_DIRECTORY = os.path.expanduser("~/.config/%s" % (APP_NAME,))
+
 CONFIG_PATH = os.path.join(CONFIG_DIRECTORY, "config.yml")
 LOG_FILE = os.path.join(CONFIG_DIRECTORY, "log") if not DEV_ENVIRONEMT else None
 
@@ -87,7 +94,7 @@ def open_crontab() -> CronTab:
     if DEV_ENVIRONEMT:
         path = os.path.join(CONFIG_DIRECTORY, "cron.tab")
         if not os.path.exists(path):
-            with open(path) as _:
+            with open(path, "x") as _:
                 pass
         return CronTab(tabfile=path)
     else:

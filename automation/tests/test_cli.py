@@ -1,33 +1,23 @@
-import unittest
-from os import remove, rename, path
-from shutil import copyfile
+from os import makedirs, environ
+from shutil import copy, rmtree
 from subprocess import Popen, PIPE
+import unittest
 
-CONFIG_LOCATION = path.expanduser("~/.config/satnogs-gut/config.yml")
-CONFIG_BACKUP = CONFIG_LOCATION + "-testbackup"
+# It must be set before import "utils"
+environ["SATNOGS_GUT_CONFIG_DIR"] = "tests/config"
+
+from utils import CONFIG_DIRECTORY
+
 CLI = "./cli.py"
 
 class TestSelectStrategy(unittest.TestCase):
 
     def setUp(self):
-        """Make a backup of config.yml (if exists), copy test config into the place."""
-        try:
-            remove(CONFIG_BACKUP)
-        except FileNotFoundError:
-            pass
-        try:
-            rename(CONFIG_LOCATION, CONFIG_BACKUP)
-        except FileNotFoundError:
-            pass
-        copyfile("tests/config.yml", CONFIG_LOCATION)
+        makedirs(CONFIG_DIRECTORY, exist_ok=True)
+        copy("tests/config.yml", CONFIG_DIRECTORY)
 
     def tearDown(self):
-        pass
-        # remove(CONFIG_LOCATION)
-        # try:
-        #     rename(CONFIG_BACKUP, CONFIG_LOCATION)
-        # except FileNotFoundError:
-        #     pass
+        rmtree(CONFIG_DIRECTORY, ignore_errors=True)
 
     def run_cmd(self, binfile, params, env = None):
         """Runs file specified as binfile, passes all parameters.
