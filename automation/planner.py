@@ -64,5 +64,5 @@ def execute(interval, cron=None):
     return passes
 
 if __name__ == '__main__':
-5    interval = int(sys.argv[1]) if len(sys.argv) > 1 else 24 * 60 * 60
+    interval = int(sys.argv[1]) if len(sys.argv) > 1 else 24 * 60 * 60
     execute(interval)
