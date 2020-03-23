@@ -2,6 +2,11 @@
     "python.pythonPath": ".env/bin/python",
     "cSpell.words": [
         "IXUSR",
-        "hmac"
+        "dateutil",
+        "hmac",
+        "orbitdb",
+        "plotille",
+        "tzinfo",
+        "tzutc"
     ]
 }

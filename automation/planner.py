@@ -7,7 +7,7 @@ from orbit_predictor.locations import Location
 from datetimerange import DateTimeRange
 
 from selectstrategy import strategy_factory, Observation
-from utils import COMMENT_PASS_TAG, fill_satellite, open_config, get_receiver_command, \
+from utils import COMMENT_PASS_TAG, set_satellite_defaults, open_config, get_receiver_command, \
                 open_crontab, utc_to_local, get_location, Configuration
 from orbitdb import OrbitDatabase
 
@@ -28,7 +28,7 @@ def get_passes(config: Configuration, from_: datetime.datetime, to: datetime.dat
     
     init = []
     for sat in satellties:
-        fill_satellite(config, sat)
+        set_satellite_defaults(config, sat)
         aos_at = sat["aos_at"]
         max_elevation_greater_than = sat["max_elevation_greater_than"]
         predictor = orbit_db.get_predictor(sat["name"])

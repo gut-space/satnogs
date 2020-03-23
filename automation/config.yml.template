@@ -1,0 +1,25 @@
+aos_at: 0
+location:
+  elevation: 100
+  latitude: 54.3
+  longitude: 18.4
+  name: Gdansk
+max_elevation_greater_than: 0
+norad:
+- https://celestrak.com/NORAD/elements/noaa.txt
+- https://celestrak.com/NORAD/elements/active.txt
+satellites:
+- freq: 137.62e6
+  name: NOAA 15
+- freq: 137.9125e6
+  name: NOAA 18
+- freq: 137.1e6
+  name: NOAA 19
+- freq: 137.1e6
+  name: METEOR-M 2
+  recipe: meteor-qpsk
+server:
+  id: '1'
+  secret: 0123456789abcdef0123456789abcdef
+  url: http://127.0.0.1:5000/receive
+strategy: max-elevation

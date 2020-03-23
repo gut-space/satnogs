@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import sys
+import shutil
 from typing import List, Optional, Iterable, TypeVar, Callable, Tuple
 
 from crontab import CronTab
@@ -88,8 +89,6 @@ def get_planner_command(directory=None):
 def get_receiver_command(directory=None):
     return _get_command(directory, "receiver.py")
 
-DEFAULT_CONFIG = 'aos_at: 0\nlocation:\n  elevation: 138\n  latitude: 54.9\n  longitude: 54.9\n  name: Taneczna\nmax_elevation_greater_than: 0\nnorad:\n- https://celestrak.com/NORAD/elements/noaa.txt\n- https://celestrak.com/NORAD/elements/active.txt\nsatellites:\n- freq: 137.62e6\n  name: NOAA 15\n- freq: 137.9125e6\n  name: NOAA 18\n- freq: 137.1e6\n  name: NOAA 19\nserver:\n  id: 1\n  secret: 873730d540e1154cf3203b09546ac1fe\n  url: http://127.0.0.1:5000/receive\nstrategy: max-elevation\n'
-
 def open_crontab() -> CronTab:
     if DEV_ENVIRONEMT:
         path = os.path.join(CONFIG_DIRECTORY, "cron.tab")
@@ -106,8 +105,7 @@ def open_config() -> Configuration:
     if not config_exists:
         directory = os.path.dirname(config_path)
         os.makedirs(directory, exist_ok=True)
-        with open(config_path, "w") as f:
-            f.write(DEFAULT_CONFIG)
+        shutil.copyfile('config.yml.template', config_path)
 
     with open(config_path) as f:
         return yaml.safe_load(f) # type: ignore
@@ -182,7 +180,11 @@ def get_location(config: Configuration) -> Tuple[str, float, float, float]:
             config["location"]["elevation"])
     return location
 
-def fill_satellite(config: Configuration, satellite: SatelliteConfiguration):
+def set_satellite_defaults(config: Configuration, satellite: SatelliteConfiguration):
+    '''
+    If satellite structure doesn't contains optional values
+    then they will be set using inherited, global configuration.
+    '''
     if 'submit' not in satellite:
         global_submit = config.get('submit', None)
         if global_submit is None:
@@ -207,9 +209,14 @@ def fill_satellite(config: Configuration, satellite: SatelliteConfiguration):
         satellite['disabled'] = False
 
 def get_satellite(config: Configuration, sat: str) -> SatelliteConfiguration:
+    '''
+    Search for satellite configuration. Throw LookupError if not found.
+    If found then omitted optional fields will be set using inherited, global
+    configuration.
+    '''
     satellites = config['satellites']
     satellite = first(satellites, lambda s: s['name'] == sat)
     if satellite is None:
         raise LookupError("Satellite %s not found" % (sat,))
-    fill_satellite(config, satellite)
+    set_satellite_defaults(config, satellite)
     return satellite
