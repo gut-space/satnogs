@@ -59,6 +59,9 @@ def create_strategy(sort_key: Callable[[Observation], Hashable],
 aos_priority_strategy = create_strategy(lambda o: o.pass_.aos, lambda _d, _p, _lr, rr: rr)
 
 def max_elevation_selector(_: Any, pass_: PredictedPass, left_range: Optional[DateTimeRange], right_range: Optional[DateTimeRange]) -> Optional[DateTimeRange]:
+    """
+    This selection strategy selects the passes that have highest elevation during TCA.
+    """
     max_elevation_date = pass_.max_elevation_date
     for r in (left_range, right_range):
         if r is not None and max_elevation_date in r:
