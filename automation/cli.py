@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+from typing import Tuple
 from dateutil import tz
 import calendar
 import os
@@ -60,7 +61,12 @@ def exist_directory(x: str) -> str:
         raise argparse.ArgumentTypeError("%s isn't a directory" % (x,))
     return x
 
-def parse_receiver_job(job):
+def parse_receiver_job(job) -> Tuple[str, datetime.datetime, datetime.datetime]:
+    '''
+    Parse receive job CRON entry.
+    Returns satellite name, AOS and LOS.
+    AOS is recover from job start date. Therefore it has one minute accuracy.
+    '''
     parameters = job.command.replace(RECEIVER_COMMAND, "")
     sat_name, los_raw = parameters.rsplit(maxsplit=1)
     sat_name = sat_name.strip('"')
@@ -178,7 +184,6 @@ elif command == "logs":
         with open(LOG_FILE, "rt") as f:
             print(f.read())
 elif command == "plan":
-
     if planner_job is None:
         args.cron = args.cron or "0 4 * * *"
         planner_job = cron.new(comment=COMMENT_PLAN_TAG, command="placeholder")
