@@ -1,7 +1,7 @@
 import datetime
 from dateutil import tz
 import math
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from datetimerange import DateTimeRange
 from orbit_predictor.locations import Location
@@ -17,11 +17,42 @@ COLOR_RED = 1
 def _calculate_series(sat_id: str,
         aos: datetime.datetime, los: datetime.datetime,
         location: Optional[Location]=None,
-        time_step: Optional[datetime.timedelta]=None):
+        time_step: Optional[datetime.timedelta]=None) \
+    -> Tuple[Sequence[datetime.datetime], Sequence[float], Sequence[float]]:
+    '''
+    Produce data for plot charts
 
+    Parameters
+    ==========
+    sat_id: str
+        Satellite ID (name compatible with Celestrak)
+    aos: datetime.datetime
+        AOS date
+    los: datetime.datetime
+        LOS date
+    location: orbit_predictor.locations.Location, optional
+        Location of the station. If not provided it will be read from config
+    time_step: datetime.timedelta, optional
+        Time quantization factor for generate samples. Determines interval
+        between samples. Default one minute.
+        Too small value causes more accurate shape of chart, but plotille draws
+        then thicker lines.
+        Too big value causes low accurate (or false) chart.
+    
+    Returns
+    =======
+    date_series: sequence of datetime.datetime
+        Dates for which samples were designated. In UTC.
+    azimuth_series: sequence of float
+        Series of azumuths in degrees.
+    elevation_series: sequence of float
+        Series of elevations in degrees.
+    '''
     tzutc = tz.tzutc()
-    assert aos.tzinfo == tzutc
-    assert los.tzinfo == tzutc
+    if aos.tzinfo != tzutc:
+        aos = aos.replace(tzinfo=tzutc)
+    if los.tzinfo != tzutc:
+        los = los.replace(tzinfo=tzutc)
 
     if time_step is None:
         time_step = datetime.timedelta(minutes=1)
@@ -50,18 +81,64 @@ def plot(sat_id: str,
         location: Optional[Location]=None,
         time_step: Optional[datetime.timedelta]=None,
         width=50, height=20, scale_elevation=True, axis_in_local_time=True, scale_polar=0.5):
+    '''
+    Plot azimuth/elevation polar chart and next azimuth/elevation from time chart.
+
+    Parameters
+    ==========
+    sat_id: str
+        Satellite name compatible with Celestrak
+    aos: datetime.datetime
+        AOS date. Start date of plot.
+    los: datetime.datetime
+        LOS date. End date of plot.
+    location: orbit_predictor.locations.Location, optional
+        Location of the station. If not provided it will be read from config
+    time_step: datetime.timedelta, optional
+        Time quantization factor for generate samples. Determines interval
+        between samples. Default one minute.
+        Too small value causes more accurate shape of chart, but plotille draws
+        then thicker lines.
+        Too big value causes low accurate (or false) chart.
+    width: int
+        Width of plot. Unit is character.
+    height: int
+        Height of plot. Unit is character.
+    scale_elevation: bool
+        If true then elevation series is scale 4x.
+        Elevation has range <0; 90>. Plottile hasn't a possibility to draw
+        second Y axis. Therefore elevation is drawed only one quarter of the area.
+        If this parameter is set to true then elevation is scaled for use full
+        area. It is easier to assess the shape of the chart. Information about
+        scalling is placed in legend.
+        If this parameter is set to false then we draw auxiliary line Y=90 degree.
+    axis_in_local_time: bool
+        If true then time axis (X axis in azimuth/elevation from time plot) is 
+        in local time. Otherwise in UTC.
+    scale_polar: float
+        @width and @height parameters will scale by this factor for plot polar
+        chart. 
+
+    Returns
+    =======
+    Plot azimuth/elevation polar chart and next azimuth/elevation from time chart.
+    '''
 
     date_series, azimuth_series, elevation_series = _calculate_series(sat_id, aos, los, location, time_step)
-    plot_polar_azimuth_elevation(azimuth_series, elevation_series,
+    _plot_polar_azimuth_elevation(azimuth_series, elevation_series,
         int(width * scale_polar), int(height * scale_polar))
-    plot_azimuth_and_elevation_from_time(date_series, azimuth_series, elevation_series,
+    _plot_azimuth_and_elevation_from_time(date_series, azimuth_series, elevation_series,
         width=width, height=height,
         scale_elevation=scale_elevation, axis_in_local_time=axis_in_local_time)
 
 
-def plot_azimuth_and_elevation_from_time(date_series: Sequence[datetime.datetime],
+def _plot_azimuth_and_elevation_from_time(date_series: Sequence[datetime.datetime],
         azimuth_series: Sequence[float], elevation_series: Sequence[float],
         width=50, height=20, scale_elevation=True, axis_in_local_time=True):
+    '''
+    Plot azimuth/elevation from time chart.
+    Series colors are compatible with gPredict.
+    '''
     # We scale elevation, because plotille library allow draw only one Y axis.
     if scale_elevation:
         elevation_series = [el *4 for el in elevation_series]
@@ -90,8 +167,15 @@ def plot_azimuth_and_elevation_from_time(date_series: Sequence[datetime.datetime
     fig.x_label = x_label
     print(fig.show(legend=True))
 
-def plot_polar_azimuth_elevation(azimuth_series: Sequence[float], elevation_series: Sequence[float],
+def _plot_polar_azimuth_elevation(azimuth_series: Sequence[float], elevation_series: Sequence[float],
         width=50, height=20):
+    '''
+    Plot azimuth/elevation polar chart.
+    Chart has auxiliary lines on -90, -60, -30, 30, 60, 90 degrees.
+    AOS point is highlighted in red.
+    '''
+    # Max values is increased by 0.05. Without it points with any coordinate
+    # eqauls max were not drawed.
     xmin, xmax, ymin, ymax = -1, 1.05, -1, 1.05
 
     canvas = plotille.Canvas(width, height, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, color_mode="byte")
@@ -124,10 +208,3 @@ def plot_polar_azimuth_elevation(azimuth_series: Sequence[float], elevation_seri
     canvas.point(first_point[0], first_point[1], color=COLOR_RED)
     print(canvas.plot())
     print("Red dot is AOS point\n")
-
-if __name__ == '__main__':
-    sat = "METEOR-M 2"
-    aos = datetime.datetime(2020, 3, 22, 15, 26, 0, tzinfo=tz.tzutc())
-    los = datetime.datetime(2020, 3, 22, 15, 38, 0, tzinfo=tz.tzutc())
-    plot(sat, aos, los, scale_polar=0.25)
-
