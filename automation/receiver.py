@@ -62,4 +62,4 @@ if __name__ == '__main__':
         cmd()
     except:
         _, name, los, *opts = sys.argv
-        logging.error("Failed receive %s (LOS: %s)" % (name, los), exc_info=True)
+        logging.error("Failed receiver %s (LOS: %s)" % (name, los), exc_info=True)

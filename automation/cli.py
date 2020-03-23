@@ -63,7 +63,7 @@ def exist_directory(x: str) -> str:
 
 def parse_receiver_job(job) -> Tuple[str, datetime.datetime, datetime.datetime]:
     '''
-    Parse receive job CRON entry.
+    Parse receiver job CRON entry.
     Returns satellite name, AOS and LOS.
     AOS is recover from job start date. Therefore it has one minute accuracy.
     '''
@@ -199,7 +199,7 @@ elif command == "plan":
     if args.force:
         interval = get_interval(planner_job)
         planner.execute(interval)
-        print("Planned receive jobs successful")
+        print("Planned receiver jobs successful")
 
     if args.cron is None:
         pass_jobs = cron.find_comment(COMMENT_PASS_TAG)

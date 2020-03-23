@@ -15,7 +15,7 @@ else:
 
 '''
 The different satellites require different software and configuration. We need
-a possibility to add new configurations without rewrite our receive scripts or
+a possibility to add new configurations without rewrite our receiver scripts or
 write wrappers in Python for each new subprogram.
 This is a recipe-based solution. "Recipe" is a shell script which is responsible
 for receive signal and decode it.
