@@ -254,8 +254,8 @@ elif command == "pass":
     print("Max elevation:", "%.2f" % (pass_.max_elevation_deg,), "deg", str(pass_.max_elevation_date.astimezone(target_tz)))
     print("Off nadir", "%.2f" % (pass_.off_nadir_deg,), "deg")
 
-    import azimuth_elevation_diagram
-    azimuth_elevation_diagram.plot(sat_name, pass_.aos, pass_.los, location,
+    import az_elev_chart
+    az_elev_chart.plot(sat_name, pass_.aos, pass_.los, location,
         args.step, args.width, args.height, args.scale_elevation,
         axis_in_local_time=not args.print_utc, scale_polar=args.scale_polar)
 elif command == "config":
