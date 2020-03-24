@@ -1,9 +1,9 @@
 [doc](../README.md) > Installation
 
-This system consists of two elements: station (which is intended to run on a Raspberry Pi, but can be run on any Linux
-box) and a server (which is intended to be run in a place with good uplink connectivity). If you are interested in
-running your own station, you most likely want to deploy just the station and use existing server. Please contact
-someone from the satnogs team and we'll hook you up.
+This system consists of two elements: station (which is intended to run on a Raspberry Pi with an SDR dongle, but can
+be run on any Linux box) and a server (which is intended to be run in a place with good uplink connectivity). If 
+you are interested in running your own station, you most likely want to deploy just the station and use existing
+server. Please contact someone from the satnogs team and we'll hook you up.
 
 # Station installation
 
