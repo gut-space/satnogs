@@ -44,8 +44,8 @@ git clone https://github.com/gut-space/satnogs
 5. **Install python dependencies**:
 
 ```
-cd satnogs
-pip install -r station/requirements.txt
+cd satnogs/station
+python3 setup.py install
 ```
 
 This step will install necessary dependencies. It is a good practice to install them in virtual environment. However,
