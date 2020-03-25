@@ -100,10 +100,9 @@ def execute_recipe(sat: SatelliteConfiguration, los: datetime.datetime) -> Itera
     You need delete or move returned files when you don't need them.
     '''
     recipe_path = get_recipe(sat)
-
-    uid = uuid.uuid4()
-    base_path = os.path.join(BASE_DIR, str(uid))
     now = datetime.datetime.utcnow()
+    prefix = "%s_%s" % (sat["name"], now.isoformat())
+    base_path = os.path.join(BASE_DIR, prefix)
     record_interval = los - now
     record_seconds = record_interval.total_seconds()
 

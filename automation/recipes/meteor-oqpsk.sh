@@ -48,11 +48,11 @@ echo "Demodulated"
 touch -r "$SIGNAL_FILENAME" "$DEMODULATED_FILENAME" || exit $?
 echo "Touched"
 # Decode
-medet "$DEMODULATED_FILENAME" "${DUMP_PREFIX_FILENAME}" -cd -int -diff || exit $?
+medet "$DEMODULATED_FILENAME" "${DUMP_PREFIX_FILENAME}" -cd -diff || exit $?
 rm "$DEMODULATED_FILENAME"
 echo "Dumped"
 # Generate images
-medet "${DUMP_PREFIX_FILENAME}.dec" "$PRODUCT_FILENAME_WITOUT_EXT" -int -diff -r 68 -g 65 -b 64 -d || exit $?
+medet "${DUMP_PREFIX_FILENAME}.dec" "$PRODUCT_FILENAME_WITOUT_EXT" -diff -r 68 -g 65 -b 64 -d || exit $?
 rm "${DUMP_PREFIX_FILENAME}"*
 echo "Decoded"
 # Convert to PNG
