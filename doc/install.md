@@ -91,10 +91,10 @@ python station/cli.py config location -lat 54.34 -lng 23.23 -ele 154
 Once your station coordinates are set, you can tell satnogs to schedule observations:
 
 ```
-python station/cli.py plan
+python station/cli.py plan --force
 ```
 
-This should be done once. CLI will update the crontab jobs and will periodically add new ones.
+This should be done once. CLI will update the crontab jobs and will periodically add new ones. The `--force` command will conduct the scheduling now, rather than wait for 4am to do scheduling.
 
 # Server installation
 
