@@ -16,20 +16,20 @@ addons:
     - postgresql-client-10
 
 install:
-  - pip install -r automation/requirements.txt
-  - pip install -r backend/requirements.txt
+  - pip install -r station/requirements.txt
+  - pip install -r server/requirements.txt
   - pip install pytest
 
 before_script:
   - psql -c 'create database satnogs;' -U postgres
-  - cp backend/.satnogs.ini.travis backend/satnogs.ini
-  - cd backend && python migrate-db.py && cd ..
-  - psql -f backend/tests/db-data.psql satnogs
+  - cp server/.satnogs.ini.travis server/satnogs.ini
+  - cd server && python migrate-db.py && cd ..
+  - psql -f server/tests/db-data.psql satnogs
   - mkdir -p ~/.config/satnogs-gut
 
 script:
-  - cd automation && pytest -v && cd ..
-  - cd backend && PYTHONTEST=. pytest -v
+  - cd station && pytest -v && cd ..
+  - cd server && PYTHONTEST=. pytest -v
 
 notifications:
   email:
