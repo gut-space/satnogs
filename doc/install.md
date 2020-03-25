@@ -51,14 +51,7 @@ python3 setup.py install
 This step will install necessary dependencies. It is a good practice to install them in virtual environment. However,
 since the scripts will be called using crontab, it would've complicated the setup.
 
-5. **Run the initial setup** script:
-
-```
-python3 station/setup.py
-```
-this script will conduct several things, such as setting up crontab to run observations periodically, create config file if there isn't any etc.
-
-# 6. Station management
+6. **Station management**
 
 There is a command line tool used to manage the station. You can run it with:
 
