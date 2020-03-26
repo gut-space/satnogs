@@ -1,8 +1,12 @@
+from sys import exit
 import os
 import traceback
 from typing import Tuple
 
-from app.repository import Repository
+try:
+    from app.repository import Repository
+except KeyError:
+    exit("Unable to load satnogs.ini - make sure the file is present and has all entries.")
 
 def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tuple[int, str]:
     '''
@@ -29,14 +33,14 @@ def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tup
         version_raw = version_raw.lstrip(prefix)
         version = int(version_raw)
         migrations.append((version, path))
-    
+
     migrations.sort(key=lambda p: p[0])
     return migrations
 
 def migrate(config=None, migration_directory="db"):
     '''
     Perform migrations.
-    
+
     Parameters
     ==========
     config
@@ -66,7 +70,7 @@ def migrate(config=None, migration_directory="db"):
             if migration_version <= db_version:
                 print("Skip to %d version migration" % (migration_version,))
                 continue
-        
+
             print("Process to %d version migration..." % (migration_version,), end="")
             with open(migration_path) as migration_file:
                 content = migration_file.read()
