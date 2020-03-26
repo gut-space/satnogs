@@ -1,5 +1,12 @@
 #!/bin/bash
 
+BRANCH=`git branch|sed -ne 's,^\* ,,p'`
+
+if test "$BRANCH" != "master"; then
+    echo "The current branch ($BRANCH) is not master, skipping update."
+    exit 1
+fi
+
 # Get rid of any mess that could be in progress
 git merge --abort
 git cherry-pick --abort
