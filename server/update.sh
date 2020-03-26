@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Get rid of any mess that could be in progress
 git merge --abort
@@ -20,7 +20,9 @@ git reset --hard
 git pull
 
 # Run the installation script
-source venv/bin/activate
+VENV=$PWD/venv/bin/activate
+echo "Enabling venv at $VENV"
+. $VENV
 python setup.py install
 
 # Restart apache
