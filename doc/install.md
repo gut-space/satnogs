@@ -123,6 +123,13 @@ The general goal is to have an apache2 running with WSGI scripting capability th
 apache2 configuation](apache2/satnogs.conf). You may want to tweak the paths and TLS configuration to use LetsEncrypt
 or another certificate of your choice. Make sure the paths are actually pointing to the right directory.
 
+Also, you should update the /etc/sudoers file to allow ordinary user (satnogs) to restart apache server.
+You should use `visudo` command to add the following line:
+
+```
+%satnogs ALL= NOPASSWD: /bin/systemctl restart apache2
+```
+
 4. **Install Flask dependencies**
 
 ```
