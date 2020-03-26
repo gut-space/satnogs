@@ -1,7 +1,7 @@
 [doc](../README.md) > Installation
 
 This system consists of two elements: station (which is intended to run on a Raspberry Pi with an SDR dongle, but can
-be run on any Linux box) and a server (which is intended to be run in a place with good uplink connectivity). If 
+be run on any Linux box) and a server (which is intended to be run in a place with good uplink connectivity). If
 you are interested in running your own station, you most likely want to deploy just the station and use existing
 server. Please contact someone from the satnogs team and we'll hook you up.
 
@@ -68,12 +68,12 @@ positional arguments:
 
 optional arguments:
   -h, --help           show this help message and exit
-  
+
 ```
 
 You can use it to inspect your configuration, clear or schedule upcoming transmissions.
 
-7. **Tweak your config**. 
+7. **Tweak your config**.
 
 Run the cli command first:
 ```
@@ -127,8 +127,15 @@ or another certificate of your choice. Make sure the paths are actually pointing
 
 ```
 cd satnogs/server
-pip install -r requirements.txt
+python3 -m virtualenv venv
+source venv/bin/install
+python setup.py install
 ```
+
+This step will install necessary dependencies. It is a good practice to install them in virtual environment. If you don't have virtualenv
+installed, you can add it with `sudo apt install python-virtualenv`
+or similar command for your system. Alternatively, you may use venv.
+However, make sure the virtual environment is created in venv directory.
 
 You can start flask manually to check if it's working. This is not needed once you have apache integration complete.
 
