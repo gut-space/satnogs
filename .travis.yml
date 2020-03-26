@@ -23,7 +23,7 @@ install:
 before_script:
   - psql -c 'create database satnogs;' -U postgres
   - cp server/.satnogs.ini.travis server/satnogs.ini
-  - cd server && python migrate-db.py && cd ..
+  - cd server && python migrate_db.py && cd ..
   - psql -f server/tests/db-data.psql satnogs
   - mkdir -p ~/.config/satnogs-gut
 
