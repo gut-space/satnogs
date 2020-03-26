@@ -2,3 +2,5 @@ Flask
 psycopg2
 webargs
 typing_extensions
+python-dateutil
+python-crontab
