@@ -24,4 +24,4 @@ source venv/bin/activate
 python setup.py install
 
 # Restart apache
-sudo systemctl apache2 restart
+sudo systemctl restart apache2
