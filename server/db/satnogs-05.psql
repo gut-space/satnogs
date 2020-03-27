@@ -1,0 +1,24 @@
+CREATE TABLE observation_files
+(
+    obs_file_id serial PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    media_type VARCHAR(255) NOT NULL,
+    obs_id INTEGER REFERENCES observations ON DELETE CASCADE
+);
+
+CREATE INDEX  idx_observation_files_obs_id ON observation_files(obs_id);
+
+ALTER TABLE observations ADD COLUMN thumbnail VARCHAR(255);
+
+UPDATE observations
+SET thumbnail='thumb-' || filename;
+
+INSERT INTO observation_files(filename, media_type, obs_id)
+SELECT filename, 'image/png', obs_id
+FROM observations
+WHERE filename IS NOT NULL;
+
+ALTER TABLE observations DROP COLUMN filename;
+ALTER TABLE observations DROP COLUMN sat_name;
+
+UPDATE schema SET version = 5;

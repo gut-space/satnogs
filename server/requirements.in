@@ -4,3 +4,4 @@ webargs
 typing_extensions
 python-dateutil
 python-crontab
+testing.postgresql
