@@ -9,19 +9,27 @@ from functools import wraps
 from typing import Any, Dict, List, NewType, Sequence, NoReturn, Union, Optional, Tuple
 import sys
 
-if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+if sys.version_info >= (3, 8):
     from typing import TypedDict, Literal
 else:
     from typing_extensions import TypedDict, Literal
 
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # Data model
 
 ObservationId = NewType("ObservationId", int)
+ObservationFileId = NewType("ObservationFileId", int)
 StationId = NewType("StationId", int)
 SatelliteId = NewType("SatelliteId", int)
 StationPhotoId = NewType("StationPhotoId", int)
+
+class ObservationFile(TypedDict):
+    obs_file_id: ObservationFileId
+    filename: str
+    media_type: str
+    obs_id: ObservationId
 
 class Observation(TypedDict):
     obs_id: ObservationId
@@ -29,10 +37,8 @@ class Observation(TypedDict):
     tca: datetime
     los: datetime
     sat_id: SatelliteId
-    sat_name: str
-    filename: str
-    thumbfile: str
-    notes: str
+    thumbnail: str
+    notes: Optional[str]
     station_id: StationId
 
 class Satellite(TypedDict):
@@ -55,8 +61,15 @@ class StationPhoto(TypedDict):
     filename: str
     descr: str
 
-# Errors
+# Utils
+def without_keys(d, keys: Sequence[str]):
+    return {x: d[x] for x in d if x not in keys}
 
+def exclude_from_dict(d, keys: Sequence[str]):
+    excluded = [d[k] for k in keys]
+    return without_keys(d, keys), *excluded
+
+# Errors
 class RepositoryError(Exception):
     '''Base class for Repository module errors.'''
     def __init__(self, message: str):
@@ -69,7 +82,7 @@ class TransactionAlreadyOpenError(RepositoryError):
 
 # Psycopg2 doesn't provide typing in current version.
 Connection = Any
-Cursor = Any
+Cursor = RealDictCursor
 
 class _TransactionContext(TypedDict):
     conn: Connection
@@ -118,18 +131,10 @@ class Repository:
         provide it then data from INI will be used.
         '''
         if config is None:
-            import app
+            from app import app
             config = app.config["database"]
         self._config = config
         self._transaction_context: Optional[_TransactionContext] = None # type: ignore
-
-    @staticmethod
-    def _row_to_object(row: Sequence[Any], columns: Sequence[str]) -> Dict[str, Any]:
-        '''Convert sequence of values to dictionary using provided labels as keys.'''
-        obj = {}
-        for label, value in zip(columns, row):
-            obj[label] = value
-        return obj
 
     @property
     def is_pending_transaction(self):
@@ -143,70 +148,82 @@ class Repository:
 
     @use_cursor
     def read_observations(self, limit:int=100, offset:int=0) -> Sequence[Observation]:
-        q = "SELECT obs_id, aos, " \
-                "tca, los, " \
-                "sat_id, sat_name, " \
-                "filename, 'thumb-' || filename, " \
-                "station_id, notes " \
-            "FROM observations " \
-            "ORDER BY aos DESC " \
-            "LIMIT %s OFFSET %s"
+        q = ("SELECT obs_id, aos, tca, los, "
+                    "sat_id, "
+                    "thumbnail, " 
+                    "station_id, notes "
+            "FROM observations "
+            "ORDER BY aos DESC "
+            "LIMIT %s OFFSET %s")
         cursor = self._cursor
         cursor.execute(q, (limit, offset))
-
-        rows = cursor.fetchall()
-        columns = ["obs_id", "aos", "tca", "los",
-                    "sat_id", "sat_name",
-                    "filename", "thumbfile", 
-                    "station_id", "notes"]
-        items: List[Observation] = []
-        
-        for row in rows:
-            item: Observation = Repository._row_to_object(row, columns) # type: ignore
-            items.append(item)
-
-        return items
+        return cursor.fetchall()
         
     @use_cursor
     def read_observation(self, obs_id: ObservationId) -> Optional[Observation]:
-        q = "SELECT obs_id, aos, " \
-                "tca, los, sat_name, " \
-                "filename, 'thumb-' || filename, " \
-                "station_id, notes " \
-            "FROM observations " \
-            "WHERE obs_id = %s" \
-            "ORDER BY aos DESC " \
-            "LIMIT 1"
+        q = ("SELECT obs_id, aos, "
+                "tca, los, "
+                "thumbnail, "
+                "station_id, notes "
+            "FROM observations "
+            "WHERE obs_id = %s"
+            "ORDER BY aos DESC "
+            "LIMIT 1")
         cursor = self._cursor
         cursor.execute(q, (obs_id,))
-
-        row = cursor.fetchone()
-        if row is None:
-            return None
-
-        columns = ["obs_id", "aos", "tca", "los", "sat_name", "filename", "thumbfile", "station_id", "notes"]
-        
-        item: Observation = Repository._row_to_object(row, columns) # type: ignore
-
-        return item    
+        return cursor.fetchone()
     
     @use_cursor
-    def insert_observation(self, observation: Observation) -> None:
+    def insert_observation(self, observation: Observation) -> ObservationId:
         cursor = self._cursor
         cursor.execute(
-            "INSERT INTO observations (aos, tca, los, sat_id, sat_name, filename, notes, station_id)"
-            "VALUES (%(aos)s, %(tca)s, %(los)s, %(sat_id)s, %(sat_name)s, %(filename)s, %(notes)s, %(station_id)s);",
+            "INSERT INTO observations (aos, tca, los, sat_id, thumbnail, notes, station_id) "
+            "VALUES (%(aos)s, %(tca)s, %(los)s, %(sat_id)s, %(thumbnail)s, %(notes)s, %(station_id)s) "
+            "RETURNING obs_id;",
             {
                 'aos': observation["aos"].isoformat(),
                 'tca': observation['tca'].isoformat(),
                 'los': observation['los'].isoformat(),
                 'sat_id': observation['sat_id'],
-                'sat_name': observation['sat_name'],
-                'filename': observation['filename'],
+                'thumbnail': observation['thumbnail'],
                 'notes': observation['notes'],
                 'station_id': observation['station_id']
             }
         )
+        return cursor.fetchone()['obs_id']
+
+    @use_cursor
+    def delete_observation(self, obs_id: ObservationId):
+        q = ("DELETE "
+             "FROM observations "
+             "WHERE obs_id = %s;")
+        cursor = self._cursor
+        cursor.execute(q, (obs_id,))
+
+    @use_cursor
+    def read_observation_files(self, obs_id: ObservationId) -> Sequence[ObservationFile]:
+        q = ("SELECT obs_file_id, filename, media_type, obs_id "
+            "FROM observation_files "
+            "WHERE obs_id = %s")
+        cursor = self._cursor
+        cursor.execute(q, (obs_id,))
+        return cursor.fetchall()
+
+    @use_cursor
+    def insert_observation_file(self, observation_file: ObservationFile) -> ObservationFileId:
+        q = ("INSERT INTO observation_files "
+                "(filename, media_type, obs_id) "
+             "VALUES "
+                "(%(filename)s, %(media)s, %(obs)s) "
+             "RETURNING obs_file_id;")
+        cursor = self._cursor
+        cursor.execute(q, {
+            'filename': observation_file['filename'],
+            'media': observation_file['media_type'],
+            'obs': observation_file['obs_id']
+        })
+        return cursor.fetchone()['obs_file_id']
+
 
     @use_cursor
     def read_satellite(self, sat: Union[SatelliteId, str]) -> Optional[Satellite]:
@@ -216,83 +233,54 @@ class Repository:
             q = "SELECT sat_id, sat_name FROM satellites WHERE sat_id = %s LIMIT 1;"
         cursor = self._cursor
         cursor.execute(q, (sat,))
-
-        row = cursor.fetchone()
-
-        if row is None:
-            return None
-
-        columns = ["sat_id", "sat_name"]
-        item: Satellite = Repository._row_to_object(row, columns) # type: ignore
-        return item
+        return cursor.fetchone()
 
     @use_cursor
     def read_stations(self, limit=100, offset=0) -> Sequence[Tuple[Station, int, datetime]]:
-        q = "SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, " \
-                    "COUNT(o), MAX(o.los) " \
-            "FROM stations s " \
-            "LEFT JOIN observations o ON s.station_id = o.station_id " \
-            "GROUP BY s.station_id " \
-            "LIMIT %s OFFSET %s"
-
-        station_columns = ["station_id", "name", "lon", "lat", "descr", "config", "registered"]
+        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, "
+                    "COUNT(o) AS count, MAX(o.los) AS los "
+            "FROM stations s "
+            "LEFT JOIN observations o ON s.station_id = o.station_id "
+            "GROUP BY s.station_id "
+            "LIMIT %s OFFSET %s")
 
         cursor = self._cursor
         cursor.execute(q, (limit, offset))
-        rows = cursor.fetchall()
-        items = []
-
-        for row in rows:
-            station: Station = Repository._row_to_object(row[:len(station_columns)], station_columns) # type: ignore
-            count: int
-            lastobs: datetime
-            count, lastobs = row[len(station_columns):]
-            item = (station, count, lastobs)
-            items.append(item)
-
-        return items
+        items = cursor.fetchall()
+        return [exclude_from_dict(i, ("count", "los")) for i in items]
 
     @use_cursor
     def read_station(self, id_: StationId) -> Optional[Tuple[Station, int, datetime]]:
-        q = "SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, " \
-                    "COUNT(o), MAX(o.los) " \
-            "FROM stations s " \
-            "LEFT JOIN observations o ON s.station_id = o.station_id " \
-            "WHERE s.station_id = %s " \
-            "GROUP BY s.station_id " \
-            "LIMIT 1"
-
-        station_columns = ["station_id", "name", "lon", "lat", "descr", "config", "registered"]
+        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, "
+                    "COUNT(o) AS count, MAX(o.los) AS los "
+            "FROM stations s "
+            "LEFT JOIN observations o ON s.station_id = o.station_id "
+            "WHERE s.station_id = %s "
+            "GROUP BY s.station_id "
+            "LIMIT 1")
 
         cursor = self._cursor
         cursor.execute(q, (id_,))
         row = cursor.fetchone()
         if row is None:
-            return row
+            return None
 
-        station: Station = Repository._row_to_object(row[:len(station_columns)], station_columns) # type: ignore
         count: int
         lastobs: datetime
-        count, lastobs = row[len(station_columns):]
-        return station, count, lastobs
+        count, lastobs = row["count"], row["los"]
+        del row["count"]
+        del row["los"]
+        return row, count, lastobs
 
     @use_cursor
     def read_station_photos(self, id_: StationId) -> Sequence[StationPhoto]:
-        q = "SELECT photo_id, station_id, sort, filename, descr " \
-            "FROM station_photos " \
-            "WHERE station_id = %s"
+        q = ("SELECT photo_id, station_id, sort, filename, descr "
+            "FROM station_photos "
+            "WHERE station_id = %s")
 
         cursor = self._cursor
         cursor.execute(q, (id_,))
-        rows = cursor.fetchall()
-
-        columns = ["photo_id", "station_id", "sort", "filename", "descr"]
-
-        items = []
-        for row in rows:
-            item: StationPhoto = Repository._row_to_object(row, columns) # type: ignore
-            items.append(item)
-        return items
+        return cursor.fetchall()
 
     @use_cursor
     def read_station_secret(self, station_id: StationId) -> Optional[bytes]:
@@ -302,7 +290,7 @@ class Repository:
         row = cursor.fetchone()
         if row is None:
             return None
-        return row[0].tobytes()
+        return row["secret"]
 
     @use_cursor
     def get_database_version(self) -> int:
@@ -310,28 +298,28 @@ class Repository:
         Returns database version. Return 0 if database is empty.
         @see: https://stackoverflow.com/a/42693458
         '''
-        is_database_empty_query = "SELECT count(*) " \
-                "FROM pg_class c " \
-                "JOIN pg_namespace s ON s.oid = c.relnamespace " \
-                "WHERE s.nspname NOT IN ('pg_catalog', 'information_schema') " \
-                        "AND s.nspname NOT LIKE 'pg_temp%' " \
-                        "AND s.nspname <> 'pg_toast'"
+        is_database_empty_query = ("SELECT count(*) AS count "
+                "FROM pg_class c "
+                "JOIN pg_namespace s ON s.oid = c.relnamespace "
+                "WHERE s.nspname NOT IN ('pg_catalog', 'information_schema') "
+                        "AND s.nspname NOT LIKE 'pg_temp%' "
+                        "AND s.nspname <> 'pg_toast'")
 
         cursor = self._cursor
         cursor.execute(is_database_empty_query)
-        is_database_empty = cursor.fetchone()[0] == 0
+        is_database_empty = cursor.fetchone()["count"] == 0
         
         if is_database_empty:
             return 0
 
-        exists_query = "SELECT EXISTS ( " \
-                        "SELECT FROM information_schema.tables " \
-                        "WHERE table_schema = 'public' " \
-                            "AND  table_name = 'schema' " \
-                        ");"
-        cursor = self._cursor
+        exists_query = ("SELECT EXISTS ( "
+                        "SELECT FROM information_schema.tables "
+                        "WHERE table_schema = 'public' "
+                            "AND  table_name = 'schema' "
+                        ");")
         cursor.execute(exists_query)
-        is_table_version_exists = cursor.fetchone()[0]
+        res = cursor.fetchone()
+        is_table_version_exists = len(res) == 1
         if not is_table_version_exists:
             return 1
 
@@ -339,8 +327,8 @@ class Repository:
         cursor.execute(version_query)
         row = cursor.fetchone()
         if row is None:
-            raise VersionNotSetError()
-        return row[0]
+            raise Exception("Database version not set")
+        return row["version"]
 
     @use_cursor
     def execute_raw_query(self, query):
@@ -382,13 +370,12 @@ class Transaction:
 
     def __enter__(self):
         '''Open new connection and cursor. Store them in repository.'''
-        transaction_context = self._transaction_context
-        if transaction_context is not None:
+        if self._transaction_context is not None:
             raise TransactionAlreadyOpenError()
 
         config = self._repository._config
         conn: Connection = psycopg2.connect(**config)
-        cursor: Cursor = conn.cursor()
+        cursor: Cursor = conn.cursor(cursor_factory=RealDictCursor)
         transaction_context: _TransactionContext = {
             'conn': conn,
             'cursor': cursor

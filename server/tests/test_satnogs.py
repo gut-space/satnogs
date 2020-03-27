@@ -1,31 +1,29 @@
 import unittest
 
+import testing.postgresql
+
 from app import app
+from tests.utils import standard_seed_db
+
+Postgresql = testing.postgresql.PostgresqlFactory(cache_initialized_db=True,
+                                                  on_initialized=standard_seed_db)
+
+def tearDownModule():
+    # clear cached database at end of tests
+    Postgresql.clear_cache()
 
 class BasicTests(unittest.TestCase):
 
-    ############################
-    #### setup and teardown ####
-    ############################
-
-    # executed prior to each test
     def setUp(self):
+        self.postgres = Postgresql()
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['DEBUG'] = False
+        app.config["database"] = self.postgres.dsn()
         self.app = app.test_client()
-        #db.drop_all()
-        #db.create_all()
 
-
-    # executed after each test
     def tearDown(self):
-        pass
-
-
-###############
-#### tests ####
-###############
+        self.postgres.stop()
 
     def test_main_page(self):
         response = self.app.get('/', follow_redirects=True)

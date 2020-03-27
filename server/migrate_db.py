@@ -1,14 +1,14 @@
 from sys import exit
 import os
 import traceback
-from typing import Tuple
+from typing import Tuple, List
 
 try:
     from app.repository import Repository
 except KeyError:
     exit("Unable to load satnogs.ini - make sure the file is present and has all entries.")
 
-def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> Tuple[int, str]:
+def list_migrations(directory: str, extension=".psql", prefix="satnogs-") -> List[Tuple[int, str]]:
     '''
     List all files in @directory meet the convention:
         [@prefix][XX][@extension]

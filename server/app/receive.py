@@ -11,7 +11,7 @@ from webargs.flaskparser import use_args
 from . import app
 from .authorize_station import authorize_station
 from .utils import make_thumbnail
-from .repository import Observation, ObservationId, Repository, SatelliteId, StationId
+from .repository import Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId
 from abc import abstractmethod
 
 import sys
@@ -55,32 +55,39 @@ def receive(station_id: str, args: RequestArguments):
 
     file_ = args['file']
     filename = "%s-%s" % (str(uuid.uuid4()), file_.filename)
+    thumb_filename = "thumb-" + filename
 
     repository = Repository()
+    with repository.transaction() as transaction:
+        satellite = repository.read_satellite(args["sat"])
+        if satellite is None:
+            abort(400, description="Unknown satellite")
 
-    satellite = repository.read_satellite(args["sat"])
-    if satellite is None:
-        abort(400, description="Unknown satellite")
+        sat_id = SatelliteId(satellite["sat_id"])
+        observation: Observation = {
+            'obs_id': ObservationId(0),
+            'aos': args['aos'],
+            'tca': args['tca'],
+            'los': args['los'],
+            'sat_id': sat_id,
+            'thumbnail': thumb_filename,
+            'notes': args.get('notes'),
+            'station_id': StationId(station_id)
+        }
 
-    sat_id = SatelliteId(satellite["sat_id"])
-    observation: Observation = {
-        'obs_id': ObservationId(0),
-        'aos': args['aos'],
-        'tca': args['tca'],
-        'los': args['los'],
-        'sat_id': sat_id,
-        'sat_name': satellite["sat_name"],
-        'filename': filename,
-        'thumbfile': '',
-        'notes': args.get('notes'),
-        'station_id': StationId(station_id)
-    }
-
-    repository.insert_observation(observation)
+        obs_id = repository.insert_observation(observation)
+        observation_file: ObservationFile = {
+            "obs_file_id": ObservationFileId(0),
+            "filename": filename,
+            "media_type": "image/png",
+            "obs_id": obs_id
+        }
+        repository.insert_observation_file(observation_file)
+        transaction.commit()
 
     root = app.config["storage"]['image_root']
     path = os.path.join(root, filename)
     file_.save(path)
-    thumb_path = os.path.join(root, "thumbs", "thumb-" + filename)
+    thumb_path = os.path.join(root, "thumbs", thumb_filename)
     make_thumbnail(path, thumb_path)
     return '', 204
