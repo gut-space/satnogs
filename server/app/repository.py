@@ -161,8 +161,9 @@ class Repository:
         
     @use_cursor
     def read_observation(self, obs_id: ObservationId) -> Optional[Observation]:
-        q = ("SELECT obs_id, aos, "
-                "tca, los, "
+        q = ("SELECT obs_id, "
+                "aos, tca, los, "
+                "sat_id, "
                 "thumbnail, "
                 "station_id, notes "
             "FROM observations "
@@ -224,6 +225,14 @@ class Repository:
         })
         return cursor.fetchone()['obs_file_id']
 
+    @use_cursor
+    def read_satellites(self, limit:int=100, offset:int=0) -> Optional[Satellite]:
+        q = ("SELECT sat_id, sat_name "
+             "FROM satellites "
+             "LIMIT %s OFFSET %s;")
+        cursor = self._cursor
+        cursor.execute(q, (limit, offset))
+        return cursor.fetchall()
 
     @use_cursor
     def read_satellite(self, sat: Union[SatelliteId, str]) -> Optional[Satellite]:
@@ -290,7 +299,7 @@ class Repository:
         row = cursor.fetchone()
         if row is None:
             return None
-        return row["secret"]
+        return bytes(row["secret"])
 
     @use_cursor
     def get_database_version(self) -> int:

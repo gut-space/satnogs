@@ -2,7 +2,7 @@ import datetime
 from dateutil.parser import isoparse
 import hashlib
 import hmac
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 '''
 HMAC based token processing - creation, parsing and verification.
@@ -53,6 +53,30 @@ def get_token(id_: str, secret: Union[bytes, bytearray], body: Dict, date: datet
     sig = _get_signature(secret, id_, body, date)
     token = ",".join((id_, date.isoformat(timespec='seconds'), sig))
     return token
+
+def get_authorization_header_value(id_: str, secret: Union[bytes, bytearray], body: Dict, date: Optional[datetime.datetime]=None):
+    '''
+    Shorthand function for create Authorization header value
+
+    Parameters
+    ==========
+    id_: str
+        Station ID
+    secret: bytes or bytearray
+        Secret of station
+    body: dict
+        Body of request. Values should be strings or file-like objects
+    date: datetime.datetime
+        Datetime in UTC (may be naive). Date when token should be valid. Default: now.
+
+    Returns
+    =======
+    Valid Authorization HTTP header value.
+    '''
+    if date is None:
+        date = datetime.datetime.utcnow()
+    token = get_token(id_, secret, body, date)
+    return "%s %s" % (AUTHORIZATION_ALGORITHM, token)
 
 def parse_token(token: str):
     '''Split token to id, timestamp and signature'''
