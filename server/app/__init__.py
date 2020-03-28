@@ -7,14 +7,14 @@ import os
 from flask import Flask
 
 app = Flask(__name__, template_folder='../templates')
+root_dir = os.path.dirname(os.path.realpath(__file__))
+root_dir = os.path.dirname(root_dir)
+ini_path = os.path.join(root_dir, 'satnogs.ini')
 
 try:
-    rootdir = os.path.dirname(os.path.realpath(__file__))
-    rootdir = os.path.dirname(rootdir)
-    inipath = os.path.join(rootdir, 'satnogs.ini')
 
     config = ConfigParser()
-    config.read(inipath)
+    config.read(ini_path)
 
     for key, value in config.defaults().items():
         app.config[key] = value
@@ -26,11 +26,11 @@ try:
             app.config[section_name][key] = value
     
 except IOError as e:
-    raise Exception("Unable to read %s file: %s" % (inipath, e) )
+    raise Exception("Unable to read %s file: %s" % (ini_path, e) )
 except NoSectionError as e:
-    raise Exception("Unable to find section 'database' in the %s file: %s" % (inipath, e) )
+    raise Exception("Unable to find section 'database' in the %s file: %s" % (ini_path, e) )
 except NoOptionError as e:
-    raise Exception("Unable to find option in 'database' section in the %s file: %s" % (inipath, e) )
+    raise Exception("Unable to find option in 'database' section in the %s file: %s" % (ini_path, e) )
 
 
 from app import routes
