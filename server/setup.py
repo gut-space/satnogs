@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 from os import getcwd, path
-from setuptools import setup, find_packages
+import shutil
 
+from setuptools import setup, find_packages
 
 # STEP 1: install python packages
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
@@ -15,11 +16,16 @@ setup(name='satnogs-server',
       install_requires=REQUIREMENTS
 )
 
-# STEP 2: ensure the database is updated.
+# STEP 2: ensure the config is exists
+if not path.exists("satnogs.ini"):
+    shutil.copyfile("satnogs.ini.template", "satnogs.ini")
+
+# STEP 3: ensure the database is updated.
+
 from migrate_db import *
 migrate()
 
-# STEP 3: make sure the update script will be called every day
+# STEP 4: make sure the update script will be called every day
 COMMENT_UPDATE_TAG = 'satnogs-gut-update'
 
 def install_update_cronjob():

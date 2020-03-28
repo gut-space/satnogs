@@ -9,3 +9,5 @@ venv
 /server/.env/bin/
 /server/.env/
 /server/data/
+/server/build/
+/server/

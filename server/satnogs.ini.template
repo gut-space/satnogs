@@ -1,12 +1,12 @@
 [database]
-host =
-database =
-user =
-password =
+host = localhost
+database = satnogs
+user = postgres
+password = postgres
 
 [storage]
-image_root =
+image_root = /data
 
 [security]
-ignore_hmac_validation_errors =
+ignore_hmac_validation_errors = false
 
