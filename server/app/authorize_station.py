@@ -8,8 +8,6 @@ from flask import abort, request
 from app import app
 from app.hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
 
-cfg = app.config["database"]
-
 def _get_body(request):
     '''
     Return dict with request arguments..

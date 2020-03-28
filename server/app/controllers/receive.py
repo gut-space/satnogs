@@ -36,8 +36,6 @@ class RequestArguments(TypedDict):
     sat: str
     notes: str
 
-cfg = app.config["database"]
-
 ALLOWED_FILE_TYPES = {
     "image/png": ".png"
 }
