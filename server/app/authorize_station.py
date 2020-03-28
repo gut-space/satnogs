@@ -5,8 +5,8 @@ from functools import wraps
 from typing import Optional, Tuple
 from flask import abort, request
 
-from . import app
-from .hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
+from app import app
+from app.hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
 
 cfg = app.config["database"]
 

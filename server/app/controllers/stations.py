@@ -25,9 +25,6 @@ def stations():
 
         stationlist.append(x)
 
-    # Generate some basic stats.
-    stats = "Showing %d ground station(s)." % len(data)
-
-    return render_template('stations.html', stations=stationlist, stats=stats)
+    return render_template('stations.html', stations=stationlist)
 
 

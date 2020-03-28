@@ -3,16 +3,15 @@ Module encapsulate database operations.
 It is responsible for create and execute SQL queries and support transactional.
 '''
 
-from configparser import Error
 from datetime import datetime
 from functools import wraps
-from typing import Any, Dict, List, NewType, Sequence, NoReturn, Union, Optional, Tuple
+from typing import Any, NewType, Sequence, Union, Optional, Tuple
 import sys
 
 if sys.version_info >= (3, 8):
-    from typing import TypedDict, Literal
+    from typing import TypedDict
 else:
-    from typing_extensions import TypedDict, Literal
+    from typing_extensions import TypedDict
 
 import psycopg2
 from psycopg2.extras import RealDictCursor

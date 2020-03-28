@@ -2,7 +2,6 @@ import abc
 import datetime
 import os.path
 import uuid
-from typing import IO, Iterable, Tuple, Union
 
 from flask import request, abort
 from webargs import fields
@@ -16,10 +15,10 @@ from app.repository import Observation, ObservationFile, ObservationFileId, Obse
 from abc import abstractmethod
 
 import sys
-if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
-    from typing import TypedDict, Literal
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
 else:
-    from typing_extensions import TypedDict, Literal
+    from typing_extensions import TypedDict
 
 class WebFileLike(abc.ABC):
     @property
@@ -31,7 +30,6 @@ class WebFileLike(abc.ABC):
         pass
 
 class RequestArguments(TypedDict):
-    file: WebFileLike
     aos: datetime.datetime
     tca: datetime.datetime
     los: datetime.datetime
