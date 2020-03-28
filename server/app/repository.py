@@ -66,7 +66,9 @@ def without_keys(d, keys: Sequence[str]):
 
 def exclude_from_dict(d, keys: Sequence[str]):
     excluded = [d[k] for k in keys]
-    return without_keys(d, keys), *excluded
+    obj = without_keys(d, keys)
+
+    return [obj,] + excluded
 
 # Errors
 class RepositoryError(Exception):
