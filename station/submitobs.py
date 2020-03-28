@@ -6,7 +6,7 @@ import sys
 from typing import Any, Dict
 
 from utils import open_config, from_iso_format
-from hmac_token import get_token, AUTHORIZATION_ALGORITHM
+from hmac_token import get_authorization_header_value
 
 config = open_config()
 section = config["server"]
@@ -14,7 +14,8 @@ station_id = str(section["id"])
 secret = bytearray.fromhex(section["secret"])
 url = section["url"]
 
-def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, tca: datetime.datetime, los: datetime.datetime, notes: str):
+def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime,
+        tca: datetime.datetime, los: datetime.datetime, notes: str):
     '''
     Submit observation to content server.
 
@@ -48,10 +49,11 @@ def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, t
     }
     body.update(form_data)
 
-    token = get_token(station_id, secret, body, datetime.datetime.utcnow())
+    header_value = get_authorization_header_value(station_id,
+        secret, body, datetime.datetime.utcnow())
 
     headers = {
-        "Authorization": "%s %s" % (AUTHORIZATION_ALGORITHM, token)
+        "Authorization": header_value
     }
 
     files = {
@@ -67,7 +69,8 @@ def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime, t
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print("Not enough parameters. At least 3 are needed: filename.png sat_name aos")
+        print("Not enough parameters. At least 3 are needed: "
+            "filename.png sat_name aos")
         exit(1)
 
     filename=sys.argv[1]

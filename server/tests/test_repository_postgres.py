@@ -8,7 +8,11 @@ import testing.postgresql
 from tests.utils import standard_seed_db
 from app.repository import Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId
 
-Postgresql = testing.postgresql.PostgresqlFactory(cache_initialized_db=True,
+Postgresql: testing.postgresql.PostgresqlFactory
+
+def setUpModule():
+    global Postgresql
+    Postgresql = testing.postgresql.PostgresqlFactory(cache_initialized_db=True,
                                                   on_initialized=standard_seed_db)
 
 def tearDownModule():

@@ -1,10 +1,6 @@
 from flask import render_template, send_from_directory, send_file
 from app import app
-from app import obslist
-from app import obs
-from app import stations
-from app import station
-from app import receive
+from app.controllers import *
 
 @app.route('/')
 @app.route('/index')

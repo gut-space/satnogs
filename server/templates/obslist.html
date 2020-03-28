@@ -6,28 +6,30 @@
 
 <p>
 <table class='table table-striped table-hover'>
-    <tr><th>ID</th>
-    <th><a href="#" data-toggle="tooltip" data-placement="top" title="Aquisition of Signal">AOS</a></th>
-    <th><a href="#" data-toggle="tooltip" data-placement="top" title="Time of closest approach">TCA</a></th>
-    <th><a href="#" data-toggle="tooltip" data-placement="top" title="Loss of Signal">LOS</a></th>
-    <th>Satellite</th>
-    <th>Station</th>
-    <th>Image</th>
+    <tr>
+        <th>ID</th>
+        <th><a href="#" data-toggle="tooltip" data-placement="top" title="Acquisition of Signal">AOS</a></th>
+        <th><a href="#" data-toggle="tooltip" data-placement="top" title="Time of closest approach">TCA</a></th>
+        <th><a href="#" data-toggle="tooltip" data-placement="top" title="Loss of Signal">LOS</a></th>
+        <th>Satellite</th>
+        <th>Station</th>
+        <th>Image</th>
+    </tr>
     {% for obs in obslist %}
         <tr>
             <td><a href="/obs/{{ obs.obs_id }}">{{ obs.obs_id }}</a></td>
             <td>{{ obs.aos }}</td>
             <td>{{ obs.tca }}</td>
             <td>{{ obs.los }}</td>
-            <td><a href="{{ obs.sat_name }}">{{ obs.sat_name }}</a></td>
+            <td><a href="{{ obs.sat_id }}">{{ obs.sat_name }}</a></td>
             <td><a href="/station/{{ obs.station_id }}">{{ obs.station_id}}</a></td>
-            <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbfile }}"></a></td>
+            <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbnail }}"></a></td>
         </tr>
     {% endfor %}
 </table>
 </p>
 
-<p>{{ stats }}</p>
+<p>List contains last {{ obslist|length }} observations</p>
 
 {% endblock %}
 

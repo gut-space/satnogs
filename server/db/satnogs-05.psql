@@ -6,19 +6,27 @@ CREATE TABLE observation_files
     obs_id INTEGER REFERENCES observations ON DELETE CASCADE
 );
 
-CREATE INDEX  idx_observation_files_obs_id ON observation_files(obs_id);
+-- Index on foreign key
+CREATE INDEX idx_observation_files_obs_id ON observation_files(obs_id);
 
 ALTER TABLE observations ADD COLUMN thumbnail VARCHAR(255);
 
 UPDATE observations
 SET thumbnail='thumb-' || filename;
 
+-- Move current files to new table
 INSERT INTO observation_files(filename, media_type, obs_id)
 SELECT filename, 'image/png', obs_id
 FROM observations
 WHERE filename IS NOT NULL;
 
 ALTER TABLE observations DROP COLUMN filename;
+-- This column repeats data from satellites table 
 ALTER TABLE observations DROP COLUMN sat_name;
+
+-- Normalize default names to Celestrak compatible
+UPDATE satellites
+SET sat_name=REPLACE(sat_name, '-', ' ')
+WHERE LEFT(sat_name, 5) = 'NOAA-';
 
 UPDATE schema SET version = 5;
