@@ -20,6 +20,7 @@ def make_thumbnail(input_path, output_path, width=200):
 
 T = TypeVar("T")
 def first(condition: Callable[[T], bool], items: Iterable[T]) -> Optional[T]:
+    '''Return first element for which @condition is True. Otherwise return None'''
     for item in items:
         if condition(item):
             return item
