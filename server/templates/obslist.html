@@ -21,7 +21,7 @@
             <td>{{ obs.aos }}</td>
             <td>{{ obs.tca }}</td>
             <td>{{ obs.los }}</td>
-            <td><a href="{{ obs.sat_id }}">{{ obs.sat_name }}</a></td>
+            <td><a href="https://www.n2yo.com/satellite/?s={{ obs.sat_id }}">{{ obs.sat_name }}</a></td>
             <td><a href="/station/{{ obs.station_id }}">{{ obs.station_id}}</a></td>
             <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbnail }}"></a></td>
         </tr>
