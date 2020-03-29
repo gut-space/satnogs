@@ -257,7 +257,7 @@ class Repository:
         cursor = self._cursor
         cursor.execute(q, (limit, offset))
         items = cursor.fetchall()
-        return [exclude_from_dict(i, ("count", "los")) for i in items]
+        return [exclude_from_dict(i, ("count", "los")) for i in items] # type: ignore
 
     @use_cursor
     def read_station(self, id_: StationId) -> Optional[Tuple[Station, int, datetime]]:
