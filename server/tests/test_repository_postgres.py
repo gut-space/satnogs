@@ -7,7 +7,7 @@ import testing.postgresql
 
 from tests.utils import standard_seed_db
 from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId,
-    Station, Observation)
+    Station, Observation, Satellite)
 
 Postgresql: testing.postgresql.PostgresqlFactory
 
@@ -183,6 +183,7 @@ class RepositoryPostgresTests(unittest.TestCase):
 
     @use_repository
     def test_stations(self, repository: Repository):
+        """Checks that a list of stations is returned properly."""
         gslist = repository.read_stations()
         self.assertGreaterEqual(len(gslist), 2)
         s1, s2 = gslist
@@ -202,6 +203,7 @@ class RepositoryPostgresTests(unittest.TestCase):
 
     @use_repository
     def test_station(self, repository: Repository):
+        """Check that a single station data is returned properly."""
         station = repository.read_station(1)
         self.assertIsNotNone(station)
         self.check_station1(station)
@@ -209,3 +211,43 @@ class RepositoryPostgresTests(unittest.TestCase):
         # Now check invalid case. There's no such station
         station = repository.read_station(123)
         self.assertIsNone(station)
+
+        # TODO: Test read_station_photos
+        # TODO: Test read_station_secret
+
+    @use_repository
+    def test_satellite(self, repository: Repository):
+        """Checks that a single satellite data is returned properly."""
+        sat = repository.read_satellite(25338)
+        self.assertIsNotNone(sat)
+
+        self.assertEqual(sat['sat_id'], 25338)
+        self.assertEqual(sat['sat_name'], 'NOAA 15')
+
+        sat = repository.read_satellite('NOAA 19')
+        self.assertEqual(sat['sat_id'], 33591)
+        self.assertEqual(sat['sat_name'], 'NOAA 19')
+
+        sat = repository.read_satellite(12345)
+        self.assertIsNone(sat) # :( No such thing yet.
+
+        sat = repository.read_satellite('GDANSKSAT-1')
+        self.assertIsNone(sat) # :( No such thing yet.
+
+    @use_repository
+    def test_satellites(self, repository: Repository):
+        """Test that a list of sats is returned properly."""
+        sats = repository.read_satellites()
+        self.assertEqual(len(sats), 3)
+        self.assertEqual(sats[-1]['sat_id'], 33591)
+        self.assertEqual(sats[-2]['sat_id'], 28654)
+        self.assertEqual(sats[-3]['sat_id'], 25338)
+
+        sats = repository.read_satellites(limit=2)
+        self.assertEqual(len(sats), 2)
+        self.assertEqual(sats[-1]['sat_id'], 28654)
+        self.assertEqual(sats[-2]['sat_id'], 25338)
+
+        sats = repository.read_satellites(offset = 2)
+        self.assertEqual(len(sats), 1)
+        self.assertEqual(sats[-1]['sat_id'], 33591)
