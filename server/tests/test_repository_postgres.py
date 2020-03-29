@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import Tuple
 import unittest
 from functools import wraps
 
@@ -61,38 +62,38 @@ class RepositoryPostgresTests(unittest.TestCase):
     def check_obs750(self, obs: Observation):
         """Check if returned parameters match observation 750 defined in tests/db-data.psql"""
         self.assertIsNotNone(obs)
-        assert(obs['obs_id'] == 750)
-        assert(obs['aos'] == datetime.datetime(2020, 3, 8, 15, 35, 2, 42786))
-        assert(obs['tca'] == datetime.datetime(2020, 3, 8, 15, 40, 1, 234567))
-        assert(obs['los'] == datetime.datetime(2020, 3, 8, 15, 51, 33, 972692))
-        assert(obs['sat_id'] == 33591)
-        assert(obs['thumbnail'] == "thumb-eb38486b-cd40-4879-81e9-31131766e84b-NOAA 19_2020-03-08T15:51:33.972692_apt.png")
-        assert(obs['station_id'] == 1)
-        assert(obs['notes'] == None)
+        self.assertEqual(obs['obs_id'], 750)
+        self.assertEqual(obs['aos'], datetime.datetime(2020, 3, 8, 15, 35, 2, 42786))
+        self.assertEqual(obs['tca'], datetime.datetime(2020, 3, 8, 15, 40, 1, 234567))
+        self.assertEqual(obs['los'], datetime.datetime(2020, 3, 8, 15, 51, 33, 972692))
+        self.assertEqual(obs['sat_id'], 33591)
+        self.assertEqual(obs['thumbnail'], "thumb-eb38486b-cd40-4879-81e9-31131766e84b-NOAA 19_2020-03-08T15:51:33.972692_apt.png")
+        self.assertEqual(obs['station_id'], 1)
+        self.assertEqual(obs['notes'], None)
 
     def check_obs751(self, obs: Observation):
         """Check if returned parameters match observation 751 defined in tests/db-data.psql"""
         self.assertIsNotNone(obs)
-        assert(obs['obs_id'] == 751)
-        assert(obs['aos'] == datetime.datetime(2020, 3, 8, 16, 17, 2, 639337))
-        assert(obs['tca'] == datetime.datetime(2020, 3, 8, 16, 17, 25, 567890))
-        assert(obs['los'] == datetime.datetime(2020, 3, 8, 16, 32, 56, 166600))
-        assert(obs['sat_id'] == 25338)
-        assert(obs['thumbnail'] == "thumb-72e94349-19ad-428c-b812-526971705607-NOAA 15_2020-03-08T16:32:56.166600_apt.png")
-        assert(obs['station_id'] == 1)
-        assert(obs['notes'] == None)
+        self.assertEqual(obs['obs_id'], 751)
+        self.assertEqual(obs['aos'], datetime.datetime(2020, 3, 8, 16, 17, 2, 639337))
+        self.assertEqual(obs['tca'], datetime.datetime(2020, 3, 8, 16, 17, 25, 567890))
+        self.assertEqual(obs['los'], datetime.datetime(2020, 3, 8, 16, 32, 56, 166600))
+        self.assertEqual(obs['sat_id'], 25338)
+        self.assertEqual(obs['thumbnail'], "thumb-72e94349-19ad-428c-b812-526971705607-NOAA 15_2020-03-08T16:32:56.166600_apt.png")
+        self.assertEqual(obs['station_id'], 1)
+        self.assertIsNone(obs['notes'])
 
     def check_obs752(self, obs: Observation):
         """Check if returned parameters match observation 752 defined in tests/db-data.psql"""
         self.assertIsNotNone(obs)
-        assert(obs['obs_id'] == 752)
-        assert(obs['aos'] == datetime.datetime(2020, 3, 8, 17, 24, 2, 88677))
-        assert(obs['tca'] == datetime.datetime(2020, 3, 8, 17, 34, 56, 789012))
-        assert(obs['los'] == datetime.datetime(2020, 3, 8, 17, 39, 6, 960326))
-        assert(obs['sat_id'] == 28654)
-        assert(obs['thumbnail'] == "thumb-f6b927bf-1472-4ea6-8657-48265cfae5ca-NOAA 18_2020-03-08T17:39:06.960326_apt.png")
-        assert(obs['station_id'] == 1)
-        assert(obs['notes'] == None)
+        self.assertEqual(obs['obs_id'], 752)
+        self.assertEqual(obs['aos'], datetime.datetime(2020, 3, 8, 17, 24, 2, 88677))
+        self.assertEqual(obs['tca'], datetime.datetime(2020, 3, 8, 17, 34, 56, 789012))
+        self.assertEqual(obs['los'], datetime.datetime(2020, 3, 8, 17, 39, 6, 960326))
+        self.assertEqual(obs['sat_id'], 28654)
+        self.assertEqual(obs['thumbnail'], "thumb-f6b927bf-1472-4ea6-8657-48265cfae5ca-NOAA 18_2020-03-08T17:39:06.960326_apt.png")
+        self.assertEqual(obs['station_id'], 1)
+        self.assertEqual(obs['notes'], None)
 
     @use_repository
     def test_read_observations(self, repository: Repository):
@@ -158,48 +159,50 @@ class RepositoryPostgresTests(unittest.TestCase):
         observation_files = repository.read_observation_files(obs_id)
         self.assertEqual(len(observation_files), 0)
 
-    def check_station1(self, s: Station):
+    def check_station1(self, entry: Tuple[Station, int, datetime.datetime]):
         """Check if returned parameters match station-id=1 defined in tests/db-data.psql"""
-        self.assertEqual(s[0]['station_id'], 1)
-        self.assertEqual(s[0]['name'], 'TKiS-1')
-        self.assertEqual(s[0]['lon'], 18.531787)
-        self.assertEqual(s[0]['lat'], 54.352469)
-        self.assertEqual(s[0]['config'], 'WiMo TA-1 antenna (omni), RTL-SDR v3, Raspberry Pi 4B')
-        self.assertEqual(s[0]['registered'], datetime.datetime(2019, 12, 15, 8, 54, 53))
-        self.assertEqual(s[1], 3) # Number of observations
-        self.assertEqual(s[2], datetime.datetime(2020, 3, 8, 17, 39, 6, 960326)) # Last observation.
+        station, count, last_obs_date = entry
+        self.assertEqual(station['station_id'], 1)
+        self.assertEqual(station['name'], 'TKiS-1')
+        self.assertEqual(station['lon'], 18.531787)
+        self.assertEqual(station['lat'], 54.352469)
+        self.assertEqual(station['config'], 'WiMo TA-1 antenna (omni), RTL-SDR v3, Raspberry Pi 4B')
+        self.assertEqual(station['registered'], datetime.datetime(2019, 12, 15, 8, 54, 53))
+        self.assertEqual(count, 3) # Number of observations
+        self.assertEqual(last_obs_date, datetime.datetime(2020, 3, 8, 17, 39, 6, 960326)) # Last observation.
 
-    def check_station2(self, s: Station):
+    def check_station2(self, entry: Tuple[Station, int, datetime.datetime]):
         """Check if returned parameters match station-id=2 defined in tests/db-data.psql"""
-        self.assertEqual(s[0]['station_id'], 2)
-        self.assertEqual(s[0]['name'], 'ETI-1')
-        self.assertEqual(s[0]['lon'], 18.613253)
-        self.assertEqual(s[0]['lat'], 54.37089)
-        self.assertEqual(s[0]['descr'], 'Planned ground station at ETI faculty of Gdansk University of Technology')
-        self.assertEqual(s[0]['config'], 'Configuration is TBD')
-        self.assertEqual(s[0]['registered'], datetime.datetime(2020, 2, 16, 21, 15, 20, 615274))
-        self.assertEqual(s[1], 0) # Number of observations
-        self.assertEqual(s[2], None) # Last observation.
+        station, count, last_obs_date = entry
+        self.assertEqual(station['station_id'], 2)
+        self.assertEqual(station['name'], 'ETI-1')
+        self.assertEqual(station['lon'], 18.613253)
+        self.assertEqual(station['lat'], 54.37089)
+        self.assertEqual(station['descr'], 'Planned ground station at ETI faculty of Gdansk University of Technology')
+        self.assertEqual(station['config'], 'Configuration is TBD')
+        self.assertEqual(station['registered'], datetime.datetime(2020, 2, 16, 21, 15, 20, 615274))
+        self.assertEqual(count, 0) # Number of observations
+        self.assertEqual(last_obs_date, None) # Last observation.
 
     @use_repository
     def test_stations(self, repository: Repository):
         """Checks that a list of stations is returned properly."""
-        gslist = repository.read_stations()
-        self.assertGreaterEqual(len(gslist), 2)
-        s1, s2 = gslist
+        station_entries = repository.read_stations()
+        self.assertGreaterEqual(len(station_entries), 2)
+        s1, s2 = station_entries
 
         self.check_station1(s1)
         self.check_station2(s2)
 
         # Now limit number of returned stations to just one. There should be only station-id 1.
-        gslist = repository.read_stations(limit=1)
-        self.assertEqual(len(gslist), 1)
-        self.check_station1(gslist[0]) # This should return values for station-id 1
+        station_entries = repository.read_stations(limit=1)
+        self.assertEqual(len(station_entries), 1)
+        self.check_station1(station_entries[0]) # This should return values for station-id 1
 
         # Now skip the first station. Only station 2 should be returned.
-        gslist = repository.read_stations(offset=1)
-        self.assertEqual(len(gslist), 1)
-        self.check_station2(gslist[0]) # This should return values for station-id 2
+        station_entries = repository.read_stations(offset=1)
+        self.assertEqual(len(station_entries), 1)
+        self.check_station2(station_entries[0]) # This should return values for station-id 2
 
     @use_repository
     def test_station(self, repository: Repository):
@@ -236,18 +239,18 @@ class RepositoryPostgresTests(unittest.TestCase):
 
     @use_repository
     def test_satellites(self, repository: Repository):
-        """Test that a list of sats is returned properly."""
-        sats = repository.read_satellites()
-        self.assertEqual(len(sats), 3)
-        self.assertEqual(sats[-1]['sat_id'], 33591)
-        self.assertEqual(sats[-2]['sat_id'], 28654)
-        self.assertEqual(sats[-3]['sat_id'], 25338)
+        """Test that a list of satellites is returned properly."""
+        satellites = repository.read_satellites()
+        self.assertEqual(len(satellites), 3)
+        self.assertEqual(satellites[-1]['sat_id'], 33591)
+        self.assertEqual(satellites[-2]['sat_id'], 28654)
+        self.assertEqual(satellites[-3]['sat_id'], 25338)
 
-        sats = repository.read_satellites(limit=2)
-        self.assertEqual(len(sats), 2)
-        self.assertEqual(sats[-1]['sat_id'], 28654)
-        self.assertEqual(sats[-2]['sat_id'], 25338)
+        satellites = repository.read_satellites(limit=2)
+        self.assertEqual(len(satellites), 2)
+        self.assertEqual(satellites[-1]['sat_id'], 28654)
+        self.assertEqual(satellites[-2]['sat_id'], 25338)
 
-        sats = repository.read_satellites(offset = 2)
-        self.assertEqual(len(sats), 1)
-        self.assertEqual(sats[-1]['sat_id'], 33591)
+        satellites = repository.read_satellites(offset = 2)
+        self.assertEqual(len(satellites), 1)
+        self.assertEqual(satellites[-1]['sat_id'], 33591)

@@ -1,6 +1,7 @@
 import abc
 import datetime
 import os.path
+from typing import Dict, List, Tuple
 import uuid
 
 from flask import request, abort
@@ -21,9 +22,14 @@ else:
     from typing_extensions import TypedDict
 
 class WebFileLike(abc.ABC):
+    '''Class for type-checking the file-like object from request'''
     @property
     @abstractmethod
     def filename(self) -> str:
+        pass
+    @property
+    @abstractmethod
+    def mimetype(self) -> str:
         pass
     @abstractmethod
     def save(self, path: str) -> None:
@@ -54,12 +60,31 @@ is_allowed_file = lambda f: f.mimetype in ALLOWED_FILE_TYPES and \
     'notes': fields.Str(required=False)
 })
 def receive(station_id: str, args: RequestArguments):
-    if len(request.files) == 0:
+    '''
+    Receive observation from station.
+
+    Station must be authenticated.
+
+    Request must have attached at least one imagery file. We accept only files
+    with MIME-type and extension listed in @ALLOWED_FILE_TYPES dictionary.
+
+    From first imagery file we create a thumbnail. Files are sorted using HTTP
+    request keys.
+
+    Request data are stored in DB. Binary files are saved in filesystem with
+    unique, conflict-safe filename.
+
+    Satellite assigned to observation must exists in database.
+    '''
+    files: Dict[str, WebFileLike] = request.files
+
+    if len(files) == 0:
         abort(400, description="Missing file")
 
+    # Filter files and create safe filenames
     uid = str(uuid.uuid4())
-    items = enumerate(sorted(request.files.items(), key=lambda e: e[0]))
-    file_entries = []
+    items = enumerate(sorted(files.items(), key=lambda e: e[0]))
+    file_entries: List[Tuple[str, WebFileLike]] = []
     for idx, (_, file_) in items:
         if not is_allowed_file(file_):
             continue
@@ -67,6 +92,7 @@ def receive(station_id: str, args: RequestArguments):
         filename = "%s-%d-%s" % (uid, idx, org_filename)
         file_entries.append((filename, file_))
 
+    # Select thumbnail source file
     thumbnail_source_entry = first(lambda f: f[1].mimetype.startswith("image/"), file_entries)
     if thumbnail_source_entry is None:
         abort(400, description="Missing imagery file")
@@ -75,6 +101,7 @@ def receive(station_id: str, args: RequestArguments):
     thumb_source_filename, _ = thumbnail_source_entry
     thumb_filename = "thumb-%s-%s" % (str(uuid.uuid4()), thumb_source_filename)
 
+    # Save data in DB
     repository = Repository()
     with repository.transaction() as transaction:
         satellite = repository.read_satellite(args["sat"])
@@ -106,12 +133,14 @@ def receive(station_id: str, args: RequestArguments):
 
         transaction.commit()
 
+    # Save files in filesystem
     root = app.config["storage"]['image_root']
 
     for filename, file_ in file_entries:
         path = os.path.join(root, filename)
         file_.save(path)
     
+    # Make thumbnail
     thumb_source_path = os.path.join(root, thumb_source_filename)
     thumb_path = os.path.join(root, "thumbs", thumb_filename)
     make_thumbnail(thumb_source_path, thumb_path)

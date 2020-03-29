@@ -1,5 +1,6 @@
 from flask import render_template, send_from_directory, send_file
-from app import app
+from app import app 
+# Load routes from modules in "controllers" directory
 from app.controllers import *
 
 @app.route('/')
