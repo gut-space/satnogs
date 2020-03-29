@@ -15,11 +15,11 @@
             {% if obs.notes %}
             <dt>Notes:</dt><dl>{{ obs.notes }}</dl>
             {% endif %}
-            <dt>Satellite:</dt><dl><a href="/satellite/{{ obs.sat_id }}">{{ sat_name }}</a></dl>
+            <dt>Satellite:</dt><dl><a href="https://www.n2yo.com/satellite/?s={{ obs.sat_id }}">{{ sat_name }}</a></dl>
             <dt>Ground station:</dt><dl><a href="/station/{{ obs.station_id }}">Link</a></dl>
         </dl>
     </p>
-    
+
     <h4>Attachments:</h4>
     {% for file_ in files %}
         <p>
