@@ -135,7 +135,7 @@ You should use `visudo` command to add the following line:
 ```
 cd satnogs/server
 python3 -m virtualenv venv
-source venv/bin/install
+source venv/bin/activate
 python setup.py install
 ```
 
