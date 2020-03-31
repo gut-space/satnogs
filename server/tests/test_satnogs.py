@@ -1,14 +1,17 @@
 import datetime
 import os
+import os.path
 import shutil
 import unittest
+import logging
+from logging import FileHandler
 
 import testing.postgresql
 
 from app import app
 from app.hmac_token import get_authorization_header_value
 from app.repository import Repository
-from tests.utils import standard_seed_db
+from tests.utils import standard_seed_db, check_output
 
 Postgresql: testing.postgresql.PostgresqlFactory
 
@@ -22,10 +25,12 @@ def tearDownModule():
     Postgresql.clear_cache()
 
 IMAGE_ROOT = "tests/images"
+LOG_FILE = "test.log"
 
 class BasicTests(unittest.TestCase):
 
     def setUp(self):
+
         self.postgres = Postgresql()
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
@@ -33,11 +38,19 @@ class BasicTests(unittest.TestCase):
         app.config["database"] = self.postgres.dsn()
         app.config["storage"]["image_root"] = IMAGE_ROOT
         os.makedirs(os.path.join(IMAGE_ROOT, "thumbs"), exist_ok=True)
+        app.testing = True
         self.app = app.test_client()
+
+        # This is a test. Log EVERYTHING.
+        logHandler = FileHandler(LOG_FILE)
+        logHandler.setLevel(logging.DEBUG)
+        app.logger.setLevel(logging.DEBUG)
+        app.logger.addHandler(logHandler)
 
     def tearDown(self):
         self.postgres.stop()
         shutil.rmtree(IMAGE_ROOT, ignore_errors=True)
+        os.remove(LOG_FILE)
 
     def test_main_page(self):
         response = self.app.get('/', follow_redirects=True)
@@ -92,6 +105,54 @@ class BasicTests(unittest.TestCase):
         )
         self.assertEqual(file_count(IMAGE_ROOT), 2)
         self.assertEqual(file_count(os.path.join(IMAGE_ROOT, "thumbs")), 1)
+
+        # Todo: Need to check if the DB entries have been added.
+
+        # Check if there are appropriate entries in the log file.
+        self.check_log(["File de350bb6-cbd5-4819-9afa-b0e74d90c4f1-0-tests_x.png written to tests/images",
+                        "File de350bb6-cbd5-4819-9afa-b0e74d90c4f1-1-tests_x.png written to tests/images"])
+
+    def check_log(self, strings):
+        """Checks if there are specific strings present in the log file"""
+
+        # Check that the log is there
+        self.assertTrue(os.path.isfile(LOG_FILE))
+        with open(LOG_FILE, 'r') as l:
+            log = l.read()
+            check_output(log, strings)
+
+    def test_receive_obs_error(self):
+        """Test error handling in the receive routine."""
+
+        repository = Repository()
+        station_id = 1
+
+        # Check what happens if the path is misconfigured (or the server is not able to write file)
+        self.app.root = app.config["storage"]['image_root'] = '/nonexistent/path'
+        secret = repository.read_station_secret(station_id)
+
+        data = {
+            'aos': datetime.datetime(2020, 3, 28, 12, 00),
+            'tca': datetime.datetime(2020, 3, 28, 12, 15),
+            'los': datetime.datetime(2020, 3, 28, 12, 30),
+            'sat': 'NOAA 15',
+            'notes': None,
+            "file0": open("tests/x.png", 'rb'),
+            "file1": open("tests/x.png", 'rb')
+        }
+
+        header_value = get_authorization_header_value(str(station_id), secret,
+            data)
+        headers = {
+            'Authorization': header_value
+        }
+        response = self.app.post('/receive', data=data, headers=headers)
+
+
+        self.assertEqual(response.status_code, 503)
+
+        # Check if there's appropriate entry in the log file.
+        self.check_log(["Failed to write /nonexistent/path/1ec45bbe-e1e9-4388-861c-e460198e5e20-0-tests_x.png (image_root=/nonexistent/path)"])
 
 if __name__ == "__main__":
     unittest.main()
