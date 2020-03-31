@@ -26,6 +26,9 @@ git reset --hard
 # Get the new version
 git pull
 
+# Store current SHA in a file
+git rev-parse HEAD > timestamp.txt
+
 # Run the installation script
 VENV=$PWD/venv/bin/activate
 echo "Enabling venv at $VENV"
