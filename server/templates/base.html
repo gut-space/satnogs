@@ -45,7 +45,7 @@ $(document).ready(function(){
     <div class="container">{% block content %}{% endblock %}</div>
     <div id="footer" class="text-center">
         {% block footer %}
-        &copy; Copyright 2020 by SATNOGS-GDN.
+        &copy; Copyright 2020 by SATNOGS-GDN. {{footer|safe}}
         {% endblock %}
     </div>
 </body>
