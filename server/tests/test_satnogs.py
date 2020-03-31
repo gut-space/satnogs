@@ -109,8 +109,8 @@ class BasicTests(unittest.TestCase):
         # Todo: Need to check if the DB entries have been added.
 
         # Check if there are appropriate entries in the log file.
-        self.check_log(["File de350bb6-cbd5-4819-9afa-b0e74d90c4f1-0-tests_x.png written to tests/images",
-                        "File de350bb6-cbd5-4819-9afa-b0e74d90c4f1-1-tests_x.png written to tests/images"])
+        self.check_log(["0-tests_x.png written to tests/images",
+                        "1-tests_x.png written to tests/images"])
 
     def check_log(self, strings):
         """Checks if there are specific strings present in the log file"""
@@ -152,7 +152,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(response.status_code, 503)
 
         # Check if there's appropriate entry in the log file.
-        self.check_log(["Failed to write /nonexistent/path/1ec45bbe-e1e9-4388-861c-e460198e5e20-0-tests_x.png (image_root=/nonexistent/path)"])
+        self.check_log(["Failed to write /nonexistent/path/", "tests_x.png (image_root=/nonexistent/path)"])
 
 if __name__ == "__main__":
     unittest.main()
