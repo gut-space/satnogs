@@ -4,7 +4,7 @@ import os.path
 from typing import Dict, List, Tuple
 import uuid
 
-from flask import request, abort
+from flask import request, abort, Response
 from webargs import fields
 from webargs.flaskparser import use_args
 from werkzeug.utils import secure_filename
@@ -97,7 +97,7 @@ def receive(station_id: str, args: RequestArguments):
     if thumbnail_source_entry is None:
         abort(400, description="Missing imagery file")
         return
-    
+
     thumb_source_filename, _ = thumbnail_source_entry
     thumb_filename = "thumb-%s-%s" % (str(uuid.uuid4()), thumb_source_filename)
 
@@ -138,8 +138,13 @@ def receive(station_id: str, args: RequestArguments):
 
     for filename, file_ in file_entries:
         path = os.path.join(root, filename)
-        file_.save(path)
-    
+        try:
+            file_.save(path)
+            app.logger.info("File %s written to %s" % (filename, root))
+        except FileNotFoundError:
+            app.logger.error("Failed to write %s (image_root=%s)" % (path, root))
+            return Response("Unable to write file %s. Disk operation error." % filename, status=503)
+
     # Make thumbnail
     thumb_source_path = os.path.join(root, thumb_source_filename)
     thumb_path = os.path.join(root, "thumbs", thumb_filename)
