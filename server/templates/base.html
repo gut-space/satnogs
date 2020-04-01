@@ -45,7 +45,11 @@ $(document).ready(function(){
     <div class="container">{% block content %}{% endblock %}</div>
     <div id="footer" class="text-center">
         {% block footer %}
-        &copy; Copyright 2020 by SATNOGS-GDN. {{footer|safe}}
+        &copy; Copyright 2020 by SATNOGS-GDN.
+        {% if footer is not none %}
+        Version <a href="https://github.com/gut-space/satnogs/commit/{{ footer.version }}">{{ footer.version }}</a>,
+        updated on {{ footer.timestamp }}
+        {% endif %}
         {% endblock %}
     </div>
 </body>
