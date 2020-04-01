@@ -16,15 +16,10 @@ def check_output(output: str, strings):
     """Checks if specified output (presumably stdout) has appropriate content. strings
     is a list of strings that are expected to be present. They're expected
     to appear in the specified order, but there may be other things
-    printed in between them. Will assert if string is not found. Returns number
-    of found strings."""
+    printed in between them. Will assert if string is not found. """
     offset = 0
-    cnt = 0
     for s in strings:
         new_offset = output.find(s, offset)
 
         if (new_offset == -1):
             assert False, "Not found an expected string: '%s'" % s
-
-        cnt += 1
-    return cnt
