@@ -12,7 +12,7 @@ def standard_seed_db(postgresql):
                 conn.commit()
 
 
-def check_output(output: str, strings):
+def check_output(self, output: str, strings):
     """Checks if specified output (presumably stdout) has appropriate content. strings
     is a list of strings that are expected to be present. They're expected
     to appear in the specified order, but there may be other things
@@ -21,7 +21,6 @@ def check_output(output: str, strings):
     for s in strings:
         new_offset = output.find(s, offset)
 
-        if (new_offset == -1):
-            assert False, "Not found an expected string: '%s'" % s
+        self.assertNotEqual(new_offset, -1, "Not found an expected string: '%s'" % s)
         # string found, move to its end and continue searching
         offset = new_offset + len(s)
