@@ -47,7 +47,7 @@ $(document).ready(function(){
         {% block footer %}
         &copy; Copyright 2020 by SATNOGS-GDN.
         {% if footer is defined and footer is not none %}
-        Version <a href="https://github.com/gut-space/satnogs/commit/{{ footer.version }}">{{ footer.version }}</a>,
+        Version <a href="https://github.com/gut-space/satnogs/commit/{{ footer.commit }}">{{ footer.commit }}</a>,
         updated on {{ footer.timestamp }}
         {% endif %}
         {% endblock %}

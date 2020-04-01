@@ -37,7 +37,7 @@ def get_footer():
         f = open(TIMESTAMP_FILE, 'r')
 
         x = {}
-        x['version'] = f.read().strip()
+        x['commit'] = f.read().strip()
         x['timestamp'] = str(datetime.fromtimestamp(path.getmtime(TIMESTAMP_FILE)))[:19]
         return x
     except OSError:
