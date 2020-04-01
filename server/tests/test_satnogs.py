@@ -38,7 +38,6 @@ class BasicTests(unittest.TestCase):
         app.config["database"] = self.postgres.dsn()
         app.config["storage"]["image_root"] = IMAGE_ROOT
         os.makedirs(os.path.join(IMAGE_ROOT, "thumbs"), exist_ok=True)
-        app.testing = True
         self.app = app.test_client()
 
         # This is a test. Log EVERYTHING.
