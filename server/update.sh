@@ -27,7 +27,7 @@ git reset --hard
 git pull
 
 # Store current SHA in a file
-git rev-parse HEAD > timestamp.txt
+git rev-parse HEAD > commit.txt
 
 # Run the installation script
 VENV=$PWD/venv/bin/activate
