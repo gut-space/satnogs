@@ -4,7 +4,7 @@ import os.path
 from typing import Dict, List, Tuple
 import uuid
 
-from flask import request, abort, Response
+from flask import request, abort
 from webargs import fields
 from webargs.flaskparser import use_args
 from werkzeug.utils import secure_filename
@@ -143,7 +143,7 @@ def receive(station_id: str, args: RequestArguments):
             app.logger.info("File %s written to %s" % (filename, root))
         except OSError as e:
             app.logger.error("Failed to write %s (image_root=%s): %s" % (path, root, e))
-            return Response("Unable to write file %s. Disk operation error." % filename, status=503)
+            return abort(503, "Unable to write file %s. Disk operation error." % filename)
 
     # Make thumbnail
     thumb_source_path = os.path.join(root, thumb_source_filename)
