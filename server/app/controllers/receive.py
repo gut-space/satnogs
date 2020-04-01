@@ -141,8 +141,8 @@ def receive(station_id: str, args: RequestArguments):
         try:
             file_.save(path)
             app.logger.info("File %s written to %s" % (filename, root))
-        except FileNotFoundError:
-            app.logger.error("Failed to write %s (image_root=%s)" % (path, root))
+        except OSError as e:
+            app.logger.error("Failed to write %s (image_root=%s): %s" % (path, root, e))
             return Response("Unable to write file %s. Disk operation error." % filename, status=503)
 
     # Make thumbnail
