@@ -23,3 +23,5 @@ def check_output(output: str, strings):
 
         if (new_offset == -1):
             assert False, "Not found an expected string: '%s'" % s
+        # string found, move to its end and continue searching
+        offset = new_offset + len(s)
