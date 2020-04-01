@@ -118,7 +118,7 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(LOG_FILE))
         with open(LOG_FILE, 'r') as l:
             log = l.read()
-            check_output(log, strings)
+            check_output(self, log, strings)
 
     def test_receive_obs_error(self):
         """Test error handling in the receive routine."""
