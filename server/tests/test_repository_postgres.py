@@ -131,11 +131,22 @@ class RepositoryPostgresTests(unittest.TestCase):
             'sat_id': SatelliteId(1),
             'thumbnail': 'thumb-123.png',
             'notes': None,
-            'station_id': StationId(1)
+            'station_id': StationId(1),
+            'tle': [
+                "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927",
+                "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"
+            ]
         }
 
         obs_id = repository.insert_observation(observation)
         self.assertEqual(type(obs_id), int)
+
+        observation["obs_id"] = obs_id
+        db_observation = repository.read_observation(obs_id)
+        self.assertDictEqual(
+            observation, # type: ignore
+            db_observation
+        )
 
         observation_file: ObservationFile = {
             'obs_file_id': ObservationFileId(0),

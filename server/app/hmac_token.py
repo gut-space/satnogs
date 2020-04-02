@@ -13,25 +13,42 @@ It should have only standard library dependencies.
 AUTHORIZATION_ALGORITHM = "HMAC-SHA256"
 SIG_LIFETIME = datetime.timedelta(minutes=2, seconds=30)
 
-def _handle_files_in_body(body: Dict):
-    '''Replace file-like values with hashes'''
-    res = {}
-    for k, v in body.items():
-        if hasattr(v, "read") and hasattr(v, "seek"):
-            hash_ = hashlib.sha1(v.read()).hexdigest()
-            res[k] = hash_
-            v.seek(0)
+def _is_file_like(obj) -> bool:
+    '''Return True if @obj is file-like. Otherwise False'''
+    return hasattr(obj, "read") and hasattr(obj, "seek")
+
+def _hash_file(obj):
+    '''Return file-like hash'''
+    hash_ = hashlib.sha1(obj.read()).hexdigest()
+    obj.seek(0)
+    return hash_
+
+def _serialize_single_item(key, value):
+    '''Serialize key-value pair for non-array value'''
+    if _is_file_like(value):
+        value = _hash_file(value)
+    return "%s=%s" % (key, value)
+
+def _serialize_iterable_item(key, values):
+    '''Serialize key-value pair for array value'''
+    return "&".join(_serialize_single_item(key, v) for v in values)
+
+def _serialize_body(body: Dict) -> str:
+    '''Serialize dictionary to string'''
+    serialized_items = []
+    for key, value in sorted(body.items(), key=lambda p: p[0]):
+        if isinstance(value, (list, tuple)):
+            serialized_item = _serialize_iterable_item(key, value)
         else:
-            res[k] = v
-    return res
+            serialized_item = _serialize_single_item(key, value)
+        serialized_items.append(serialized_item)
+    return "&".join(serialized_items)
 
 def _get_sig_basestring(id_: str, body: Dict, date: datetime.datetime):
     '''Create basestring for signature'''
     timestamp = date.isoformat(timespec='seconds')
-    body = _handle_files_in_body(body)
 
-    pairs = sorted(body.items(), key=lambda p: p[0])
-    body_string = "&".join("%s=%s" % (k, v) for k, v in pairs)
+    body_string = _serialize_body(body)
     sig_basestring = ("%s:%s:%s" % (id_, timestamp, body_string)).encode()
     return sig_basestring
 
@@ -65,7 +82,10 @@ def get_authorization_header_value(id_: str, secret: Union[bytes, bytearray], bo
     secret: bytes or bytearray
         Secret of station
     body: dict
-        Body of request. Values should be strings or file-like objects
+        Body of request. Values should be:
+        - strings
+        - file-like objects
+        - list of strings or file-like objects
     date: datetime.datetime
         Datetime in UTC (may be naive). Date when token should be valid. Default: now.
 

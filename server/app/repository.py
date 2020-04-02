@@ -5,7 +5,7 @@ It is responsible for create and execute SQL queries and support transactional.
 
 from datetime import datetime
 from functools import wraps
-from typing import Any, NewType, Sequence, Union, Optional, Tuple
+from typing import Any, List, NewType, Sequence, Union, Optional, Tuple
 import sys
 
 if sys.version_info >= (3, 8):
@@ -39,6 +39,7 @@ class Observation(TypedDict):
     thumbnail: str
     notes: Optional[str]
     station_id: StationId
+    tle: Optional[List[str]]
 
 class Satellite(TypedDict):
     sat_id: SatelliteId
@@ -152,7 +153,7 @@ class Repository:
         q = ("SELECT obs_id, aos, tca, los, "
                     "sat_id, "
                     "thumbnail, " 
-                    "station_id, notes "
+                    "station_id, notes, tle "
             "FROM observations "
             "ORDER BY aos DESC "
             "LIMIT %s OFFSET %s")
@@ -166,7 +167,7 @@ class Repository:
                 "aos, tca, los, "
                 "sat_id, "
                 "thumbnail, "
-                "station_id, notes "
+                "station_id, notes, tle "
             "FROM observations "
             "WHERE obs_id = %s"
             "ORDER BY aos DESC "
@@ -179,8 +180,10 @@ class Repository:
     def insert_observation(self, observation: Observation) -> ObservationId:
         cursor = self._cursor
         cursor.execute(
-            "INSERT INTO observations (aos, tca, los, sat_id, thumbnail, notes, station_id) "
-            "VALUES (%(aos)s, %(tca)s, %(los)s, %(sat_id)s, %(thumbnail)s, %(notes)s, %(station_id)s) "
+            "INSERT INTO observations "
+                "(aos, tca, los, sat_id, thumbnail, notes, station_id, tle) "
+            "VALUES (%(aos)s, %(tca)s, %(los)s, %(sat_id)s, %(thumbnail)s, "
+                    "%(notes)s, %(station_id)s, %(tle)s) "
             "RETURNING obs_id;",
             {
                 'aos': observation["aos"].isoformat(),
@@ -189,7 +192,8 @@ class Repository:
                 'sat_id': observation['sat_id'],
                 'thumbnail': observation['thumbnail'],
                 'notes': observation['notes'],
-                'station_id': observation['station_id']
+                'station_id': observation['station_id'],
+                'tle': observation['tle']
             }
         )
         return cursor.fetchone()['obs_id']
