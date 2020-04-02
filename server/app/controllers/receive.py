@@ -1,11 +1,11 @@
 import abc
 import datetime
 import os.path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 import uuid
 
 from flask import request, abort
-from webargs import fields
+from webargs import fields, validate
 from webargs.flaskparser import use_args
 from werkzeug.utils import secure_filename
 
@@ -40,7 +40,8 @@ class RequestArguments(TypedDict):
     tca: datetime.datetime
     los: datetime.datetime
     sat: str
-    notes: str
+    notes: Optional[str]
+    tle: Optional[List[str]]
 
 ALLOWED_FILE_TYPES = {
     "image/png": ".png"
@@ -57,7 +58,19 @@ is_allowed_file = lambda f: f.mimetype in ALLOWED_FILE_TYPES and \
     'tca': fields.DateTime(required=True),
     'los': fields.DateTime(required=True),
     'sat': fields.Str(required=True),
-    'notes': fields.Str(required=False)
+    'notes': fields.Str(required=False),
+    'tle': fields.List(fields.Str, required=False,
+        validate=[
+            # TLE must contains exact two lines
+            validate.Length(equal=2, error="Require 2 line TLE. Actual: {input}"),
+            # TLE lines may be ended with trailling character
+            lambda tle: validate.Length(min=69, max=70,
+                error="First TLE line length expected {min}-{max}. Actual: {input}")
+                (tle[0]),
+            lambda tle: validate.Length(min=69, max=70,
+                error="Second TLE line length expected {min}-{max}. Actual: {input}")
+                (tle[1]),
+        ])
 })
 def receive(station_id: str, args: RequestArguments):
     '''
@@ -109,6 +122,12 @@ def receive(station_id: str, args: RequestArguments):
             abort(400, description="Unknown satellite")
 
         sat_id = SatelliteId(satellite["sat_id"])
+
+        tle = args.get('tle')
+        if tle:
+            # Remove trailing character
+            tle = [line.strip() for line in tle]
+
         observation: Observation = {
             'obs_id': ObservationId(0),
             'aos': args['aos'],
@@ -117,7 +136,8 @@ def receive(station_id: str, args: RequestArguments):
             'sat_id': sat_id,
             'thumbnail': thumb_filename,
             'notes': args.get('notes'),
-            'station_id': StationId(station_id)
+            'station_id': StationId(station_id),
+            'tle': tle
         }
 
         obs_id = repository.insert_observation(observation)

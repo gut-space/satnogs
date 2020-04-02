@@ -86,9 +86,14 @@ class BasicTests(unittest.TestCase):
             'tca': datetime.datetime(2020, 3, 28, 12, 15),
             'los': datetime.datetime(2020, 3, 28, 12, 30),
             'sat': 'NOAA 15',
-            'notes': None,
+            'notes': 'note text',
             "file0": open("tests/x.png", 'rb'),
-            "file1": open("tests/x.png", 'rb')
+            "file1": open("tests/x.png", 'rb'),
+            "tle": [
+                # Include trailling character
+                "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927 ",
+                "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"
+            ]
         }
 
         header_value = get_authorization_header_value(str(station_id), secret,
@@ -135,7 +140,7 @@ class BasicTests(unittest.TestCase):
             'tca': datetime.datetime(2020, 3, 28, 12, 15),
             'los': datetime.datetime(2020, 3, 28, 12, 30),
             'sat': 'NOAA 15',
-            'notes': None,
+             # 'notes': optional,
             "file0": open("tests/x.png", 'rb'),
             "file1": open("tests/x.png", 'rb')
         }

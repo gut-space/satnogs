@@ -1,0 +1,16 @@
+ALTER TABLE observations
+ALTER COLUMN tle TYPE varchar(69)[2]; -- data cannot include trailing character
+
+-- From Postgres 12 or less documentation:
+-- However, the current implementation ignores any supplied array size limits,
+-- i.e., the behavior is the same as for arrays of unspecified length.
+
+ALTER TABLE observations ADD CONSTRAINT tle_length_check CHECK (
+   (tle is NULL) OR (
+       array_length(tle, 1) = 2 AND
+       LENGTH(tle[1]) = 69 AND
+       LENGTH(tle[2]) = 69
+   )
+);
+
+UPDATE schema SET version = 6;

@@ -8,13 +8,26 @@ from flask import abort, request
 from app import app
 from app.hmac_token import parse_token, validate_token, AUTHORIZATION_ALGORITHM
 
+def _normalize_request_dict(dict_):
+    '''Accepts multi-dict. If entry has multiple values then handle it as pair
+    with single key and array of values. Else handle entry as key-value pair'''
+    res = {}
+    for key, values in dict_.lists():
+        value = None
+        if len(values) == 1:
+            value = values[0]
+        elif len(values) > 1:
+            value = values
+        res[key] = value
+    return res
+
 def _get_body(request):
     '''
     Return dict with request arguments..
     '''
     body = {}
-    body.update(request.form)
-    body.update(request.files)
+    body.update(_normalize_request_dict(request.form))
+    body.update(_normalize_request_dict(request.files))
     return body
 
 def _get_secret(station_id) -> bytes:
@@ -89,7 +102,10 @@ def authorize_station(f):
            Key and value should be treat as strings.
            If you attach any file then as value use SHA-1 hash
            from content (digest, hex format).
-        2. Sort your pairs alphabetically
+           If your value is array of strings or files then you create pair
+           for each value (with the same key)
+        2. Sort your pairs alphabetically by key (keep order for pairs with
+           the same key, order must be the same as in sended request)
         3. Concat key and value using equal sign as hyphen
            For example if your key is named "foo" and value is "bar"
            then your pair representation is "foo=bar"
