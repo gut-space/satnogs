@@ -1,7 +1,7 @@
 import datetime
 import logging
 import os
-from typing import Sequence
+from typing import List, Sequence
 import requests
 import requests.exceptions
 import time
@@ -77,13 +77,21 @@ class OrbitDatabase:
         except LookupError:
             return False
 
-    def get_predictor(self, sat_id) -> CartesianPredictor:
+    def _get_source(self, sat_id):
         for url in self.urls:
             path = self._get_current_tle_file(url)
             source = NoradTLESource.from_file(path)
             if self._is_in_source(source, sat_id):
-                return source.get_predictor(sat_id)
+                return source
         raise LookupError("Could not find %s in orbit data." % (sat_id,))
+
+    def get_predictor(self, sat_id: str) -> CartesianPredictor:
+        source = self._get_source(sat_id)
+        return source.get_predictor(sat_id)
+
+    def get_tle(self, sat_id: str, date: datetime.datetime) -> List[str]:
+        source = self._get_source(sat_id)
+        return source.get_tle(sat_id, date).lines # type: ignore
 
     def refresh_satellites(self, sat_ids):
         all_sat_ids = set(sat_ids)
