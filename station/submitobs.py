@@ -3,16 +3,24 @@ import datetime
 import os
 import requests
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from utils import open_config, from_iso_format
 from hmac_token import get_authorization_header_value
+from orbitdb import OrbitDatabase
 
 config = open_config()
 section = config["server"]
 station_id = str(section["id"])
 secret = bytearray.fromhex(section["secret"])
 url = section["url"]
+
+def get_tle(sat_name: str, date: datetime.datetime) -> Optional[List[str]]:
+    try:
+        db = OrbitDatabase()
+        return db.get_tle(sat_name, date)
+    except:
+        return None
 
 def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime,
         tca: datetime.datetime, los: datetime.datetime, notes: str):
@@ -35,13 +43,18 @@ def submit_observation(image_path: str, sat_name: str, aos: datetime.datetime,
         Any text note
     '''
     _, filename = os.path.split(image_path)
-    form_data = {
+
+    form_data: dict = {
         "aos": aos.isoformat(),
         "tca": tca.isoformat(),
         "los": los.isoformat(),
         "sat": sat_name,
-        "notes": notes
+        "notes": notes,
     }
+
+    tle = get_tle(sat_name, aos)
+    if tle is not None:
+        form_data["tle"] = tle
 
     file_obj = open(image_path, 'rb') 
     body: Dict[str, Any] = {

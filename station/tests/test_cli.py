@@ -75,7 +75,6 @@ class TestCli(unittest.TestCase):
                 "'name': 'Secret Lair'",
                 "'max_elevation_greater_than': 0",
                 "https://celestrak.com/NORAD/elements/noaa.txt",
-                "https://celestrak.com/NORAD/elements/active.txt",
                 "{'freq': '137.62e6', 'name': 'NOAA 15'}",
                 "{'freq': '137.9125e6', 'name': 'NOAA 18'}",
                 "{'freq': '137.1e6', 'name': 'NOAA 19'}",
