@@ -1,10 +1,11 @@
 from urllib.parse import urlsplit, parse_qsl, urlencode, urlunsplit
 
 from app import app
-from app.utils import get_footer, first
+from app.utils import first
+from app.pagination import PARAM_NAME
 
 @app.template_global()
-def url_page(url: str, page: int, param_name="page"):
+def url_page(url: str, page: int, param_name=PARAM_NAME):
     """Given a URL, set or replace a query parameter and return the
     modified URL.
 

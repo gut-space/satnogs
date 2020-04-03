@@ -149,6 +149,14 @@ class Repository:
         return context.get("cursor")
 
     @use_cursor
+    def count_observations(self) -> int:
+        q = ("SELECT COUNT(*) as count "
+             "FROM observations")
+        cursor = self._cursor
+        cursor.execute(q)
+        return cursor.fetchone()["count"]
+
+    @use_cursor
     def read_observations(self, limit:int=100, offset:int=0) -> Sequence[Observation]:
         q = ("SELECT obs_id, aos, tca, los, "
                     "sat_id, "
@@ -248,6 +256,14 @@ class Repository:
         cursor = self._cursor
         cursor.execute(q, (sat,))
         return cursor.fetchone()
+
+    @use_cursor
+    def count_stations(self) -> int:
+        q = ("SELECT COUNT(*) as count "
+             "FROM stations")
+        cursor = self._cursor
+        cursor.execute(q)
+        return cursor.fetchone()["count"]
 
     @use_cursor
     def read_stations(self, limit=100, offset=0) -> Sequence[Tuple[Station, int, datetime]]:

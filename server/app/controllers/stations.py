@@ -2,13 +2,15 @@ from app.repository import Repository
 from flask import render_template
 from app import app, utils
 
+from app.pagination import Pagination, use_pagination
+
 @app.route('/stations')
-def stations():
+@use_pagination()
+def stations(limit_and_offset):
     '''This function retrieves list of all registered ground stations.'''
-
     repository = Repository()
-    data = repository.read_stations()
-
+    data = repository.read_stations(**limit_and_offset)
+    station_count = repository.count_stations()
     # Now convert the data to a list of objects that we can pass to the template.
     stationlist = []
 
@@ -25,6 +27,6 @@ def stations():
 
         stationlist.append(x)
 
-    return render_template('stations.html', stations=stationlist)
+    return 'stations.html', dict(stations=stationlist, item_count=station_count)
 
 
