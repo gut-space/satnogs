@@ -37,7 +37,7 @@ def install_update_cronjob():
     cron.remove_all(comment=COMMENT_UPDATE_TAG)
 
     # This job will pull the new code at noon
-    job = cron.new(command=path.join(getcwd(),'update.sh'), comment=COMMENT_UPDATE_TAG)
+    job = cron.new(command="cd " + getcwd() + " && ./update.sh", comment=COMMENT_UPDATE_TAG)
     job.setall('0 12 * * *')
 
     cron.write()
