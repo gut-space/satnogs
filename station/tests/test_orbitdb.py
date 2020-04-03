@@ -29,7 +29,7 @@ class TestOrbitDb(unittest.TestCase):
         tle = self.db.get_tle("NOAA 15", now)
         
         self.assertIsNotNone(tle)
-        self.assertEquals(len(tle), 2)
+        self.assertEqual(len(tle), 2)
         tle_org = ("1 25338U 98030A   20093.30220133  .00000034  00000-0  32765-4 0  9993",
                    "2 25338  98.7251 118.7119 0011447 121.8181 238.4115 14.25957034138389")
         self.assertEqual(tle, tle_org)
