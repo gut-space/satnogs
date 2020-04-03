@@ -34,7 +34,7 @@ except NoOptionError as e:
 
 
 from app import routes
-from app import context_processors
+from app import template_globals
 from app.utils import get_footer
 
 footer = get_footer()
