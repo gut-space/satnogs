@@ -34,5 +34,9 @@ except NoOptionError as e:
 
 
 from app import routes
+from app import context_processors
+from app.utils import get_footer
 
+footer = get_footer()
+app.jinja_env.globals["footer"] = footer
 
