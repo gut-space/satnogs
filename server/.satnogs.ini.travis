@@ -10,4 +10,5 @@ image_root = ~/tmp
 [security]
 ignore_hmac_validation_errors = False
 
-
+[view]
+items_per_page = 100
