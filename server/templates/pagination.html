@@ -1,12 +1,12 @@
-{% if pagination %}
+{% if pagination and pagination.page_count > 1 %}
 <nav aria-label="Page navigation example" class="text-center">
     <ul class="pagination">
-        {% if pagination.current != 1 %}
+        {% if pagination.page_current != 1 %}
         <li class="page-item">
             <a class="page-link" href="{{ url_page(pagination.url, 1) }}">First</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="{{ url_page(pagination.url, pagination.current - 1) }}">Previous</a>
+            <a class="page-link" href="{{ url_page(pagination.url, pagination.page_current - 1) }}">Previous</a>
         </li>
         {% else %}
         <li class="page-item disabled">
@@ -16,17 +16,17 @@
             <a class="page-link" href="#">Previous</a>
         </li>
         {% endif %}
-        {% for i in range(1, pagination.count + 1) %}
-        <li class="page-item {{ 'active' if pagination.current == i else '' }}">
+        {% for i in range(1, pagination.page_count + 1) %}
+        <li class="page-item {{ 'active' if pagination.page_current == i else '' }}">
             <a class="page-link" href="{{ url_page(pagination.url, i) }}">{{ i }}</a>
         </li>
         {% endfor %}
-        {% if pagination.current != pagination.count %}
+        {% if pagination.page_current != pagination.page_count %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_page(pagination.url, pagination.current + 1) }}">Next</a>
+            <a class="page-link" href="{{ url_page(pagination.url, pagination.page_current + 1) }}">Next</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="{{ url_page(pagination.url, pagination.count) }}">Last</a>
+            <a class="page-link" href="{{ url_page(pagination.url, pagination.page_count) }}">Last</a>
         </li>
         {% else %}
         <li class="page-item disabled">
@@ -39,3 +39,6 @@
     </ul>
   </nav>
 {% endif %}
+<p class="text-center">
+    Display {{ pagination.items_current }} from {{ pagination.items_count }} items
+</p>

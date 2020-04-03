@@ -10,3 +10,6 @@ image_root = /home/satnogs/data
 [security]
 ignore_hmac_validation_errors = false
 
+[view]
+items_per_page = 100
+

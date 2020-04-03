@@ -265,3 +265,15 @@ class RepositoryPostgresTests(unittest.TestCase):
         satellites = repository.read_satellites(offset = 2)
         self.assertEqual(len(satellites), 1)
         self.assertEqual(satellites[-1]['sat_id'], 33591)
+
+    @use_repository
+    def test_observations_count(self, repository: Repository):
+        count = repository.count_observations()
+        self.assertEqual(count, 3)
+
+    @use_repository
+    def test_observations_limit_and_offset(self, repository: Repository):
+        observations = repository.read_observations(limit=2, offset=1)
+        self.assertEqual(len(observations), 2)
+        self.assertEqual([o["obs_id"] for o in observations], [751, 750])
+    
