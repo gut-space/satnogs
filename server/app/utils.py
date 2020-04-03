@@ -38,7 +38,7 @@ def get_footer():
         root_dir = path.dirname(root_dir)
         commit_path = path.join(root_dir, COMMIT_FILE)
 
-        with open(commit_path, 'r'):
+        with open(commit_path, 'r') as f:
             return {
                 'commit': f.read().strip(),
                 'timestamp': datetime.fromtimestamp(path.getmtime(COMMIT_FILE)).isoformat(" ", "minutes")

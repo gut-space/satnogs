@@ -17,7 +17,7 @@ from typing import Optional
 import urllib.parse as urlparse
 import sys
 
-if sys.version_info < (3, 8):
+if sys.version_info >= (3, 8):
     from typing import TypedDict
 else:
     from typing_extensions import TypedDict
