@@ -55,5 +55,6 @@
   </nav>
 {% endif %}
 <p class="text-center">
-    Display {{ pagination.items_current }} from {{ pagination.items_count }} items
+    Displaying {{ pagination.items_current }} from {{ pagination.items_count }}
+    item{{ 's' if pagination.items_count > 1 else '' }}
 </p>

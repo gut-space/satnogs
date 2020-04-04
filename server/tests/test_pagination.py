@@ -15,28 +15,28 @@ class TestPagination(unittest.TestCase):
         paginaton = Pagination(items_per_page)
 
         limit_and_offset = paginaton.limit_and_offset(1)
-        self.assertDictContainsSubset({
+        self.assertLessEqual({
             'limit': 5,
             'offset': 0
-        }, limit_and_offset)
+        }.items(), limit_and_offset.items())
 
         limit_and_offset = paginaton.limit_and_offset(2)
-        self.assertDictContainsSubset({
+        self.assertLessEqual({
             'limit': 5,
             'offset': 5
-        }, limit_and_offset)
+        }.items(), limit_and_offset.items())
 
         limit_and_offset = paginaton.limit_and_offset(3)
-        self.assertDictContainsSubset({
+        self.assertLessEqual({
             'limit': 5,
             'offset': 10
-        }, limit_and_offset)
+        }.items(), limit_and_offset)
 
         limit_and_offset = paginaton.limit_and_offset(4)
-        self.assertDictContainsSubset({
+        self.assertLessEqual({
             'limit': 5,
             'offset': 15
-        }, limit_and_offset)
+        }.items(), limit_and_offset)
 
     def test_items_current(self):
         items = 15

@@ -2,7 +2,7 @@
 Pagination helpers. You have three ways to use this tools:
 
 1. Low-level. You should create Paginate class object and use them to calculate
-    all needed parameters. You must manuall retrive page number and pass
+    all needed parameters. You must manually retrieve page number and pass
     pagination variables to template
 2. Medium-level. See "use_page" decorator docstring. It provides ready solutions
     for common tasks, but you need to join it together.
@@ -134,7 +134,7 @@ def use_page(*param_names:Iterable[str]):
         3. Create object of Pagination class
         4. Calculate limit and offset
         5. Pass limit and offset to specific repository read method by unpack
-            content by duble asteriks
+            content by double asterisks
         6. Fetch total count of your items
         7. Create template pagination arguments
         8. Pass template arguments by unpack it using double asteriks
@@ -208,7 +208,7 @@ def use_pagination(
     1. Add this decorator to your action (with parenthness)
     2. Take as function argument "limit_and_offset"
     3. Pass limit and offset to specific repository read method by unpack
-        content by duble asteriks
+        content by double asterisks
     4. Fetch total count of your items
     5. When return from action don't call "render_template" at end.
         Instead of this returns tuple of "render_template" arguments.
