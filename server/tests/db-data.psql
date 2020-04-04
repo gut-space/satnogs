@@ -20,3 +20,9 @@ INSERT INTO public.observations (obs_id, aos, tca, los, sat_id, thumbnail, notes
 INSERT INTO public.station_photos (photo_id, station_id, sort, filename, descr) VALUES
 (1, 1, 1, 'wimo-ta1-antenna.jpg	WiMo antenna', NULL),
 (2, 1, 2, 'malina4.jpg	Pi + SDR module', NULL);
+
+INSERT INTO public.users (username, digest, email, role) VALUES
+('asimov', '023456789abcdef', 'issac@terminus.org', 'regular'),
+('baxter', 'aaaaaaaaaaaaaaa', 'baxter@gmail.com', 'owner'),
+('clarke', '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e', 'acc@gmail.com', 'admin'), -- password = sha256('password')
+('lem', '', 'fake@wp.pl', 'banned');

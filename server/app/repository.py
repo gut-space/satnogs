@@ -6,6 +6,7 @@ It is responsible for create and execute SQL queries and support transactional.
 from datetime import datetime
 from functools import wraps
 from typing import Any, List, NewType, Sequence, Union, Optional, Tuple
+from enum import Enum
 import sys
 from collections import defaultdict
 
@@ -74,6 +75,18 @@ class StationPhoto(TypedDict):
     sort: int
     filename: str
     descr: str
+
+class UserRole(Enum):
+    REGULAR = 1
+    OWNER = 2
+    ADMIN = 3
+    BANNED = 4
+
+class User(TypedDict):
+    username: str
+    digest: str
+    email: str
+    role: UserRole
 
 # Utils
 def without_keys(d, keys: Sequence[str]):
@@ -213,13 +226,13 @@ class Repository:
         query_kwargs.update({ 'limit': limit, 'offset': offset})
         cursor.execute(q, query_kwargs)
         return cursor.fetchall()
-        
+
     def read_observation(self, obs_id: ObservationId) -> Optional[Observation]:
         observations = self.read_observations({ 'obs_id': obs_id }, limit=1)
         if len(observations) == 0:
             return None
         return observations[0]
-    
+
     @use_cursor
     def insert_observation(self, observation: Observation) -> ObservationId:
         cursor = self._cursor
@@ -326,7 +339,7 @@ class Repository:
 
     @use_cursor
     def read_station(self, id_: StationId) -> Optional[Station]:
-        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered " 
+        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered "
             "FROM stations s "
             "WHERE s.station_id = %s "
             "LIMIT 1")
@@ -381,6 +394,25 @@ class Repository:
             return None
         return bytes(row["secret"])
 
+    def user_role_to_enum(self, role: str) -> UserRole:
+        """Converts string to UserRole enum"""
+        for u in UserRole:
+            if u.name == role.upper():
+                return u
+
+        # If we were not able to figure out, let's assume it's a regular user
+        return UserRole.REGULAR
+
+    @use_cursor
+    def read_user(self, username: str) -> Optional[User]:
+        query = "SELECT username, digest, email, role FROM users WHERE username = %s"
+        cursor = self._cursor
+        cursor.execute(query, (username,))
+        row = cursor.fetchone()
+        if row:
+            row['role'] = self.user_role_to_enum(row['role'])
+        return row
+
     @use_cursor
     def get_database_version(self) -> int:
         '''
@@ -397,7 +429,7 @@ class Repository:
         cursor = self._cursor
         cursor.execute(is_database_empty_query)
         is_database_empty = cursor.fetchone()["count"] == 0
-        
+
         if is_database_empty:
             return 0
 
@@ -428,8 +460,8 @@ class Repository:
         '''Create new transaction.'''
         return Transaction(self)
 
-    
-        
+
+
 class Transaction:
     def __init__(self, repository: Repository):
         self._repository = repository
