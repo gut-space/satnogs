@@ -8,7 +8,7 @@ import testing.postgresql
 
 from tests.utils import standard_seed_db
 from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationFilter, ObservationId, Repository, SatelliteId, StationId,
-    Station, Observation, Satellite, StationStatistics)
+    Station, Observation, Satellite, StationStatistics, User, UserRole)
 
 Postgresql: testing.postgresql.PostgresqlFactory
 
@@ -341,3 +341,25 @@ class RepositoryPostgresTests(unittest.TestCase):
         observations = repository.read_observations(filters=filters)
         self.assertEqual(len(observations), 1)
         self.assertEqual(observations[0]["obs_id"], 751)
+    def test_user(self, repository: Repository):
+        """Test if user data can be retrieved automatically."""
+
+        nonexistent = repository.read_user(username="notfound")
+        self.assertIsNone(nonexistent)
+
+        user = repository.read_user(username="clarke")
+        print(user)
+        self.assertEqual(user['username'], 'clarke')
+        self.assertEqual(user['digest'], '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') # sha256('password')
+        self.assertEqual(user['email'], 'acc@gmail.com')
+        self.assertEqual(user['role'], UserRole.ADMIN)
+
+        # UserRole field is enum, better be safe and check all possible combinations.
+        user = repository.read_user(username='asimov')
+        self.assertEqual(user['role'], UserRole.REGULAR)
+
+        user = repository.read_user(username='baxter')
+        self.assertEqual(user['role'], UserRole.OWNER)
+
+        user = repository.read_user(username='lem')
+        self.assertEqual(user['role'], UserRole.BANNED)
