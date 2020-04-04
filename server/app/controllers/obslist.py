@@ -1,8 +1,6 @@
-from flask import render_template
-
 from app import app
 from app.repository import Repository
-from app.pagination import Pagination, use_pagination
+from app.pagination import use_pagination
 
 @app.route('/obslist')
 @use_pagination()
