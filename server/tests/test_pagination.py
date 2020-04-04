@@ -1,9 +1,6 @@
-from threading import local
 from typing import Any
 import unittest
 from unittest import mock
-
-import flask
 
 from app import app
 from app.pagination import Pagination, use_pagination
@@ -83,7 +80,7 @@ class TestPagination(unittest.TestCase):
 
         with app.test_client() as client:
             @app.route("/test-multi-pagination")
-            @use_pagination(10, {
+            @use_pagination({
                 'items_per_page': 50,
                 'count_name': 'item_a_count',
                 'page_param': 'page_a',
