@@ -30,13 +30,13 @@ class TestPagination(unittest.TestCase):
         self.assertLessEqual({
             'limit': 5,
             'offset': 10
-        }.items(), limit_and_offset)
+        }.items(), limit_and_offset.items())
 
         limit_and_offset = paginaton.limit_and_offset(4)
         self.assertLessEqual({
             'limit': 5,
             'offset': 15
-        }.items(), limit_and_offset)
+        }.items(), limit_and_offset.items())
 
     def test_items_current(self):
         items = 15
