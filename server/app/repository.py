@@ -215,12 +215,24 @@ class Repository:
         cursor.execute(q, (obs_id,))
 
     @use_cursor
-    def read_observation_files(self, obs_id: ObservationId) -> Sequence[ObservationFile]:
-        q = ("SELECT obs_file_id, filename, media_type, obs_id "
-            "FROM observation_files "
-            "WHERE obs_id = %s")
+    def count_observation_files(self, obs_id: ObservationId) -> int:
+        q = ("SELECT COUNT(*) as count "
+             "FROM observation_files "
+             "WHERE obs_id = %s")
         cursor = self._cursor
         cursor.execute(q, (obs_id,))
+        return cursor.fetchone()["count"]
+
+    @use_cursor
+    def read_observation_files(self, obs_id: ObservationId,
+            limit:int=100, offset:int=0) -> Sequence[ObservationFile]:
+        q = ("SELECT obs_file_id, filename, media_type, obs_id "
+            "FROM observation_files "
+            "WHERE obs_id = %s "
+            "ORDER BY obs_file_id "
+            "LIMIT %s OFFSET %s")
+        cursor = self._cursor
+        cursor.execute(q, (obs_id, limit, offset))
         return cursor.fetchall()
 
     @use_cursor
