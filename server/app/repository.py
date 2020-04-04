@@ -7,6 +7,7 @@ from datetime import datetime
 from functools import wraps
 from typing import Any, List, NewType, Sequence, Union, Optional, Tuple
 import sys
+from collections import defaultdict
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -41,6 +42,15 @@ class Observation(TypedDict):
     station_id: StationId
     tle: Optional[List[str]]
 
+class ObservationFilter(TypedDict, total=False):
+    obs_id: ObservationId
+    aos_before: datetime
+    los_after: datetime
+    sat_id: SatelliteId
+    notes: str
+    station_id: StationId
+    has_tle: bool
+
 class Satellite(TypedDict):
     sat_id: SatelliteId
     sat_name: str
@@ -70,6 +80,12 @@ def exclude_from_dict(d, keys: Sequence[str]):
     obj = without_keys(d, keys)
 
     return [obj,] + excluded
+
+class DefaultDictWithAnyKey(defaultdict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def __contains__(self, item):
+        return True
 
 # Errors
 class RepositoryError(Exception):
@@ -157,32 +173,32 @@ class Repository:
         return cursor.fetchone()["count"]
 
     @use_cursor
-    def read_observations(self, limit:int=100, offset:int=0) -> Sequence[Observation]:
-        q = ("SELECT obs_id, aos, tca, los, "
-                    "sat_id, "
-                    "thumbnail, " 
-                    "station_id, notes, tle "
+    def read_observations(self, filters: ObservationFilter={}, limit:int=100,
+            offset:int=0) -> Sequence[Observation]:
+        q = ("SELECT obs_id, aos, tca, los,  sat_id,  thumbnail,  station_id, "
+                "notes, tle "
             "FROM observations "
+            "WHERE (%(obs_id)s IS NULL OR obs_id = %(obs_id)s) AND "
+              "(%(aos_before)s IS NULL OR aos <= %(aos_before)s) AND "
+              "(%(los_after)s IS NULL OR los >= %(los_after)s) AND "
+              "(%(sat_id)s IS NULL OR sat_id = %(sat_id)s) AND "
+              "(%(station_id)s IS NULL OR station_id = %(station_id)s) AND "
+              "(%(notes)s IS NULL OR notes ILIKE '%%' || %(notes)s || '%%') AND "
+              "(%(has_tle)s IS NULL OR (tle IS NOT NULL) = %(has_tle)s) "
             "ORDER BY aos DESC "
-            "LIMIT %s OFFSET %s")
+            "LIMIT %(limit)s OFFSET %(offset)s")
         cursor = self._cursor
-        cursor.execute(q, (limit, offset))
+        query_kwargs = DefaultDictWithAnyKey(lambda: None)
+        query_kwargs.update(filters)
+        query_kwargs.update({ 'limit': limit, 'offset': offset})
+        cursor.execute(q, query_kwargs)
         return cursor.fetchall()
         
-    @use_cursor
     def read_observation(self, obs_id: ObservationId) -> Optional[Observation]:
-        q = ("SELECT obs_id, "
-                "aos, tca, los, "
-                "sat_id, "
-                "thumbnail, "
-                "station_id, notes, tle "
-            "FROM observations "
-            "WHERE obs_id = %s"
-            "ORDER BY aos DESC "
-            "LIMIT 1")
-        cursor = self._cursor
-        cursor.execute(q, (obs_id,))
-        return cursor.fetchone()
+        observations = self.read_observations({ 'obs_id': obs_id }, limit=1)
+        if len(observations) == 0:
+            return None
+        return observations[0]
     
     @use_cursor
     def insert_observation(self, observation: Observation) -> ObservationId:
