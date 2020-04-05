@@ -1,4 +1,7 @@
+from datetime import datetime
+from typing import Callable, Sequence
 from flask import abort, Response
+from io import BytesIO
 
 from app import app, tle_diagrams, cache
 from app.repository import ObservationId, Repository
@@ -25,7 +28,9 @@ def obs(obs_id: ObservationId = None, limit_and_offset = None):
     return 'obs.html', dict(obs = observation, files=files,
         sat_name=satellite["sat_name"], item_count=files_count)
 
-def _tle_plot(obs_id: ObservationId, plot_func):
+def _tle_plot(obs_id: ObservationId, plot_func: Callable[[tle_diagrams.Location,
+        Sequence[str], datetime, datetime], BytesIO]):
+    '''Fetch data from DB, call ploting and return response.'''
     repository = Repository()
     observation = repository.read_observation(obs_id)
     

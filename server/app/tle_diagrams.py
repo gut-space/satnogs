@@ -10,7 +10,6 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import TypedDict
 
-
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from orbit_predictor.sources import get_predictor_from_tle_lines
@@ -22,6 +21,7 @@ def _calculate_series(location: Location, tle: Sequence[str],
         aos: datetime, los: datetime,
         time_step: timedelta) -> Tuple[Sequence[datetime],
         Sequence[float], Sequence[float]]:
+    '''Calculate data for plot diagrams'''
     date_series: List[datetime] = []
     azimuth_series: List[float] = []
     elevation_series: List[float] = []
@@ -44,7 +44,8 @@ def _calculate_series(location: Location, tle: Sequence[str],
 
 def _produce_azimuth_elevation_by_time_figure(dates: Sequence[datetime],
         azimuths: Sequence[float], elevations: Sequence[float]) -> plt.Figure:
-    #fig = plt.Figure()
+    '''Return figure with azimuth/elevation plot by time. X axis contains dates.
+        Plot has two Y axis. Colors are compatible with gPredict.'''
     fig: plt.Figure = plt.figure()
     ax1: plt.Axes = fig.add_subplot()
 
@@ -64,6 +65,8 @@ def _produce_azimuth_elevation_by_time_figure(dates: Sequence[datetime],
 def _produce_azimuth_elevation_polar_figure(dates: Sequence[datetime],
         azimuths: Sequence[float], elevations: Sequence[float],
         time_step:timedelta) -> plt.Figure:
+    '''Returns figure with azimuth/elevation polar plot. @time_step define
+        temporal distance between labels near trajectory.'''
     fig: plt.Figure = plt.figure()
     ax: plt.Axes = fig.add_subplot(projection="polar")
     ax.set_theta_zero_location('N')
@@ -84,7 +87,8 @@ def _produce_azimuth_elevation_polar_figure(dates: Sequence[datetime],
     return fig
 
 def _save_to_png(figure: plt.Figure) -> io.BytesIO:
-    # Based on https://stackoverflow.com/a/50728936
+    '''Generate PNG from figure and return binary stream.
+        @see https://stackoverflow.com/a/50728936'''
     output = io.BytesIO()
     FigureCanvas(figure).print_png(output)
     return output
@@ -93,7 +97,26 @@ def generate_polar_plot_png(location: Location, tle: Sequence[str],
         aos: datetime, los: datetime,
         predict_time_step: timedelta=timedelta(seconds=30),
         polar_time_step: timedelta=timedelta(minutes=2, seconds=30)):
-    
+    '''
+    Return binary stream with azimuth/elevation polar plot in PNG file.
+
+    Parameters
+    ==========
+    location: Location
+        Location of ground station
+    tle: two strings
+        TLE data
+    aos: datetime.datetime
+        Acquisition of Signal
+    los: datetime.datetime
+        Loss of Signal
+    predict_time_step: datetime.timedelta, optional
+        Step between data samples to predict. Lower produces more accurate
+        plot, but increase computation time
+    polar_time_step: datetime.timedelta, optional
+        Temporal distance between date labels on plot. Higher reduces
+        readability.
+    '''
     series = _calculate_series(location, tle, aos, los, predict_time_step)
     by_time_figure = _produce_azimuth_elevation_by_time_figure(*series) # type: ignore
     figure = _produce_azimuth_elevation_polar_figure(*series, # type: ignore
@@ -104,7 +127,23 @@ def generate_polar_plot_png(location: Location, tle: Sequence[str],
 def generate_by_time_plot_png(location: Location, tle: Sequence[str],
         aos: datetime, los: datetime,
         predict_time_step: timedelta=timedelta(seconds=30)):
-    
+    '''
+    Return binary stream with azimuth/elevation by time plot in PNG file.
+
+    Parameters
+    ==========
+    location: Location
+        Location of ground station
+    tle: two strings
+        TLE data
+    aos: datetime.datetime
+        Acquisition of Signal
+    los: datetime.datetime
+        Loss of Signal
+    predict_time_step: datetime.timedelta, optional
+        Step between data samples to predict. Lower produces more accurate
+        plot, but increase computation time
+    '''
     series = _calculate_series(location, tle, aos, los, predict_time_step)
     figure = _produce_azimuth_elevation_by_time_figure(*series) # type: ignore
     return _save_to_png(figure)
