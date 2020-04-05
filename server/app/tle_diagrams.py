@@ -103,8 +103,7 @@ def generate_polar_plot_png(location: Location, tle: Sequence[str],
 
 def generate_by_time_plot_png(location: Location, tle: Sequence[str],
         aos: datetime, los: datetime,
-        predict_time_step: timedelta=timedelta(seconds=30),
-        polar_time_step: timedelta=timedelta(minutes=2, seconds=30)):
+        predict_time_step: timedelta=timedelta(seconds=30)):
     
     series = _calculate_series(location, tle, aos, los, predict_time_step)
     figure = _produce_azimuth_elevation_by_time_figure(*series) # type: ignore
