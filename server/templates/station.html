@@ -10,7 +10,11 @@
             <li>Station registration time: {{ station.registered }}</li>
             <li>First recorded transmission: TBD</li>
             <li>Most recent transmission: {{ station.lastobs }}</li>
-            <li>Number of transmissions: {{ station.cnt }}</li>
+            <li>Number of transmissions: {{ station.cnt }}
+                <a href="{{ url_for('obslist', station_id=station.station_id) }}">
+                    [List]
+                </a>
+            </li>
         </ul>
     </p>
     <p>

@@ -9,6 +9,7 @@ from app.pagination import use_pagination
 def obs(obs_id: ObservationId = None, limit_and_offset = None):
     if obs_id is None:
         abort(300, description="ID is required")
+        return
 
     repository = Repository()
     with repository.transaction():

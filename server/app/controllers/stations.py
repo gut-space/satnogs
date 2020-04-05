@@ -9,12 +9,13 @@ from app.pagination import Pagination, use_pagination
 def stations(limit_and_offset):
     '''This function retrieves list of all registered ground stations.'''
     repository = Repository()
-    data = repository.read_stations(**limit_and_offset)
+    stations = repository.read_stations(**limit_and_offset)
+    statistics = repository.read_stations_statistics(**limit_and_offset)
     station_count = repository.count_stations()
     # Now convert the data to a list of objects that we can pass to the template.
     stationlist = []
 
-    for station, count, lastobs in data:
+    for station, stat in zip(stations, statistics):
         x = {}
         x['station_id'] = station['station_id']
         x['name'] = station['name']
@@ -22,8 +23,8 @@ def stations(limit_and_offset):
         x['descr'] = station['descr']
         x['config'] = station['config']
         x['registered'] = station['registered']
-        x['lastobs'] = lastobs
-        x['cnt'] = count
+        x['lastobs'] = stat["last_los"]
+        x['cnt'] = stat["observation_count"]
 
         stationlist.append(x)
 
