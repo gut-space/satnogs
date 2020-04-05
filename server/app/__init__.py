@@ -4,7 +4,9 @@ except ImportError:
     from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 
 import os
+
 from flask import Flask
+from flask_caching import Cache
 
 app = Flask(__name__, template_folder='../templates')
 root_dir = os.path.dirname(os.path.realpath(__file__))
@@ -14,6 +16,7 @@ ini_path = os.path.join(root_dir, 'satnogs.ini')
 try:
 
     config = ConfigParser()
+    config.optionxform = str 
     config.read(ini_path)
 
     for key, value in config.defaults().items():
@@ -32,6 +35,9 @@ except NoSectionError as e:
 except NoOptionError as e:
     raise Exception("Unable to find option in 'database' section in the %s file: %s" % (ini_path, e) )
 
+if app.config["cache"]["CACHE_DEFAULT_TIMEOUT"]:
+    app.config["cache"]["CACHE_DEFAULT_TIMEOUT"] = int(app.config["cache"]["CACHE_DEFAULT_TIMEOUT"])
+cache = Cache(app, config=app.config["cache"])
 
 from app import routes
 from app import template_globals
