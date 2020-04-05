@@ -5,3 +5,5 @@ typing_extensions
 python-dateutil
 python-crontab
 testing.postgresql
+orbit-predictor
+matplotlib
