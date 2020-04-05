@@ -19,6 +19,11 @@
             <dt>Ground station:</dt><dl><a href="/station/{{ obs.station_id }}">Link</a></dl>
         </dl>
     </p>
+    {% if obs.tle %}
+    <h4>Pass plots</h4>
+    <img width="45%" class="tle-plot" alt="Azimuth/elevation by time" src="{{ url_for('obs_by_time_plot', obs_id=obs.obs_id) }}" />
+    <img width="45%" class="tle-plot" alt="Azimuth/elevation polar" src="{{ url_for('obs_polar_plot', obs_id=obs.obs_id) }}" />    
+    {% endif %}
 
     <h4>Attachments:</h4>
     {% for file_ in files %}
