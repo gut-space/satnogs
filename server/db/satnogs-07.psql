@@ -1,0 +1,17 @@
+-- Add foreign key on observations referenced to satellite
+
+-- Fill missing IDs,
+UPDATE observations
+SET sat_id = s.sat_id
+FROM satellites s
+WHERE observations.sat_id is NULL AND
+    LOWER(s.sat_name) = REPLACE(LOWER(observations.sat_name), '-', ' ');
+
+-- Drop redunand column
+ALTER TABLE observations DROP COLUMN sat_name;
+
+-- Add reference
+ALTER TABLE observations
+ADD CONSTRAINT fk_sat_id FOREIGN KEY (sat_id) REFERENCES satellites (sat_id);
+
+UPDATE schema SET version = 7;
