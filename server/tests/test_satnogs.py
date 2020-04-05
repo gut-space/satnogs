@@ -68,6 +68,20 @@ class BasicTests(unittest.TestCase):
         response = self.app.get('/obs/1', follow_redirects=True)
         self.assertEqual(response.status_code, 404)
 
+    def test_obs_plots(self):
+        response = self.app.get('/obs/751/az_el_polar.png', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, 'image/png')
+        response = self.app.get('/obs/751/az_el_by_time.png', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, 'image/png')
+
+    def test_obs_plots_missing(self):
+        response = self.app.get('/obs/750/az_el_polar.png', follow_redirects=True)
+        self.assertEqual(response.status_code, 404)
+        response = self.app.get('/obs/750/az_el_by_time.png', follow_redirects=True)
+        self.assertEqual(response.status_code, 404)
+
     def test_stations(self):
         response = self.app.get('/stations', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
