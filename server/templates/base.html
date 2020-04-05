@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  {% block head %}
+{% block head %}
   <title>SATNOGS-GDN: {% block title %}{% endblock %}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,10 +11,11 @@
   <link rel="shortcut icon" href="/static/favicon.png" />
 
   <script>
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
-});
-</script>{% endblock %}
+    $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}
 </head>
 
 <body>
@@ -52,5 +53,6 @@ $(document).ready(function(){
         {% endif %}
         {% endblock %}
     </div>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

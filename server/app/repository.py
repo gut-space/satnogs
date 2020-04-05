@@ -64,6 +64,10 @@ class Station(TypedDict):
     config: str
     registered: datetime
 
+class StationStatistics(TypedDict):
+    observation_count: int
+    last_los: Optional[datetime]
+
 class StationPhoto(TypedDict):
     photo_id: StationPhotoId
     station_id: StationId
@@ -165,11 +169,20 @@ class Repository:
         return context.get("cursor")
 
     @use_cursor
-    def count_observations(self) -> int:
+    def count_observations(self, filters: ObservationFilter={}) -> int:
         q = ("SELECT COUNT(*) as count "
-             "FROM observations")
+             "FROM observations "
+             "WHERE (%(obs_id)s IS NULL OR obs_id = %(obs_id)s) AND "
+              "(%(aos_before)s IS NULL OR aos <= %(aos_before)s) AND "
+              "(%(los_after)s IS NULL OR los >= %(los_after)s) AND "
+              "(%(sat_id)s IS NULL OR sat_id = %(sat_id)s) AND "
+              "(%(station_id)s IS NULL OR station_id = %(station_id)s) AND "
+              "(%(notes)s IS NULL OR notes ILIKE '%%' || %(notes)s || '%%') AND "
+              "(%(has_tle)s IS NULL OR (tle IS NOT NULL) = %(has_tle)s);")
         cursor = self._cursor
-        cursor.execute(q)
+        query_kwargs = DefaultDictWithAnyKey(lambda: None)
+        query_kwargs.update(filters)
+        cursor.execute(q, query_kwargs)
         return cursor.fetchone()["count"]
 
     @use_cursor
@@ -294,41 +307,50 @@ class Repository:
         return cursor.fetchone()["count"]
 
     @use_cursor
-    def read_stations(self, limit=100, offset=0) -> Sequence[Tuple[Station, int, datetime]]:
-        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, "
-                    "COUNT(o) AS count, MAX(o.los) AS los "
+    def read_stations(self, limit=100, offset=0) -> Sequence[Station]:
+        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered "
             "FROM stations s "
-            "LEFT JOIN observations o ON s.station_id = o.station_id "
-            "GROUP BY s.station_id "
-            "LIMIT %s OFFSET %s")
+            "LIMIT %s OFFSET %s;")
 
         cursor = self._cursor
         cursor.execute(q, (limit, offset))
-        items = cursor.fetchall()
-        return [exclude_from_dict(i, ("count", "los")) for i in items] # type: ignore
+        return cursor.fetchall()
 
     @use_cursor
-    def read_station(self, id_: StationId) -> Optional[Tuple[Station, int, datetime]]:
-        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered, "
-                    "COUNT(o) AS count, MAX(o.los) AS los "
+    def read_station(self, id_: StationId) -> Optional[Station]:
+        q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered " 
             "FROM stations s "
-            "LEFT JOIN observations o ON s.station_id = o.station_id "
             "WHERE s.station_id = %s "
-            "GROUP BY s.station_id "
             "LIMIT 1")
 
         cursor = self._cursor
         cursor.execute(q, (id_,))
-        row = cursor.fetchone()
-        if row is None:
-            return None
+        return cursor.fetchone()
 
-        count: int
-        lastobs: datetime
-        count, lastobs = row["count"], row["los"]
-        del row["count"]
-        del row["los"]
-        return row, count, lastobs
+    @use_cursor
+    def read_station_statistics(self, station_id: StationId) \
+            -> Optional[StationStatistics]:
+        q = ("SELECT COUNT(o) AS observation_count, MAX(o.los) AS last_los "
+             "FROM stations s "
+             "LEFT JOIN observations o ON s.station_id = o.station_id "
+             "WHERE s.station_id = %s "
+             "GROUP BY s.station_id "
+             "LIMIT 1")
+        cursor = self._cursor
+        cursor.execute(q, (station_id,))
+        return cursor.fetchone()
+
+    @use_cursor
+    def read_stations_statistics(self, limit:int=100, offset:int=0) \
+            -> Sequence[StationStatistics]:
+        q = ("SELECT COUNT(o) AS observation_count, MAX(o.los) AS last_los "
+             "FROM stations s "
+             "LEFT JOIN observations o ON s.station_id = o.station_id "
+             "GROUP BY s.station_id "
+             "LIMIT %s OFFSET %s;")
+        cursor = self._cursor
+        cursor.execute(q, (limit, offset,))
+        return cursor.fetchall()
 
     @use_cursor
     def read_station_photos(self, id_: StationId) -> Sequence[StationPhoto]:

@@ -4,6 +4,52 @@
 <div class="container">
 <h3>Observations</h3>
 
+<form class="form-inline" method="GET" action="/obslist" id="search-form">
+    <div class="form-group">
+      <label for="los_after">From</label>
+      <input type="date" class="form-control" name="los_after"
+        placeholder="After date", value="{{ filters.los_after }}" />
+      <!-- <span class="invisible help-block">From date should be earlier then after date</span> -->
+    </div>
+    <div class="form-group">
+        <label for="aos_before">To</label>
+        <input type="date" class="form-control" name="aos_before"
+            placeholder="Before date", value="{{ filters.aos_before }}" />
+    </div>
+    <div class="form-group">
+        <label for="sat_id">Satellite</label>
+        <select class="form-control" name="sat_id">
+            <option value="" {{ 'selected' if not filters.sat_id else '' }}>&gt;All&lt;</option>
+            {% for satellite in satellites %}
+            <option value="{{ satellite.sat_id }}"
+                {{ 'selected' if satellite.sat_id == filters.sat_id else '' }}>
+                {{ satellite.sat_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="station_id">Station</label>
+        <select class="form-control" name="station_id">
+            <option value="" {{ 'selected' if not filters.station_id else '' }}>&gt;All&lt;</option>
+            {% for station in stations %}
+            <option value="{{ station.station_id }}"
+                {{ 'selected' if station.station_id == filters.station_id else '' }}>
+                {{ station.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="checkbox">
+        <label for="has_tle">
+            <input name="has_tle" id="has_tle" type="checkbox" value="true"
+                {{ 'checked' if filters.has_tle else '' }} /> TLE
+        </label>
+    </div>
+    <button type="submit" class="btn btn-success">Search</button>
+    <button type="reset" class="btn btn-default">Reset</button>
+  </form>
+
 <p>
 <table class='table table-striped table-hover'>
     <tr>
@@ -22,7 +68,7 @@
             <td>{{ obs.tca }}</td>
             <td>{{ obs.los }}</td>
             <td><a href="https://www.n2yo.com/satellite/?s={{ obs.sat_id }}">{{ obs.sat_name }}</a></td>
-            <td><a href="/station/{{ obs.station_id }}">{{ obs.station_id}}</a></td>
+            <td><a href="/station/{{ obs.station_id }}">{{ obs.station_name }}</a></td>
             <td><a href="/obs/{{ obs.obs_id }}"> <img src="/data/thumbs/{{ obs.thumbnail }}"></a></td>
         </tr>
     {% endfor %}
@@ -32,3 +78,92 @@
 
 {% endblock %}
 
+{% block scripts %}
+<script defer>
+    const form = document.getElementById("search-form");
+
+    function getFormControls()
+    {
+        return form.querySelectorAll("input, select");
+    }
+
+    function disableNonEmptyControls()
+    {
+        const controls = getFormControls();
+        for (let i=0; i < controls.length; i++)
+        {
+            const control = controls[i];
+            if (control.value == "") {
+                control.disabled = true;
+            }
+        }
+    }
+
+    function search_for_parent(element, className, maximum_parent) {
+        while (element.parentElement != null && element != maximum_parent)
+        {
+            if (element.classList.contains(className))
+            {
+                return element;
+            }
+            element = element.parentElement;
+        }
+        return null;
+    }
+
+    function validate()
+    {
+        let is_valid = true;
+        const error_control_containers = form.querySelectorAll(".has-error");
+        error_control_containers.forEach(c => c.classList.remove("has-error"));
+        const error_message_containers = form.querySelectorAll(".help-block");
+        error_message_containers.forEach(c => c.classList.add("invisible"));
+
+        const from_input = form.querySelector("input[name=los_after]");
+        const to_input = form.querySelector("input[name=aos_before]");
+        
+        if (from_input.value != "" && to_input.value != "") {
+            const from_date = new Date(from_input.value);
+            const to_date = new Date(to_input.value);
+            if (from_date > to_date)
+            {
+                is_valid = false;
+                [from_input, to_input].forEach(input => {
+                    parent = search_for_parent(input, "form-group", form);
+                    parent.classList.add("has-error")
+                    error_message_container = parent.querySelector(".help-block");
+                    if (error_message_container) {
+                        error_message_container.classList.remove("invisible");
+                    }
+
+                })
+
+            }
+        }
+
+        return is_valid;
+    }
+
+    form.onsubmit = function(ev) {
+        if (!validate())
+        {
+            ev.preventDefault();
+            ev.stopPropagation();
+            return;
+        }
+        disableNonEmptyControls();
+    }
+    form.onreset = function(ev) {
+        const controls = getFormControls();
+        for (let i=0; i < controls.length; i++)
+        {
+            const control = controls[i];
+            control.value = ""
+        }
+        ev.preventDefault();
+        ev.stopPropagation();
+        disableNonEmptyControls();
+        form.submit();
+    }
+</script>
+{% endblock %}

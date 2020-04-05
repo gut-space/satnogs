@@ -6,15 +6,12 @@ from app import app, utils
 def station(station_id = None):
 
     repository = Repository()
-    item = repository.read_station(station_id)
-    if item is None:
+    station = repository.read_station(station_id)
+    if station is None:
         abort(404, "Station not found")
-
-    station, count, lastobs = item
+    statistics = repository.read_station_statistics(station["station_id"])
+    
     photos = repository.read_station_photos(station_id)
-
-    x = {}
-    files = []
 
     x = {}
     x['station_id'] = station['station_id']
@@ -23,9 +20,10 @@ def station(station_id = None):
     x['descr'] = station['descr']
     x['config'] = station['config']
     x['registered'] = station['registered']
-    x['lastobs'] = lastobs
-    x['cnt'] = count
+    x['lastobs'] = statistics["last_los"]
+    x['cnt'] = statistics["observation_count"]
 
+    files = []
     for photo in photos:
         y = {}
         y['filename'] = photo['filename']

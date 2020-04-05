@@ -8,7 +8,7 @@ import testing.postgresql
 
 from tests.utils import standard_seed_db
 from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId,
-    Station, Observation, Satellite)
+    Station, Observation, Satellite, StationStatistics)
 
 Postgresql: testing.postgresql.PostgresqlFactory
 
@@ -111,13 +111,14 @@ class RepositoryPostgresTests(unittest.TestCase):
 
     @use_repository
     def test_read_observation(self, repository: Repository):
-        obs = repository.read_observation(750)
+        obs = repository.read_observation(ObservationId(750))
+        self.assertIsNotNone(obs)
 
         # Now check if the response is as expected.
-        self.check_obs750(obs)
+        self.check_obs750(obs) # type: ignore
 
         # Now test negative case. There's nos uch observation
-        obs = repository.read_observation(12345)
+        obs = repository.read_observation(ObservationId(12345))
         assert obs == None
 
     @use_repository
@@ -143,10 +144,8 @@ class RepositoryPostgresTests(unittest.TestCase):
 
         observation["obs_id"] = obs_id
         db_observation = repository.read_observation(obs_id)
-        self.assertDictEqual(
-            observation, # type: ignore
-            db_observation
-        )
+        self.assertIsNotNone(db_observation)
+        self.assertDictEqual(observation, db_observation) # type: ignore
 
         observation_file: ObservationFile = {
             'obs_file_id': ObservationFileId(0),
@@ -170,9 +169,9 @@ class RepositoryPostgresTests(unittest.TestCase):
         observation_files = repository.read_observation_files(obs_id)
         self.assertEqual(len(observation_files), 0)
 
-    def check_station1(self, entry: Tuple[Station, int, datetime.datetime]):
+    def check_station1(self, station: Station, statistics: StationStatistics):
         """Check if returned parameters match station-id=1 defined in tests/db-data.psql"""
-        station, count, last_obs_date = entry
+        count, last_obs_date = statistics["observation_count"], statistics["last_los"]
         self.assertEqual(station['station_id'], 1)
         self.assertEqual(station['name'], 'TKiS-1')
         self.assertEqual(station['lon'], 18.531787)
@@ -182,9 +181,9 @@ class RepositoryPostgresTests(unittest.TestCase):
         self.assertEqual(count, 3) # Number of observations
         self.assertEqual(last_obs_date, datetime.datetime(2020, 3, 8, 17, 39, 6, 960326)) # Last observation.
 
-    def check_station2(self, entry: Tuple[Station, int, datetime.datetime]):
+    def check_station2(self, station: Station, stat: StationStatistics):
         """Check if returned parameters match station-id=2 defined in tests/db-data.psql"""
-        station, count, last_obs_date = entry
+        count, last_obs_date = stat["observation_count"], stat["last_los"]
         self.assertEqual(station['station_id'], 2)
         self.assertEqual(station['name'], 'ETI-1')
         self.assertEqual(station['lon'], 18.613253)
@@ -199,32 +198,42 @@ class RepositoryPostgresTests(unittest.TestCase):
     def test_stations(self, repository: Repository):
         """Checks that a list of stations is returned properly."""
         station_entries = repository.read_stations()
-        self.assertGreaterEqual(len(station_entries), 2)
-        s1, s2 = station_entries
+        station_statistics = repository.read_stations_statistics()
+        self.assertEqual(len(station_entries), 2)
+        self.assertEqual(len(station_statistics), 2)
+        s1, s2 = zip(station_entries, station_statistics)
 
-        self.check_station1(s1)
-        self.check_station2(s2)
+        self.check_station1(*s1)
+        self.check_station2(*s2)
 
         # Now limit number of returned stations to just one. There should be only station-id 1.
         station_entries = repository.read_stations(limit=1)
+        station_statistics = repository.read_stations_statistics(limit=1)
         self.assertEqual(len(station_entries), 1)
-        self.check_station1(station_entries[0]) # This should return values for station-id 1
+        self.assertEqual(len(station_statistics), 1)
+        self.check_station1(station_entries[0], station_statistics[0]) # This should return values for station-id 1
 
         # Now skip the first station. Only station 2 should be returned.
         station_entries = repository.read_stations(offset=1)
+        station_statistics = repository.read_stations_statistics(offset=1)
         self.assertEqual(len(station_entries), 1)
-        self.check_station2(station_entries[0]) # This should return values for station-id 2
+        self.assertEqual(len(station_statistics), 1)
+        self.check_station2(station_entries[0], station_statistics[0]) # This should return values for station-id 2
 
     @use_repository
     def test_station(self, repository: Repository):
         """Check that a single station data is returned properly."""
         station = repository.read_station(1)
+        statistics = repository.read_station_statistics(1)
         self.assertIsNotNone(station)
-        self.check_station1(station)
+        self.assertIsNotNone(statistics)
+        self.check_station1(station, statistics)
 
         # Now check invalid case. There's no such station
         station = repository.read_station(123)
+        statistics = repository.read_station_statistics(123)
         self.assertIsNone(station)
+        self.assertIsNone(statistics)
 
         # TODO: Test read_station_photos
         # TODO: Test read_station_secret
