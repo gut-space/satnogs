@@ -7,7 +7,7 @@ from functools import wraps
 import testing.postgresql
 
 from tests.utils import standard_seed_db
-from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId,
+from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationFilter, ObservationId, Repository, SatelliteId, StationId,
     Station, Observation, Satellite, StationStatistics)
 
 Postgresql: testing.postgresql.PostgresqlFactory
@@ -93,7 +93,7 @@ class RepositoryPostgresTests(unittest.TestCase):
         self.assertEqual(obs['sat_id'], 28654)
         self.assertEqual(obs['thumbnail'], "thumb-f6b927bf-1472-4ea6-8657-48265cfae5ca-NOAA 18_2020-03-08T17:39:06.960326_apt.png")
         self.assertEqual(obs['station_id'], 1)
-        self.assertEqual(obs['notes'], None)
+        self.assertEqual(obs['notes'], "Note")
 
     @use_repository
     def test_read_observations(self, repository: Repository):
@@ -285,4 +285,59 @@ class RepositoryPostgresTests(unittest.TestCase):
         observations = repository.read_observations(limit=2, offset=1)
         self.assertEqual(len(observations), 2)
         self.assertEqual([o["obs_id"] for o in observations], [751, 750])
-    
+
+    @use_repository
+    def test_observations_filters(self, repository: Repository):
+        filters: ObservationFilter = {
+            "obs_id": ObservationId(751)
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(observations[0]["obs_id"], 751)
+
+        # Include observations partially (of fully) in date range
+        #   AOS before > LOS after
+        filters = {
+            "aos_before": datetime.datetime(2020, 3, 8, 15, 45, 0, 0),
+            "los_after": datetime.datetime(2020, 3, 8, 15, 30, 0)
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(observations[0]["obs_id"], 750)
+
+        filters = {
+            "sat_id": SatelliteId(28654)
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(observations[0]["obs_id"], 752)
+
+        filters = {
+            "station_id": StationId(1)
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 3)
+
+        filters = {
+            "notes": "ote"
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(observations[0]["notes"], "Note")
+
+        filters = {
+            "has_tle": True
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertIsNotNone(observations[0]["tle"])
+
+        filters = {
+            "sat_id": SatelliteId(25338),
+            "station_id": StationId(1),
+            "has_tle": True,
+            "los_after": datetime.datetime(2020, 3, 8, 15, 30, 0)
+        }
+        observations = repository.read_observations(filters=filters)
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(observations[0]["obs_id"], 751)
