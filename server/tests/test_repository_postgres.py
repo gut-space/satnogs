@@ -129,7 +129,7 @@ class RepositoryPostgresTests(unittest.TestCase):
             'aos': datetime.datetime(2020, 3, 21, 12, 00, 0),
             'tca': datetime.datetime(2020, 3, 21, 12, 15, 0),
             'los': datetime.datetime(2020, 3, 21, 12, 30, 0),
-            'sat_id': SatelliteId(1),
+            'sat_id': SatelliteId(28654),
             'thumbnail': 'thumb-123.png',
             'notes': None,
             'station_id': StationId(1),
