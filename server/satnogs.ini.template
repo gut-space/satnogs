@@ -1,3 +1,13 @@
+[cache]
+CACHE_DEFAULT_TIMEOUT = 300
+
+# Uses a local python dictionary for caching. This is not really thread safe.
+#CACHE_TYPE = simple
+
+# Uses the filesystem to store cached values
+CACHE_TYPE = filesystem
+CACHE_DIR = cache_tmp
+
 [database]
 host = localhost
 database = satnogs

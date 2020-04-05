@@ -1,6 +1,6 @@
 from flask import abort, Response
 
-from app import app, tle_diagrams
+from app import app, tle_diagrams, cache
 from app.repository import ObservationId, Repository
 from app.pagination import use_pagination
 
@@ -41,9 +41,11 @@ def _tle_plot(obs_id: ObservationId, plot_func):
     return Response(stream.getvalue(), mimetype='image/png')
 
 @app.route('/obs/<obs_id>/az_el_polar.png')
+@cache.cached()
 def obs_polar_plot(obs_id: ObservationId):
     return _tle_plot(obs_id, tle_diagrams.generate_polar_plot_png)
 
 @app.route('/obs/<obs_id>/az_el_by_time.png')
+@cache.cached()
 def obs_by_time_plot(obs_id: ObservationId):
     return _tle_plot(obs_id, tle_diagrams.generate_by_time_plot_png)

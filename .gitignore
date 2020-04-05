@@ -10,3 +10,4 @@ venv
 /server/.env/
 /server/data/
 /server/build/
+/server/cache_tmp/
