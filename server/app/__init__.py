@@ -6,8 +6,10 @@ except ImportError:
 import os
 
 from flask import Flask
+from flask_login import LoginManager, login_manager
 
 app = Flask(__name__, template_folder='../templates')
+
 root_dir = os.path.dirname(os.path.realpath(__file__))
 root_dir = os.path.dirname(root_dir)
 ini_path = os.path.join(root_dir, 'satnogs.ini')
@@ -15,7 +17,7 @@ ini_path = os.path.join(root_dir, 'satnogs.ini')
 try:
 
     config = ConfigParser()
-    config.optionxform = str 
+    config.optionxform = str
     config.read(ini_path)
 
     for key, value in config.defaults().items():
@@ -26,7 +28,7 @@ try:
         section = config[section_name]
         for key, value in section.items():
             app.config[section_name][key] = value
-    
+
 except IOError as e:
     raise Exception("Unable to read %s file: %s" % (ini_path, e) )
 except NoSectionError as e:
@@ -37,6 +39,14 @@ except NoOptionError as e:
 from app import routes
 from app import template_globals
 from app.utils import get_footer
+from app.repository import Repository
+from flask_login import UserMixin
 
 footer = get_footer()
 app.jinja_env.globals["footer"] = footer
+
+login = LoginManager(app)
+
+@login.user_loader
+def load_user(user_id):
+    return Repository.read_user(id=user_id)
