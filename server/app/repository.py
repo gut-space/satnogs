@@ -83,6 +83,7 @@ class UserRole(Enum):
     BANNED = 4
 
 class User(TypedDict):
+    id: int
     username: str
     digest: str
     email: str
@@ -404,10 +405,16 @@ class Repository:
         return UserRole.REGULAR
 
     @use_cursor
-    def read_user(self, username: str) -> Optional[User]:
-        query = "SELECT username, digest, email, role FROM users WHERE username = %s"
-        cursor = self._cursor
-        cursor.execute(query, (username,))
+    def read_user(self, id: int = 0, username: str = "") -> Optional[User]:
+        if id:
+            query = "SELECT id, username, digest, email, role FROM users WHERE id = %s"
+            cursor = self._cursor
+            cursor.execute(query, (id,))
+        elif username:
+            query = "SELECT id, username, digest, email, role FROM users WHERE username = %s"
+            cursor = self._cursor
+            cursor.execute(query, (username,))
+
         row = cursor.fetchone()
         if row:
             row['role'] = self.user_role_to_enum(row['role'])
