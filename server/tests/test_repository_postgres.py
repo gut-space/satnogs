@@ -347,12 +347,22 @@ class RepositoryPostgresTests(unittest.TestCase):
         nonexistent = repository.read_user(username="notfound")
         self.assertIsNone(nonexistent)
 
-        user = repository.read_user(username="clarke")
-        print(user)
-        self.assertEqual(user['username'], 'clarke')
-        self.assertEqual(user['digest'], '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') # sha256('password')
-        self.assertEqual(user['email'], 'acc@gmail.com')
-        self.assertEqual(user['role'], UserRole.ADMIN)
+        nonexistent = repository.read_user(id=5)
+        self.assertIsNone(nonexistent)
+
+        user1 = repository.read_user(username="clarke")
+        self.assertEqual(user1['username'], 'clarke')
+        self.assertEqual(user1['digest'], '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') # sha256('password')
+        self.assertEqual(user1['email'], 'acc@gmail.com')
+        self.assertEqual(user1['role'], UserRole.ADMIN)
+
+        user2 = repository.read_user(id=3)
+        self.assertEqual(user2['username'], 'clarke')
+        self.assertEqual(user2['digest'], '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') # sha256('password')
+        self.assertEqual(user2['email'], 'acc@gmail.com')
+        self.assertEqual(user2['role'], UserRole.ADMIN)
+
+        self.assertEqual(user1, user2)
 
         # UserRole field is enum, better be safe and check all possible combinations.
         user = repository.read_user(username='asimov')
