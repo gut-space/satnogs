@@ -2,28 +2,7 @@
 
 # Satnogs-GDN Architecture
 
-```mermaid
-+---------+
-| Antenna |
-+----+----+
-     |
-+----+---------------------------------+    +-------------------------------+
-|    |                                 |    |                               |
-| +--+--+               +------------+ |    | +---------------------------+ |
-| | SDR |               |  gPredict  | |    | |         Bootstrap         | |
-| +--+--+               +------+-----+ |    | |         HTML + JS         | |
-|    |                         |       |    | +---------------------------+ |
-| +--+--------------+   +------+-----+ |    |                               |
-| |      GQRX       +---+            | |    | +---------------------------+ |
-| | (Radio decoder) |   |            +-+----+-+           Flask           | |
-| +--+--------------+   | Automation | |    | +---------------------------+ |
-|    |                  |  software  | |    |                               |
-| +--+-------+          |            | |    | +------------+ +------------+ |
-| | noaa-apt |          |            | |    | | PostgreSQL | |   Apache   | |
-| +----------+          +------------+ |    | |  database  | | web server | |
-|                                      |    | +------------+ +------------+ |
-+-----------Raspberry Pi---------------+    +-----------VPS Server----------+
-```
+<img align="center" src="automation-server-arch.png" />
 
 The project consists of two major components: a station and a server. Station is a reasonably small set of tools that's
 intended to be run on Rasbperry Pi (although it can be run on any Linux machine) that conducts the actual observations
