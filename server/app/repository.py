@@ -416,9 +416,11 @@ class Repository:
             cursor.execute(query, (username,))
 
         row = cursor.fetchone()
+        u = None
         if row:
             row['role'] = self.user_role_to_enum(row['role'])
-        return row
+            u = User(row)
+        return u
 
     @use_cursor
     def get_database_version(self) -> int:
