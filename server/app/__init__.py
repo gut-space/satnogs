@@ -6,7 +6,7 @@ except ImportError:
 import os
 
 from flask import Flask
-from flask_login import LoginManager, login_manager
+from app.repository import User
 
 app = Flask(__name__, template_folder='../templates')
 
@@ -39,14 +39,8 @@ except NoOptionError as e:
 from app import routes
 from app import template_globals
 from app.utils import get_footer
-from app.repository import Repository
-from flask_login import UserMixin
 
 footer = get_footer()
 app.jinja_env.globals["footer"] = footer
 
-login = LoginManager(app)
 
-@login.user_loader
-def load_user(user_id):
-    return Repository.read_user(id=user_id)
