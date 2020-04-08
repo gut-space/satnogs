@@ -1,9 +1,6 @@
-from datetime import datetime
-from typing import Callable, Sequence
-from flask import abort, Response
-from io import BytesIO
+from flask import abort
 
-from app import app, tle_diagrams, cache
+from app import app
 from app.repository import ObservationId, Repository
 from app.pagination import use_pagination
 
@@ -27,30 +24,3 @@ def obs(obs_id: ObservationId = None, limit_and_offset = None):
 
     return 'obs.html', dict(obs = observation, files=files,
         sat_name=satellite["sat_name"], item_count=files_count)
-
-def _tle_plot(obs_id: ObservationId, plot_func: Callable[[tle_diagrams.Location,
-        Sequence[str], datetime, datetime], BytesIO]):
-    '''Fetch data from DB, call ploting and return response.'''
-    repository = Repository()
-    observation = repository.read_observation(obs_id)
-    
-    if observation is None:
-        abort(404, "Observation not found")
-    if observation["tle"] is None:
-        abort(404, "TLE not found")
-
-    station = repository.read_station(observation["station_id"])[0]
-    location = tle_diagrams.Location(station["lat"], station["lon"], 0)
-    stream = plot_func(location,
-        observation["tle"], observation["aos"], observation["los"])
-    return Response(stream.getvalue(), mimetype='image/png')
-
-@app.route('/obs/<obs_id>/az_el_polar.png')
-@cache.cached()
-def obs_polar_plot(obs_id: ObservationId):
-    return _tle_plot(obs_id, tle_diagrams.generate_polar_plot_png)
-
-@app.route('/obs/<obs_id>/az_el_by_time.png')
-@cache.cached()
-def obs_by_time_plot(obs_id: ObservationId):
-    return _tle_plot(obs_id, tle_diagrams.generate_by_time_plot_png)
