@@ -173,7 +173,7 @@ def receive(station_id: str, args: RequestArguments):
     make_thumbnail(thumb_source_path, thumb_path)
 
     # Make charts
-    station = repository.read_station(observation["station_id"])[0]
+    station = repository.read_station(observation["station_id"])
     make_charts(observation, station, root)
     return '', 204
 
