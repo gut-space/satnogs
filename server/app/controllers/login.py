@@ -1,7 +1,7 @@
 from flask import render_template, abort, request, flash, redirect, url_for
 from app import app
 from flask_wtf import FlaskForm
-from flask_login import current_user, login_user, UserMixin, LoginManager
+from flask_login import current_user, login_user, logout_user, UserMixin, LoginManager
 
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import InputRequired, Email, Length
@@ -34,11 +34,13 @@ class SatnogsUser(UserMixin):
         self.auth = False
 
     def check_digest(self, digest: str):
+        """This compares hashes. It's almost useless (execept perhaps for testing) as the hashes
+        are salted. So they're almost always different. This sets the auth field (true if provided
+        password is correct)."""
         self.auth = self.digest == digest
         return self.auth
 
     def check_password(self, passwd: str):
-        print("### comparing hashes:")
         return check_password_hash(self.digest, passwd)
 
     def is_authenticated(self):
@@ -55,7 +57,9 @@ class SatnogsUser(UserMixin):
 def login():
 
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return render_template('login.html', user = current_user)
+
+    #        redirect(url_for('index'))
 
     form = LoginForm()
 
@@ -84,7 +88,7 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
-        return redirect(next_page)
+        #return redirect(next_page)
 
     return render_template('login.html', form=form)
 
@@ -97,3 +101,8 @@ def load_user(user_id):
     if u:
         return SatnogsUser(u)
     return None
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
