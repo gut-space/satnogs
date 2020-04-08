@@ -1,3 +1,5 @@
+[doc](../README.md) > Users
+
 # Users Management
 
 Users information has been introduced in schema update 07. There's a new table that holds user-id, username,
