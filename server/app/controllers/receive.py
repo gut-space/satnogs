@@ -1,6 +1,9 @@
 import abc
+from abc import abstractmethod
 import datetime
 import os.path
+import shutil
+import sys
 from typing import Dict, List, Optional, Tuple
 import uuid
 
@@ -10,12 +13,11 @@ from webargs.flaskparser import use_args
 from werkzeug.utils import secure_filename
 
 from app import app
+from app import tle_diagrams
 from app.authorize_station import authorize_station
-from app.utils import make_thumbnail, first
-from app.repository import Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, StationId
-from abc import abstractmethod
+from app.utils import make_thumbnail, first, save_binary_stream_to_file
+from app.repository import Observation, ObservationFile, ObservationFileId, ObservationId, Repository, SatelliteId, Station, StationId
 
-import sys
 if sys.version_info >= (3, 8):
     from typing import TypedDict
 else:
@@ -169,4 +171,28 @@ def receive(station_id: str, args: RequestArguments):
     thumb_source_path = os.path.join(root, thumb_source_filename)
     thumb_path = os.path.join(root, "thumbs", thumb_filename)
     make_thumbnail(thumb_source_path, thumb_path)
+
+    # Make charts
+    station = repository.read_station(observation["station_id"])[0]
+    make_charts(observation, station, root)
     return '', 204
+
+def make_charts(observation: Observation, station: Station,
+        root:str=None):
+    if root is None:
+        root = app.config["storage"]['image_root']
+
+    location = tle_diagrams.Location(station["lat"], station["lon"], 0)
+    
+    chart_dir = os.path.join(root, "charts")
+    get_chart_path = lambda type_, obs_id: os.path.join(
+        chart_dir,
+        "%s-%d.png" % (type_, obs_id)
+    )
+    
+    for type_, gen in [("by_time", tle_diagrams.generate_by_time_plot_png),
+                    ("polar", tle_diagrams.generate_polar_plot_png)]:
+        stream = gen(location, observation["tle"], observation["aos"],
+                        observation["los"])
+        path = get_chart_path(type_, observation["obs_id"])
+        save_binary_stream_to_file(path, stream)

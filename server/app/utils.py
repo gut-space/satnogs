@@ -1,7 +1,8 @@
 import subprocess
-import time
 from datetime import datetime
-from os import path, getcwd
+from io import BytesIO
+from os import path
+import shutil
 from typing import Callable, Iterable, Optional, TypeVar
 
 def coords(lon, lat):
@@ -46,3 +47,10 @@ def get_footer():
     except OSError:
         # The file was not found or is generally inaccessible. Return nothing.
         return None
+
+def save_binary_stream_to_file(path: str, stream: BytesIO):
+    '''Efficient way to save binary stream to file.
+        See: https://stackoverflow.com/a/39050559'''
+    stream.seek(0)
+    with open(path, 'wb') as f:
+        shutil.copyfileobj(stream, f, length=131072)

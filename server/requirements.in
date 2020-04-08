@@ -7,4 +7,3 @@ python-crontab
 testing.postgresql
 orbit-predictor
 matplotlib
-Flask-Caching

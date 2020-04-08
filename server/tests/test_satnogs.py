@@ -38,6 +38,7 @@ class BasicTests(unittest.TestCase):
         app.config["database"] = self.postgres.dsn()
         app.config["storage"]["image_root"] = IMAGE_ROOT
         os.makedirs(os.path.join(IMAGE_ROOT, "thumbs"), exist_ok=True)
+        os.makedirs(os.path.join(IMAGE_ROOT, "charts"), exist_ok=True)
         self.app = app.test_client()
 
         # This is a test. Log EVERYTHING.
@@ -66,20 +67,6 @@ class BasicTests(unittest.TestCase):
 
     def test_obs_missing(self):
         response = self.app.get('/obs/1', follow_redirects=True)
-        self.assertEqual(response.status_code, 404)
-
-    def test_obs_plots(self):
-        response = self.app.get('/obs/751/az_el_polar.png', follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.mimetype, 'image/png')
-        response = self.app.get('/obs/751/az_el_by_time.png', follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.mimetype, 'image/png')
-
-    def test_obs_plots_missing(self):
-        response = self.app.get('/obs/750/az_el_polar.png', follow_redirects=True)
-        self.assertEqual(response.status_code, 404)
-        response = self.app.get('/obs/750/az_el_by_time.png', follow_redirects=True)
         self.assertEqual(response.status_code, 404)
 
     def test_stations(self):
@@ -123,7 +110,7 @@ class BasicTests(unittest.TestCase):
         )
         self.assertEqual(file_count(IMAGE_ROOT), 2)
         self.assertEqual(file_count(os.path.join(IMAGE_ROOT, "thumbs")), 1)
-
+        self.assertEqual(file_count(os.path.join(IMAGE_ROOT, "charts")), 2)
         # Todo: Need to check if the DB entries have been added.
 
         # Check if there are appropriate entries in the log file.
