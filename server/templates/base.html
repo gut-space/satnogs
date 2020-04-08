@@ -30,7 +30,7 @@
             </div>
             <ul class="nav navbar-nav">
                 <li {% if request.path == "/" or request.path == "/index" %}class="active"{% endif %}>
-                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('index') }}"><span class="glyphicon glyphicon-home"></span> Home</a>
                 </li>
                 <li {% if request.path == "/obslist" %}class="active"{% endif %}>
                     <a href="{{ url_for('obslist') }}">Observations</a>
@@ -41,8 +41,10 @@
                 <li {% if request.path == "/viewer" %}class="active"{% endif %}>
                     <a href="/viewer/">Orbit Viewer</a>
                 </li>
-                <li {% if request.path == "/viewer" %}class="active"{% endif %}>
-                    <a href="/login">Login</a>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li {% if request.path == "/login" %}class="active"{% endif %}>
+                    <a href="/login"><span class="glyphicon glyphicon-user"></span> Login</a>
                 </li>
             </ul>
         </div>
