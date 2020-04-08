@@ -15,7 +15,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from orbit_predictor.sources import get_predictor_from_tle_lines
 from orbit_predictor.locations import Location as PredictLocation
 
-Location = namedtuple("Locatio", ("latitude", "longitude", "elevation"))
+Location = namedtuple("Location", ("latitude", "longitude", "elevation"))
 
 def _calculate_series(location: Location, tle: Sequence[str],
         aos: datetime, los: datetime,
@@ -147,4 +147,3 @@ def generate_by_time_plot_png(location: Location, tle: Sequence[str],
     series = _calculate_series(location, tle, aos, los, predict_time_step)
     figure = _produce_azimuth_elevation_by_time_figure(*series) # type: ignore
     return _save_to_png(figure)
-
