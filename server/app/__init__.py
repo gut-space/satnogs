@@ -6,7 +6,6 @@ except ImportError:
 import os
 
 from flask import Flask
-from app.repository import User
 
 app = Flask(__name__, template_folder='../templates')
 
@@ -42,5 +41,3 @@ from app.utils import get_footer
 
 footer = get_footer()
 app.jinja_env.globals["footer"] = footer
-
-
