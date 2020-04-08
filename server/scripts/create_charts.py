@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+# This script generates fly-over charts for observations that have TLE
+# information recorded.
+
 from typing import Dict
 from app.controllers.receive import make_charts
 from app.repository import Repository, Station, StationId
