@@ -27,6 +27,8 @@ def tearDownModule():
 IMAGE_ROOT = "tests/images"
 LOG_FILE = "test.log"
 
+app.config["SECRET_KEY"] = "test secret"
+
 class BasicTests(unittest.TestCase):
 
     def setUp(self):
@@ -160,7 +162,7 @@ class BasicTests(unittest.TestCase):
         self.check_log(["Failed to write /nonexistent/path/", "tests_x.png (image_root=/nonexistent/path)"])
 
     def test_login(self):
-        """Test login mechanism."""
+        """Tests login mechanism (invalid username, password, disabled account, successful login)."""
 
         # CASE 1 (not logged in): Make sure the page contains a form field.
         response = self.app.get('/login', follow_redirects=True)
@@ -173,9 +175,8 @@ class BasicTests(unittest.TestCase):
             'password': 'idunno',
             'remember': True
         }
-        # TODO: I don't know how to pass the form credentials... :/
-        # response = self.app.get('/login', follow_redirects=True, form=form)
-        # check_output(self, str(response.data), ["Invalid username."])
+        response = self.app.post('/login', follow_redirects=True, data=form)
+        check_output(self, str(response.data), ["Invalid username."])
 
         # CASE 3 (invalid data): Provide incorrect credentials (correct username, invalid password)
         form = {
@@ -183,9 +184,8 @@ class BasicTests(unittest.TestCase):
             'password': 'idunno',
             'remember': True
         }
-        # TODO: I don't know how to pass the form credentials... :/
-        # response = self.app.get('/login', follow_redirects=True, form=form)
-        # check_output(self, str(response.data), ["Invalid password."])
+        response = self.app.post('/login', follow_redirects=True, data=form)
+        check_output(self, str(response.data), ["Invalid password."])
 
         # CASE 4: (login in as disabled account)
         form = {
@@ -193,9 +193,8 @@ class BasicTests(unittest.TestCase):
             'password': 'password',
             'remember': True
         }
-        # TODO: I don't know how to pass the form credentials... :/
-        # response = self.app.get('/login', follow_redirects=True, form=form)
-        # check_output(self, str(response.data), ["Account disabled."])
+        response = self.app.post('/login', follow_redirects=True, data=form)
+        check_output(self, str(response.data), ["Account disabled."])
 
         # CASE 5: login successful
         form = {
@@ -203,9 +202,8 @@ class BasicTests(unittest.TestCase):
             'password': 'password',
             'remember': False
         }
-        # TODO: I don't know how to pass the form credentials... :/
-        # response = self.app.get('/login', follow_redirects=True, form=form)
-        # check_output(self, str(response.data), ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
+        response = self.app.post('/login', follow_redirects=True, data=form)
+        check_output(self, str(response.data), ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
 
 if __name__ == "__main__":
     unittest.main()

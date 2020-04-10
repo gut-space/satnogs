@@ -9,7 +9,7 @@ from werkzeug.urls import url_parse
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import app
-from app.repository import Repository
+from app.repository import Repository, UserRole
 
 class LoginForm(FlaskForm):
     username = StringField("Your login name", validators=[InputRequired(), Length(min=3, max=20)])
@@ -78,7 +78,7 @@ def login():
             flash("Invalid password.")
             return redirect(url_for("login"))
 
-        if u.role == UserRole.ADMIN:
+        if u.role == UserRole.BANNED:
             app.logger.info("Login failed: attempt to login into disabled account %s" % form.username.data)
             flash("Account disabled.")
             return redirect(url_for("login"))
