@@ -12,12 +12,11 @@ from app import app
 from app.repository import Repository
 
 class LoginForm(FlaskForm):
-    username = StringField('Your login name', validators=[InputRequired(), Length(min=3, max=20)])
-    password = PasswordField('Your password', validators=[InputRequired(), Length(min=5, max=80)])
-    remember = BooleanField('Remember me')
+    username = StringField("Your login name", validators=[InputRequired(), Length(min=3, max=20)])
+    password = PasswordField("Your password", validators=[InputRequired(), Length(min=5, max=80)])
+    remember = BooleanField("Remember me")
 
-    submit = SubmitField('Sign In')
-
+    submit = SubmitField("Sign In")
 
 class SatnogsUser(UserMixin):
 
@@ -26,11 +25,11 @@ class SatnogsUser(UserMixin):
 
     def __init__(self, user):
         # I'm sure there's easier way to do it. There's some magic involving **...
-        self.id = user['id']
-        self.username = user['username']
-        self.digest = user['digest']
-        self.email = user['email']
-        self.role = user['role']
+        self.id = user["id"]
+        self.username = user["username"]
+        self.digest = user["digest"]
+        self.email = user["email"]
+        self.role = user["role"]
         self.auth = False
 
     def check_digest(self, digest: str):
@@ -57,7 +56,7 @@ class SatnogsUser(UserMixin):
 def login():
 
     if current_user.is_authenticated:
-        return render_template('login.html', user = current_user)
+        return render_template("login.html", user = current_user)
 
     form = LoginForm()
 
@@ -70,29 +69,29 @@ def login():
 
         if user is None:
             app.logger.info("Login failed: invalid username: %s" % form.username.data)
-            flash('Invalid username.')
-            return redirect(url_for('login'))
+            flash("Invalid username.")
+            return redirect(url_for("login"))
 
         u = SatnogsUser(user)
         if not u.check_password(form.password.data):
             app.logger.info("Login failed: invalid password %s for user %s" % (form.password.data, form.username.data))
-            flash('Invalid password.')
-            return redirect(url_for('login'))
+            flash("Invalid password.")
+            return redirect(url_for("login"))
 
         if u.role == UserRole.ADMIN:
             app.logger.info("Login failed: attempt to login into disabled account %s" % form.username.data)
-            flash('Account disabled.')
-            return redirect(url_for('login'))
+            flash("Account disabled.")
+            return redirect(url_for("login"))
 
         app.logger.info("Login successful for user %s" % form.username.data)
         login_user(u, remember = form.remember.data)
 
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('login')
+        next_page = request.args.get("next")
+        if not next_page or url_parse(next_page).netloc != "":
+            next_page = url_for("login")
         return redirect(next_page)
 
-    return render_template('login.html', form=form)
+    return render_template("login.html", form=form)
 
 login = LoginManager(app)
 
@@ -104,7 +103,7 @@ def load_user(user_id):
         return SatnogsUser(u)
     return None
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
