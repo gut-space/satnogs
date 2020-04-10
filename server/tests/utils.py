@@ -17,6 +17,10 @@ def check_output(self, output: str, strings):
     is a list of strings that are expected to be present. They're expected
     to appear in the specified order, but there may be other things
     printed in between them. Will assert if string is not found. """
+
+    # Make sure we're dealing with a string, and not something similar (like bytes)
+    output = str(output)
+
     offset = 0
     for s in strings:
         new_offset = output.find(s, offset)
