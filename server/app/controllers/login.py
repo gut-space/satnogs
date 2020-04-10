@@ -53,7 +53,7 @@ class SatnogsUser(UserMixin):
         return self.id
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
 
     if current_user.is_authenticated:
@@ -62,25 +62,29 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        print('Login requested for user %s, pass=%s, remember_me=%s' % (form.username.data, form.password.data, form.remember.data))
+        app.logger.info("Login requested for user %s, pass=%s, remember_me=%s" % (form.username.data, form.password.data, form.remember.data))
 
         repository = Repository()
 
         user = repository.read_user(username=form.username.data)
-        print('Retrieved from DB: %s' % repr(user))
 
         if user is None:
-            print('Invalid username')
-            flash('Invalid username')
+            app.logger.info("Login failed: invalid username: %s" % form.username.data)
+            flash('Invalid username.')
             return redirect(url_for('login'))
 
         u = SatnogsUser(user)
         if not u.check_password(form.password.data):
-            print('Invalid password')
-            flash('Invalid password')
+            app.logger.info("Login failed: invalid password %s for user %s" % (form.password.data, form.username.data))
+            flash('Invalid password.')
             return redirect(url_for('login'))
 
-        print("Login success!")
+        if u.role == UserRole.ADMIN:
+            app.logger.info("Login failed: attempt to login into disabled account %s" % form.username.data)
+            flash('Account disabled.')
+            return redirect(url_for('login'))
+
+        app.logger.info("Login successful for user %s" % form.username.data)
         login_user(u, remember = form.remember.data)
 
         next_page = request.args.get('next')
