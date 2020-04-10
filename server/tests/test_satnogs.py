@@ -159,5 +159,53 @@ class BasicTests(unittest.TestCase):
         # Check if there's appropriate entry in the log file.
         self.check_log(["Failed to write /nonexistent/path/", "tests_x.png (image_root=/nonexistent/path)"])
 
+    def test_login(self):
+        """Test login mechanism."""
+
+        # CASE 1 (not logged in): Make sure the page contains a form field.
+        response = self.app.get('/login', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        check_output(self, str(response.data), ['<form class="form-signin"', "Your login name", "Your password"])
+
+        # CASE 2 (invalid data): Provide incorrect credentials (wrong username)
+        form = {
+            'username': 'nonexisting',
+            'password': 'idunno',
+            'remember': True
+        }
+        # TODO: I don't know how to pass the form credentials... :/
+        # response = self.app.get('/login', follow_redirects=True, form=form)
+        # check_output(self, str(response.data), ["Invalid username."])
+
+        # CASE 3 (invalid data): Provide incorrect credentials (correct username, invalid password)
+        form = {
+            'username': 'clarke',
+            'password': 'idunno',
+            'remember': True
+        }
+        # TODO: I don't know how to pass the form credentials... :/
+        # response = self.app.get('/login', follow_redirects=True, form=form)
+        # check_output(self, str(response.data), ["Invalid password."])
+
+        # CASE 4: (login in as disabled account)
+        form = {
+            'username': 'lem',
+            'password': 'password',
+            'remember': True
+        }
+        # TODO: I don't know how to pass the form credentials... :/
+        # response = self.app.get('/login', follow_redirects=True, form=form)
+        # check_output(self, str(response.data), ["Account disabled."])
+
+        # CASE 5: login successful
+        form = {
+            'username': 'clarke',
+            'password': 'password',
+            'remember': False
+        }
+        # TODO: I don't know how to pass the form credentials... :/
+        # response = self.app.get('/login', follow_redirects=True, form=form)
+        # check_output(self, str(response.data), ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
+
 if __name__ == "__main__":
     unittest.main()

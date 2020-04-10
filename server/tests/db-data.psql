@@ -25,4 +25,4 @@ INSERT INTO public.users (id, username, digest, email, role) VALUES
 (1, 'asimov', '023456789abcdef', 'issac@terminus.org', 'regular'),
 (2, 'baxter', 'aaaaaaaaaaaaaaa', 'baxter@gmail.com', 'owner'),
 (3, 'clarke', 'pbkdf2:sha256:150000$Ij6XJyek$d6a0cd085e6955843a9c3224ccf24088852207d55bb056aa0b544168f94860b8', 'acc@gmail.com', 'admin'), -- password = sha256('password')
-(4, 'lem', '', 'fake@wp.pl', 'banned');
+(4, 'lem', 'pbkdf2:sha256:150000$Ij6XJyek$d6a0cd085e6955843a9c3224ccf24088852207d55bb056aa0b544168f94860b8', 'fake@wp.pl', 'banned'); -- password = sha256('password')
