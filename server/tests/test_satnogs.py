@@ -167,7 +167,7 @@ class BasicTests(unittest.TestCase):
         # CASE 1 (not logged in): Make sure the page contains a form field.
         response = self.app.get('/login', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        check_output(self, str(response.data), ['<form class="form-signin"', "Your login name", "Your password"])
+        check_output(self, response.data, ['<form class="form-signin"', "Your login name", "Your password"])
 
         # CASE 2 (invalid data): Provide incorrect credentials (wrong username)
         form = {
@@ -176,7 +176,7 @@ class BasicTests(unittest.TestCase):
             'remember': True
         }
         response = self.app.post('/login', follow_redirects=True, data=form)
-        check_output(self, str(response.data), ["Invalid username."])
+        check_output(self, response.data, ["Invalid username."])
 
         # CASE 3 (invalid data): Provide incorrect credentials (correct username, invalid password)
         form = {
@@ -185,7 +185,7 @@ class BasicTests(unittest.TestCase):
             'remember': True
         }
         response = self.app.post('/login', follow_redirects=True, data=form)
-        check_output(self, str(response.data), ["Invalid password."])
+        check_output(self, response.data, ["Invalid password."])
 
         # CASE 4: (login in as disabled account)
         form = {
@@ -194,7 +194,7 @@ class BasicTests(unittest.TestCase):
             'remember': True
         }
         response = self.app.post('/login', follow_redirects=True, data=form)
-        check_output(self, str(response.data), ["Account disabled."])
+        check_output(self, response.data, ["Account disabled."])
 
         # CASE 5: login successful
         form = {
@@ -203,7 +203,7 @@ class BasicTests(unittest.TestCase):
             'remember': False
         }
         response = self.app.post('/login', follow_redirects=True, data=form)
-        check_output(self, str(response.data), ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
+        check_output(self, response.data, ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
 
 if __name__ == "__main__":
     unittest.main()
