@@ -317,6 +317,7 @@ class Repository:
     def read_stations(self, limit=100, offset=0) -> Sequence[Station]:
         q = ("SELECT s.station_id, s.name, s.lon, s.lat, s.descr, s.config, s.registered "
             "FROM stations s "
+            "ORDER BY s.station_id "
             "LIMIT %s OFFSET %s;")
 
         cursor = self._cursor
@@ -354,6 +355,7 @@ class Repository:
              "FROM stations s "
              "LEFT JOIN observations o ON s.station_id = o.station_id "
              "GROUP BY s.station_id "
+             "ORDER BY s.station_id "
              "LIMIT %s OFFSET %s;")
         cursor = self._cursor
         cursor.execute(q, (limit, offset,))
