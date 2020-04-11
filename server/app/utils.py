@@ -42,7 +42,7 @@ def get_footer():
         with open(commit_path, 'r') as f:
             return {
                 'commit': f.read().strip(),
-                'timestamp': datetime.fromtimestamp(path.getmtime(COMMIT_FILE)).isoformat(" ", "minutes")
+                'timestamp': datetime.fromtimestamp(path.getmtime(commit_path)).isoformat(" ", "minutes")
             }
     except OSError:
         # The file was not found or is generally inaccessible. Return nothing.
