@@ -341,6 +341,8 @@ class RepositoryPostgresTests(unittest.TestCase):
         observations = repository.read_observations(filters=filters)
         self.assertEqual(len(observations), 1)
         self.assertEqual(observations[0]["obs_id"], 751)
+
+    @use_repository
     def test_user(self, repository: Repository):
         """Test if user data can be retrieved automatically."""
 
