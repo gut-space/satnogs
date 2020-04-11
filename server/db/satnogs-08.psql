@@ -1,0 +1,19 @@
+
+-- Create enum. Using enums may be a bit tricky. But let's see how it works out.
+CREATE TYPE user_type AS ENUM (
+    'regular',  -- normal user who just created account
+    'owner',    -- station owner
+    'admin',    -- admin
+    'banned');  -- someone we don't like anymore
+
+-- Add a table to store users
+CREATE TABLE users (
+    id SERIAL primary key,
+    username VARCHAR(32),
+    digest VARCHAR(128) NOT NULL, -- length of SHA256 digest is 32 bytes, but we're using whatever was returned by werkzeug.security
+    email VARCHAR(128),
+    role user_type DEFAULT 'regular'
+);
+
+-- We're at 8 already.
+UPDATE schema SET version = 8;
