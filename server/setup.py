@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import datetime
-from os import getcwd, path, makedirs
+from os import getcwd, path, makedirs, environ
 import shutil
 
 from setuptools import setup, find_packages
@@ -36,6 +36,8 @@ def backup_database():
     now = datetime.datetime.utcnow()
     timestamp_filename="satnogs-gut-%s.backup" % (now.isoformat())
     backup_path = path.join(backup_dir, timestamp_filename)
+    env = environ.copy()
+    env["PGPASSWORD"] = db["password"]
     subprocess.check_call(
         ["pg_dump",
          "--host", db["host"],
@@ -46,9 +48,7 @@ def backup_database():
          "--compress", "8",
          "--no-password",
          "--file", backup_path
-        ], env={
-            "PGPASSWORD": db["password"]
-        }
+        ], env=env
     )
     if not path.exists(backup_path):
         raise FileNotFoundError(backup_path)
