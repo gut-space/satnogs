@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
-from os import getcwd, path
+import datetime
+from os import getcwd, path, makedirs
 import shutil
 
 from setuptools import setup, find_packages
@@ -17,11 +17,45 @@ setup(name='satnogs-server',
 )
 
 # STEP 2: ensure the config is exists
-if not path.exists("satnogs.ini"):
-    shutil.copyfile("satnogs.ini.template", "satnogs.ini")
+config_path = "satnogs.ini"
+if not path.exists(config_path):
+    shutil.copyfile("satnogs.ini.template", config_path)
 
 # STEP 3: ensure the database is updated.
+def backup_database():
+    import subprocess
+    try:
+        from configparser import ConfigParser
+    except ImportError:
+        from ConfigParser import ConfigParser
+    backup_dir = "backups"
+    makedirs(backup_dir, exist_ok=True)
+    config = ConfigParser()
+    config.read(config_path)
+    db = config["database"]
+    now = datetime.datetime.utcnow()
+    timestamp_filename="satnogs-gut-%s.backup" % (now.isoformat())
+    backup_path = path.join(backup_dir, timestamp_filename)
+    subprocess.check_call(
+        ["pg_dump",
+         "--host", db["host"],
+         "--port", db.get("port", "5432"),
+         "--username", db["user"],
+         "--dbname", db["database"],
+         "--format", "c", # Custom
+         "--compress", "8",
+         "--no-password",
+         "--file", backup_path
+        ], env={
+            "PGPASSWORD": db["password"]
+        }
+    )
+    if not path.exists(backup_path):
+        raise FileNotFoundError(backup_path)
+    print("Backup created here: %s" % (backup_path,))
 
+backup_database()
+import sys
 from migrate_db import *
 migrate()
 
