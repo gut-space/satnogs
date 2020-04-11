@@ -86,6 +86,13 @@ def exclude_from_dict(d, keys: Sequence[str]):
     return [obj,] + excluded
 
 class DefaultDictWithAnyKey(defaultdict):
+    '''
+    Same as defaultdict, but always return True if you check
+    key existance. Idea: if defaultdict returns value for any
+    key then it should return that contains any key.
+    For expected work you should pass @default_factory in
+    constructor.
+    '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     def __contains__(self, item):

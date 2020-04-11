@@ -100,8 +100,17 @@
 
 {% endblock %}
 
+{% block addToHead %}
+<style>
+    /* Fix incorrect vertical align in date inputs in Bootstrap. */
+    input[type=date].form-control {
+        line-height: 1.42857143; /* Bootstrap 3 default value */
+    }
+</style>
+{% endblock %}
+
 {% block scripts %}
-<script defer>
+<script>
     const form = document.getElementById("search-form");
 
     function getFormControls()
@@ -109,7 +118,7 @@
         return form.querySelectorAll("input, select");
     }
 
-    function disableNonEmptyControls()
+    function disableEmptyControls()
     {
         const controls = getFormControls();
         for (let i=0; i < controls.length; i++)
@@ -165,7 +174,7 @@
             ev.stopPropagation();
             return;
         }
-        disableNonEmptyControls();
+        disableEmptyControls();
     }
     form.onreset = function(ev) {
         const controls = getFormControls();
@@ -176,7 +185,7 @@
         }
         ev.preventDefault();
         ev.stopPropagation();
-        disableNonEmptyControls();
+        disableEmptyControls();
         form.submit();
     }
 </script>

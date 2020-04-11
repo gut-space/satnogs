@@ -1,6 +1,5 @@
 from sys import exit
 import os
-import traceback
 from typing import Tuple, List
 
 try:

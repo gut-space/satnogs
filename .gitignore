@@ -11,3 +11,6 @@ venv
 /server/data/
 /server/build/
 /server/cache_tmp/
+/server/backups/
+/server/satnogs_server.egg-info/
+/server/dist/
