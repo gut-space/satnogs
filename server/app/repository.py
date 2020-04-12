@@ -406,15 +406,13 @@ class Repository:
         raise LookupError("can't convert %s to any known user roles." % role)
 
     @use_cursor
-    def read_user(self, id: int = 0, username: str = "") -> Optional[User]:
-        if id:
+    def read_user(self, user: Union[int, str]) -> Optional[User]:
+        if type(user) == int:
             query = "SELECT id, username, digest, email, role FROM users WHERE id = %s"
-            cursor = self._cursor
-            cursor.execute(query, (id,))
-        elif username:
+        else:
             query = "SELECT id, username, digest, email, role FROM users WHERE username = %s"
-            cursor = self._cursor
-            cursor.execute(query, (username,))
+        cursor = self._cursor
+        cursor.execute(query, (user,))
 
         row = cursor.fetchone()
         u = None

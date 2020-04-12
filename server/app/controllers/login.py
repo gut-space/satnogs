@@ -62,7 +62,7 @@ def login():
 
         repository = Repository()
 
-        user = repository.read_user(username=form.username.data)
+        user = repository.read_user(user=form.username.data)
 
         if user is None:
             app.logger.info("Login failed: invalid username: %s" % form.username.data)
@@ -95,7 +95,7 @@ lm = LoginManager(app)
 @lm.user_loader
 def load_user(user_id):
     rep = Repository()
-    u = rep.read_user(id=user_id)
+    u = rep.read_user(user=user_id)
     if u:
         return ApplicationUser(u)
     return None

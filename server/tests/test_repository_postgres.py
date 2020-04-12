@@ -347,19 +347,19 @@ class RepositoryPostgresTests(unittest.TestCase):
     def test_user(self, repository: Repository):
         """Test if user data can be retrieved automatically."""
 
-        nonexistent = repository.read_user(username="notfound")
+        nonexistent = repository.read_user(user="notfound")
         self.assertIsNone(nonexistent)
 
-        nonexistent = repository.read_user(id=5)
+        nonexistent = repository.read_user(user=5)
         self.assertIsNone(nonexistent)
 
-        user1 = repository.read_user(username="clarke")
+        user1 = repository.read_user(user="clarke")
         self.assertEqual(user1['username'], 'clarke')
         self.assertEqual(user1['digest'], 'pbkdf2:sha256:150000$Ij6XJyek$d6a0cd085e6955843a9c3224ccf24088852207d55bb056aa0b544168f94860b8') # sha256('password')
         self.assertEqual(user1['email'], 'acc@gmail.com')
         self.assertEqual(user1['role'], UserRole.ADMIN)
 
-        user2 = repository.read_user(id=3)
+        user2 = repository.read_user(user=3)
         self.assertEqual(user2['username'], 'clarke')
         self.assertEqual(user2['digest'], 'pbkdf2:sha256:150000$Ij6XJyek$d6a0cd085e6955843a9c3224ccf24088852207d55bb056aa0b544168f94860b8') # sha256('password')
         self.assertEqual(user2['email'], 'acc@gmail.com')
@@ -368,13 +368,13 @@ class RepositoryPostgresTests(unittest.TestCase):
         self.assertEqual(user1, user2)
 
         # UserRole field is enum, better be safe and check all possible combinations.
-        user = repository.read_user(username='asimov')
+        user = repository.read_user(user='asimov')
         self.assertEqual(user['role'], UserRole.REGULAR)
 
-        user = repository.read_user(username='baxter')
+        user = repository.read_user(user='baxter')
         self.assertEqual(user['role'], UserRole.OWNER)
 
-        user = repository.read_user(username='lem')
+        user = repository.read_user(user='lem')
         self.assertEqual(user['role'], UserRole.BANNED)
 
     @use_repository
