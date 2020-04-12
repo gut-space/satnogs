@@ -165,7 +165,7 @@ class BasicTests(unittest.TestCase):
         """Tests login mechanism (invalid username, password, disabled account, successful login)."""
 
         # CASE 1 (not logged in): Make sure the page contains a form field.
-        response = self.app.get('/login', follow_redirects=True)
+        response = self.app.post('/login', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         check_output(self, response.data, ['<form class="form-signin"', "Your login name", "Your password"])
 
@@ -203,6 +203,17 @@ class BasicTests(unittest.TestCase):
             'remember': False
         }
         response = self.app.post('/login', follow_redirects=True, data=form)
+        # After loging is successful, the user is redirected to main page. It should show username
+        # on the navbar.
+        check_output(self, response.data, ["Login (clarke)"])
+
+        # However, we want to check that the users data is displayed properly. After logging in, the
+        # user should be able to go to login page to see his own details.
+        response = self.app.post('/login', follow_redirects=True, data=form)
+        check_output(self, response.data, ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
+
+        # The login information should be remembered, no need to pass the data every time.
+        response = self.app.post('/login', follow_redirects=True)
         check_output(self, response.data, ["Welcome, clarke!", "Your user-id is 3", "Your role is ADMIN"])
 
 if __name__ == "__main__":
