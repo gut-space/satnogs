@@ -7,7 +7,7 @@ from pytest import raises
 
 import testing.postgresql
 
-from tests.utils import standard_seed_db
+from tests.test_utils import standard_seed_db
 from app.repository import (Observation, ObservationFile, ObservationFileId, ObservationFilter, ObservationId, Repository, SatelliteId, StationId,
     Station, Observation, Satellite, StationStatistics, User, UserRole)
 
