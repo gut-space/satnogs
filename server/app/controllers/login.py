@@ -18,7 +18,7 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField("Sign In")
 
-class SatnogsUser(UserMixin):
+class ApplicationUser(UserMixin):
 
     # The following fields are useful for Flask-login
     # It's basically a reimplementation of UserMixin
@@ -72,7 +72,7 @@ def login():
             flash("Invalid username.")
             return redirect(url_for("login"))
 
-        u = SatnogsUser(user)
+        u = ApplicationUser(user)
         if not u.check_password(form.password.data):
             app.logger.info("Login failed: invalid password %s for user %s" % (form.password.data, form.username.data))
             flash("Invalid password.")
@@ -100,7 +100,7 @@ def load_user(user_id):
     rep = Repository()
     u = rep.read_user(id=user_id)
     if u:
-        return SatnogsUser(u)
+        return ApplicationUser(u)
     return None
 
 @app.route("/logout")
