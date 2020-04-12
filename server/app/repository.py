@@ -17,6 +17,7 @@ else:
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from app.utils import first
 
 # Data model
 
@@ -397,9 +398,9 @@ class Repository:
 
     def user_role_to_enum(self, role: str) -> UserRole:
         """Converts string to UserRole enum"""
-        for u in UserRole:
-            if u.name == role.upper():
-                return u
+        u = first(lambda u: u.name == role.upper(), UserRole)
+        if u is not None:
+            return u
 
         # Rage quit if we're not able to figure the role out
         raise LookupError("can't convert %s to any known user roles." % role)
