@@ -2,7 +2,7 @@
 
 # Users Management
 
-Users information has been introduced in [schema update 07](../server/db/satnogs-07.psql). There's a new table that holds
+Users information has been introduced in [schema update 07](../server/db/satnogs-08.psql). There's a new table that holds
 user-id, username, salted SHA256 digest, and user role. Until we add flask-admin (or some other management panel), the
 process of adding new users is manual.
 
@@ -14,9 +14,9 @@ To add a new user:
 
 ```sql
 INSERT INTO users(id, username, digest, email, role)
-VALUES(1, 
-       'admin', 
-       'pbkdf2:sha256:150000$kTuJClSh$2e93de2d7a169df346a577a24ccc85c2cf1ff62e5a64f944a301cda76ce39c68', 
+VALUES(1,
+       'admin',
+       'pbkdf2:sha256:150000$kTuJClSh$2e93de2d7a169df346a577a24ccc85c2cf1ff62e5a64f944a301cda76ce39c68',
        'spam@wp.pl',
        'admin');
 ```
