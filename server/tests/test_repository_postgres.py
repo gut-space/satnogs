@@ -3,6 +3,7 @@ import os
 from typing import Tuple
 import unittest
 from functools import wraps
+from pytest import raises
 
 import testing.postgresql
 
@@ -375,3 +376,14 @@ class RepositoryPostgresTests(unittest.TestCase):
 
         user = repository.read_user(username='lem')
         self.assertEqual(user['role'], UserRole.BANNED)
+
+    @use_repository
+    def test_user_role(self, repository: Repository):
+        """Tests conversion of string to user roles."""
+        self.assertEqual(repository.user_role_to_enum('REGULAR'), UserRole.REGULAR)
+        self.assertEqual(repository.user_role_to_enum('OWNER'), UserRole.OWNER)
+        self.assertEqual(repository.user_role_to_enum('ADMIN'), UserRole.ADMIN)
+        self.assertEqual(repository.user_role_to_enum('BANNED'), UserRole.BANNED)
+
+        with raises(LookupError) as e:
+            repository.user_role_to_enum('moderator') # no such role

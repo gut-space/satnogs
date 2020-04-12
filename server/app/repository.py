@@ -401,8 +401,8 @@ class Repository:
             if u.name == role.upper():
                 return u
 
-        # If we were not able to figure out, let's assume it's a regular user
-        return UserRole.REGULAR
+        # Rage quit if we're not able to figure the role out
+        raise LookupError("can't convert %s to any known user roles." % role)
 
     @use_cursor
     def read_user(self, id: int = 0, username: str = "") -> Optional[User]:
