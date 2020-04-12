@@ -27,6 +27,7 @@ def tearDownModule():
 IMAGE_ROOT = "tests/images"
 LOG_FILE = "test.log"
 
+# Setting the secret is necessary for storing login details is a session.
 app.config["SECRET_KEY"] = "test secret"
 
 class BasicTests(unittest.TestCase):
