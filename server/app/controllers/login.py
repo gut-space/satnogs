@@ -24,12 +24,9 @@ class ApplicationUser(UserMixin):
     # It's basically a reimplementation of UserMixin
 
     def __init__(self, user):
-        # I'm sure there's easier way to do it. There's some magic involving **...
-        self.id = user["id"]
-        self.username = user["username"]
-        self.digest = user["digest"]
-        self.email = user["email"]
-        self.role = user["role"]
+        # Copy id, username, digest, email, role fields
+        for key, value in user.items():
+            setattr(self, key, value)
         self.auth = False
 
     def check_digest(self, digest: str):
