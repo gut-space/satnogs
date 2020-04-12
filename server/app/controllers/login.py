@@ -93,9 +93,9 @@ def login():
 
     return render_template("login.html", form=form)
 
-login = LoginManager(app)
+lm = LoginManager(app)
 
-@login.user_loader
+@lm.user_loader
 def load_user(user_id):
     rep = Repository()
     u = rep.read_user(id=user_id)
