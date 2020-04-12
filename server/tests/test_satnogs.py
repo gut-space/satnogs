@@ -11,7 +11,7 @@ import testing.postgresql
 from app import app
 from app.hmac_token import get_authorization_header_value
 from app.repository import Repository
-from tests.utils import standard_seed_db, check_output
+from tests.test_utils import standard_seed_db, check_output
 
 Postgresql: testing.postgresql.PostgresqlFactory
 
