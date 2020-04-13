@@ -16,8 +16,9 @@ git reset --hard
 
 # Disabled for testing. The problem with testing is that if this
 # checks out master, then there's no way to test this change on
-# a branch. As such, this fill be uncommented only AFTER this
+# a branch. As such, this should be uncommented only AFTER this
 # update procedure is merged to master.
+
 #git checkout master
 
 # This will wipe all non-tracked files. It's a bit much.
