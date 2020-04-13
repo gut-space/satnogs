@@ -23,7 +23,7 @@ Work in progress and plans for the next couple weeks:
 - user management
 - automated updates for the station
 
-# Links
+# Documentation
 
 - [Installation](doc/install.md)
 - [Architecture](doc/arch.md)
