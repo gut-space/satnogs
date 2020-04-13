@@ -22,6 +22,8 @@ Work in progress and plans for the next couple weeks:
 - fly-over (azimuth/elevation) charts
 - user management
 - automated updates for the station
+- quality assessment for decoded images
+- georeferencing
 
 # Documentation
 
