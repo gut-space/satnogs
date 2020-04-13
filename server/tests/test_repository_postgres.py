@@ -179,8 +179,8 @@ class RepositoryPostgresTests(unittest.TestCase):
         self.assertEqual(station['lat'], 54.352469)
         self.assertEqual(station['config'], 'WiMo TA-1 antenna (omni), RTL-SDR v3, Raspberry Pi 4B')
         self.assertEqual(station['registered'], datetime.datetime(2019, 12, 15, 8, 54, 53))
-        self.assertEqual(count, 3) # Number of observations
-        self.assertEqual(last_obs_date, datetime.datetime(2020, 3, 8, 17, 39, 6, 960326)) # Last observation.
+        self.assertEqual(count, 4) # Number of observations
+        self.assertEqual(last_obs_date, datetime.datetime(2020, 4, 12, 9, 17, 6, 466954)) # Last observation.
 
     def check_station2(self, station: Station, stat: StationStatistics):
         """Check if returned parameters match station-id=2 defined in tests/db-data.psql"""
@@ -279,13 +279,13 @@ class RepositoryPostgresTests(unittest.TestCase):
     @use_repository
     def test_observations_count(self, repository: Repository):
         count = repository.count_observations()
-        self.assertEqual(count, 3)
+        self.assertEqual(count, 4)
 
     @use_repository
     def test_observations_limit_and_offset(self, repository: Repository):
         observations = repository.read_observations(limit=2, offset=1)
         self.assertEqual(len(observations), 2)
-        self.assertEqual([o["obs_id"] for o in observations], [751, 750])
+        self.assertEqual([o["obs_id"] for o in observations], [752, 751])
 
     @use_repository
     def test_observations_filters(self, repository: Repository):
@@ -310,14 +310,15 @@ class RepositoryPostgresTests(unittest.TestCase):
             "sat_id": SatelliteId(28654)
         }
         observations = repository.read_observations(filters=filters)
-        self.assertEqual(len(observations), 1)
-        self.assertEqual(observations[0]["obs_id"], 752)
+        self.assertEqual(len(observations), 2)
+        self.assertEqual(observations[0]["obs_id"], 1276)
+        self.assertEqual(observations[1]["obs_id"], 752)
 
         filters = {
             "station_id": StationId(1)
         }
         observations = repository.read_observations(filters=filters)
-        self.assertEqual(len(observations), 3)
+        self.assertEqual(len(observations), 4)
 
         filters = {
             "notes": "ote"
@@ -330,8 +331,9 @@ class RepositoryPostgresTests(unittest.TestCase):
             "has_tle": True
         }
         observations = repository.read_observations(filters=filters)
-        self.assertEqual(len(observations), 1)
+        self.assertEqual(len(observations), 2) # obs 751 and 1276
         self.assertIsNotNone(observations[0]["tle"])
+        self.assertIsNotNone(observations[1]["tle"])
 
         filters = {
             "sat_id": SatelliteId(25338),
@@ -385,5 +387,5 @@ class RepositoryPostgresTests(unittest.TestCase):
         self.assertEqual(repository.user_role_to_enum('ADMIN'), UserRole.ADMIN)
         self.assertEqual(repository.user_role_to_enum('BANNED'), UserRole.BANNED)
 
-        with raises(LookupError) as e:
+        with raises(LookupError):
             repository.user_role_to_enum('moderator') # no such role
