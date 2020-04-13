@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # This script generates fly-over charts for observations that have TLE
 # information recorded.
 
@@ -13,17 +11,22 @@ if __name__ == '__main__':
     repository = Repository()
     observation_count = repository.count_observations()
 
+    print("There are a total of %d observations" % observation_count)
+
     STEP = 100
     limit = STEP
     offset = 0
     index = 0
 
-    while limit < observation_count:
+    while offset < observation_count:
         # ToDo: Add filtration when MR with filtration will be merged.
         observations = repository.read_observations(limit=limit, offset=offset)
 
+        print("Processing batch of %d observations" % len(observations))
+
         for observation in observations:
-            if observation.tle is None:
+            if observation['tle'] is None:
+                print("No TLE info for observation %d, skipping." % observation['obs_id'])
                 continue
             station_id = observation["station_id"]
             if station_id in stations:
@@ -31,6 +34,7 @@ if __name__ == '__main__':
             else:
                 station = repository.read_station(station_id)
                 stations[station_id] = station
+
 
             make_charts(observation, station)
             index += 1
