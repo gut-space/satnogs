@@ -14,12 +14,14 @@ As of April 2020, the following features are working:
 - Automated reception and transmission decoding for NOAA-15, NOAA-18 and NOAA-19 satellites (APT)
 - Support for Meteor M2 transmissions (LRPT)
 - Transmissions are decoded and uploaded automatically to our content server (see https://satnogs.klub.com.pl)
+- automated updates for the server
 
 Work in progress and plans for the next couple weeks:
 
 - record TLE
 - fly-over (azimuth/elevation) charts
 - user management
+- automated updates for the station
 
 # Links
 
