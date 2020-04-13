@@ -6,6 +6,8 @@ Users information has been introduced in [schema update 08](../server/db/satnogs
 user-id, username, salted SHA256 digest, and user role. Until we add flask-admin (or some other management panel), the
 process of adding new users is manual.
 
+This is pretty basic for now. One day we will add a capability for the user registration.
+
 To add a new user:
 
 1. log into the server using ssh
