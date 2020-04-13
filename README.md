@@ -30,6 +30,6 @@ Work in progress and plans for the next couple weeks:
 - [Installation](doc/install.md)
 - [Architecture](doc/arch.md)
 - [User Management](doc/users.md)
-- [Project report](doc/prototype-phase/satnogs-gdn-report.pdf)
+- [Project report](doc/prototype-phase/satnogs-gdn-report.pdf) - a report from the early days when this was a team university project
 - [Project poster 1](doc/prototype-phase/poster1-pl.jpg)
 - [Project poster 2](doc/prototype-phase/poster2-en.jpg)
