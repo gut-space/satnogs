@@ -2,7 +2,7 @@
 
 # Users Management
 
-Users information has been introduced in [schema update 07](../server/db/satnogs-08.psql). There's a new table that holds
+Users information has been introduced in [schema update 08](../server/db/satnogs-08.psql). There's a new table that holds
 user-id, username, salted SHA256 digest, and user role. Until we add flask-admin (or some other management panel), the
 process of adding new users is manual.
 
