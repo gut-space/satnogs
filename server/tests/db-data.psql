@@ -17,6 +17,13 @@ INSERT INTO public.observations (obs_id, aos, tca, los, sat_id, thumbnail, notes
 (751, '2020-03-08 16:17:02.639337', '2020-03-08 16:17:25.567890', '2020-03-08 16:32:56.1666',   25338, 'thumb-72e94349-19ad-428c-b812-526971705607-NOAA 15_2020-03-08T16:32:56.166600_apt.png', NULL, NULL, '{ "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927", "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"}', 1),
 (752, '2020-03-08 17:24:02.088677', '2020-03-08 17:34:56.789012', '2020-03-08 17:39:06.960326', 28654, 'thumb-f6b927bf-1472-4ea6-8657-48265cfae5ca-NOAA 18_2020-03-08T17:39:06.960326_apt.png', 'Note', NULL, NULL, 1);
 
+-- Add observation 1276 (this one is special for two reasons: excellent reception and visible several countries,
+-- which makes it particularly good for experiments with rectification and georeferencing)
+INSERT INTO public.observations (obs_id, aos, tca, los, sat_id, notes, config, tle, station_id, thumbnail) VALUES
+(1276, '2020-04-12 09:01:03.063476', '2020-04-12 09:01:03.063476', '2020-04-12 09:17:06.466954', 28654, '', NULL, '{"1 28654U 05018A   20098.54037539  .00000075  00000-0  65128-4 0  9992","2 28654  99.0522 154.2797 0015184  73.2195 287.0641 14.12501077766909"}', 1, 'thumb-7ee1c350-09e8-49f0-9826-ca504c5543bf-ab802ca1-419f-418a-aeea-d99bb9c702aa-0-1c60fdf5-3f18-409d-9834-17f014c608c1_product.png');
+INSERT INTO public.observation_files (obs_file_id, filename, media_type, obs_id)
+VALUES (1069, 'ab802ca1-419f-418a-aeea-d99bb9c702aa-0-1c60fdf5-3f18-409d-9834-17f014c608c1_product.png', 'image/png', 1276);
+
 INSERT INTO public.station_photos (photo_id, station_id, sort, filename, descr) VALUES
 (1, 1, 1, 'wimo-ta1-antenna.jpg	WiMo antenna', NULL),
 (2, 1, 2, 'malina4.jpg	Pi + SDR module', NULL);
