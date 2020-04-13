@@ -19,6 +19,7 @@ As of March 2020, the following features are working:
 
 - [Installation](doc/install.md)
 - [Architecture](doc/arch.md)
+- [User Management](doc/users.md)
 - [Project report](doc/prototype-phase/satnogs-gdn-report.pdf)
 - [Project poster 1](doc/prototype-phase/poster1-pl.jpg)
 - [Project poster 2](doc/prototype-phase/poster2-en.jpg)
