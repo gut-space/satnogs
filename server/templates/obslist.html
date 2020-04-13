@@ -64,6 +64,7 @@
         <th><abbr title="Time of closest approach">TCA</abbr></th>
         <th><abbr title="Loss of Signal">LOS</abbr></th>
         <th>Satellite</th>
+        <th><abbr title="Two Line Element">TLE</abbr></th>
         <th>Station</th>
         <th>Image</th>
     </tr>
@@ -71,12 +72,23 @@
         <tr>
             <td><a href="/obs/{{ obs.obs_id }}">{{ obs.obs_id }}</a></td>
             <td>{{ obs.aos }}</td>
-            <td>{{ obs.tca }}</td>
+            <td>{{ obs.tca }} {% if obs.aos == obs.tca %}
+                <abbr title="TCA is equal to AOS, which looks suspicious."><span class="glyphicon text-warning glyphicon-question-sign"></span></abbr>
+                {% endif %}
+            </td>
             <td>{{ obs.los }}</td>
             <td>
                 <a href="https://www.n2yo.com/satellite/?s={{ obs.sat_id }}">
                     {{ obs.sat_name }}
                 </a>
+            </td>
+            <td>
+                {% if obs.tle %}
+                <span class="tle glyphicon text-success glyphicon-ok" data-toggle="tooltip" data-html="true" boundary="window"
+                      title="<b>TLE</b><br/>{{ obs.tle[0]}}<br/>{{ obs.tle[1] }}"></span>
+                {% else %}
+                <span class="glyphicon text-danger glyphicon-remove"></span>
+                {% endif %}
             </td>
             <td>
                 <a href="/station/{{ obs.station_id }}">
@@ -150,7 +162,7 @@
 
         const from_input = form.querySelector("input[name=los_after]");
         const to_input = form.querySelector("input[name=aos_before]");
-        
+
         if (from_input.value != "" && to_input.value != "") {
             const from_date = new Date(from_input.value);
             const to_date = new Date(to_input.value);

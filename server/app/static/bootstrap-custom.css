@@ -1,0 +1,15 @@
+.tooltip-inner {
+    min-width: 480px; /* the minimum width */
+}
+
+.text-danger {
+    color: red
+}
+
+.text-success {
+    color: rgb(0,180, 0)
+}
+
+.text-warning {
+    color: orange
+}
