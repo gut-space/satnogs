@@ -18,8 +18,8 @@
             <td><a href="/station/{{ s.station_id }}">{{ s.name }}</a></td>
             <td>{{ s.coords }}</td>
             <td>{{ s.cnt }} [<a href="/obslist?station_id={{s.station_id}}">list</a>]</td>
-            <td>{{ s.registered }}</td>
-            <td>{{ s.lastobs }}</td>
+            <td>{{ s.registered.isoformat(" ", "seconds") }}</td>
+            <td>{% if s.lastobs %} {{ s.lastobs.isoformat(" ", "seconds") }} {% else %}None{% endif %}</td>
         </tr>
     {% endfor %}
 </table>
