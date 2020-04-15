@@ -71,14 +71,14 @@
     {% for obs in obslist %}
         <tr>
             <td><a href="/obs/{{ obs.obs_id }}">{{ obs.obs_id }}</a></td>
-            <td>{{ obs.aos.isoformat(" ", "seconds") }}</td>
-            <td>{{ obs.tca.isoformat(" ", "seconds") }} {% if obs.aos == obs.tca %}
+            <td>{{ obs.aos|datetime }}</td>
+            <td>{{ obs.tca|datetime }} {% if obs.aos == obs.tca %}
                 <abbr title="TCA is equal to AOS, which looks suspicious. Corrected rough estimate is shown below in parentheses.">
                     <span class="glyphicon text-warning glyphicon-question-sign"></span></abbr>
-                <br/>({{ (obs.aos + (obs.los - obs.aos)/2).isoformat(" ", "seconds") }})
+                <br/>({{ (obs.aos + (obs.los - obs.aos)/2)|datetime }})
                 {% endif %}
             </td>
-            <td>{{ obs.los.isoformat(" ", "seconds") }}</td>
+            <td>{{ obs.los|datetime }}</td>
             <td>
                 <a href="https://www.n2yo.com/satellite/?s={{ obs.sat_id }}">
                     {{ obs.sat_name }}

@@ -15,11 +15,16 @@ def url_page(url: str, page: int, param_name: str):
     """
     scheme, netloc, path, query_string, fragment = urlsplit(url)
     query_params = parse_qsl(query_string)
-    
+
     page_param = first(lambda p: p[0] == param_name, query_params)
     if page_param is not None:
         query_params.remove(page_param)
     query_params.append((param_name, str(page)))
-    
+
     new_query_string = urlencode(query_params, doseq=True)
     return urlunsplit((scheme, netloc, path, new_query_string, fragment)) # type: ignore
+
+@app.template_filter()
+def datetime(value):
+    """Given a datetime, it format the out to use yyyy-mm-dd hh:mm:ss format"""
+    return value.isoformat(" ", "seconds")

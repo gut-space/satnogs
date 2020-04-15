@@ -19,7 +19,7 @@
             <td>{{ s.coords }}</td>
             <td>{{ s.cnt }} [<a href="/obslist?station_id={{s.station_id}}">list</a>]</td>
             <td>{{ s.registered.isoformat(" ", "seconds") }}</td>
-            <td>{% if s.lastobs %} {{ s.lastobs.isoformat(" ", "seconds") }} {% else %}None{% endif %}</td>
+            <td>{% if s.lastobs %} {{ s.lastobs|datetime }} {% else %}None{% endif %}</td>
         </tr>
     {% endfor %}
 </table>
