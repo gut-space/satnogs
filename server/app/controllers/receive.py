@@ -143,6 +143,7 @@ def receive(station_id: str, args: RequestArguments):
         }
 
         obs_id = repository.insert_observation(observation)
+        observation["obs_id"] = obs_id
 
         for filename, file_ in file_entries:
             observation_file: ObservationFile = {

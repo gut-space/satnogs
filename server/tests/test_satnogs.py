@@ -113,7 +113,10 @@ class BasicTests(unittest.TestCase):
         )
         self.assertEqual(file_count(IMAGE_ROOT), 2)
         self.assertEqual(file_count(os.path.join(IMAGE_ROOT, "thumbs")), 1)
-        self.assertEqual(file_count(os.path.join(IMAGE_ROOT, "charts")), 2)
+        chart_dir = os.path.join(IMAGE_ROOT, "charts")
+        self.assertEqual(file_count(chart_dir), 2)
+        chart_files = sorted(os.listdir(chart_dir))
+        self.assertEqual(chart_files, ["by_time-1.png", "polar-1.png"])
         # Todo: Need to check if the DB entries have been added.
 
         # Check if there are appropriate entries in the log file.
