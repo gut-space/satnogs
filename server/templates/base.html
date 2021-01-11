@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 {% block head %}
-  <title>SATNOGS-GDN: {% block title %}{% endblock %}</title>
+  <title>AQUARIUS: {% block title %}{% endblock %}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
@@ -55,7 +55,7 @@
     <div class="container">{% block content %}{% endblock %}</div>
     <div id="footer" class="text-center">
         {% block footer %}
-        &copy; Copyright 2020 by SATNOGS-GDN.
+        &copy; Copyright 2020 by AQUARIUS.
         {% if footer %}
         Version <a href="https://github.com/gut-space/satnogs/commit/{{ footer.commit }}">{{ footer.commit }}</a>,
         updated on {{ footer.timestamp }}
