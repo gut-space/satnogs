@@ -8,7 +8,7 @@ Project founders: [Sławek Figiel](https://github.com/fivitti) and [Tomek Mrugal
 
 # Project status
 
-This is an old, unmaintaned fork. For up to date code, see https://github.com/gut-space/aquarius
+This is an old, unmaintaned fork. For up to date code, see https://github.com/gut-space/svarog
 
 # Documentation (old)
 
