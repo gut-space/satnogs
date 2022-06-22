@@ -12,15 +12,15 @@ click==7.0
     # via flask
 cycler==0.10.0
     # via matplotlib
-flask-login==0.5.0
-    # via -r requirements.in
-flask-wtf==0.14.3
-    # via -r requirements.in
 flask==1.1.1
     # via
     #   -r requirements.in
     #   flask-login
     #   flask-wtf
+flask-login==0.5.0
+    # via -r requirements.in
+flask-wtf==0.14.3
+    # via -r requirements.in
 idna==2.9
     # via requests
 itsdangerous==1.1.0
@@ -37,14 +37,14 @@ marshmallow==3.5.0
     # via webargs
 matplotlib==3.2.1
     # via -r requirements.in
-numpy==1.18.2
+numpy==1.22.0
     # via
     #   matplotlib
     #   orbit-predictor
 orbit-predictor==1.12.0
     # via -r requirements.in
 pg8000==1.14.1
-    # via testing.postgresql
+    # via testing-postgresql
 psycopg2==2.8.4
     # via -r requirements.in
 pyparsing==2.4.6
@@ -66,9 +66,9 @@ six==1.14.0
     # via
     #   cycler
     #   python-dateutil
-testing.common.database==2.0.3
-    # via testing.postgresql
-testing.postgresql==1.3.0
+testing-common-database==2.0.3
+    # via testing-postgresql
+testing-postgresql==1.3.0
     # via -r requirements.in
 typing-extensions==3.7.4.1
     # via -r requirements.in
